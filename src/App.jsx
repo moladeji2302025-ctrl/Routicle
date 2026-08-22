@@ -2,6 +2,7 @@ import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import ProductShowcase from './components/ProductShowcase'
 import Capabilities from './components/Capabilities'
+import Stats from './components/Stats'
 import FeedFilters from './components/FeedFilters'
 import FeedGrid from './components/FeedGrid'
 import Comparison from './components/Comparison'
@@ -18,6 +19,7 @@ export default function App() {
         <Hero />
         <ProductShowcase />
         <Capabilities />
+        <Stats />
         <FeedFilters />
         <FeedGrid items={FEED_ITEMS} />
         <Comparison />
