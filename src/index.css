@@ -742,11 +742,10 @@ a:hover {
 
 .bento-grid {
   display: grid;
-  grid-template-columns: 1fr 1.3fr 1fr;
-  grid-template-rows: auto auto;
+  grid-template-columns: 1fr 1fr;
   grid-template-areas:
-    'tall wide wide'
-    'tall maroon teal';
+    'wide wide'
+    'maroon teal';
   gap: 16px;
 }
 
@@ -771,16 +770,6 @@ a:hover {
   line-height: 1.5;
   margin: 0;
   max-width: 300px;
-}
-
-.bento-tall {
-  grid-area: tall;
-  background: oklch(0.95 0.003 90);
-  color: oklch(0.16 0.004 90);
-}
-
-.bento-tall .bento-desc {
-  color: oklch(0.5 0.006 90);
 }
 
 .bento-wide {
@@ -814,73 +803,6 @@ a:hover {
   color: oklch(0.8 0.03 220);
 }
 
-.mini-app {
-  margin-top: 16px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: oklch(0.99 0.002 90);
-  border: 1px solid oklch(0.9 0.003 90);
-  border-radius: 13px;
-  padding: 12px;
-  min-height: 300px;
-}
-
-.mini-app-tabs {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 9px;
-}
-
-.mini-app-tab {
-  font-size: 11px;
-  font-weight: 500;
-  padding: 6px 11px;
-  border-radius: 999px;
-  color: oklch(0.5 0.006 90);
-}
-
-.mini-app-tab-active {
-  background: oklch(0.16 0.004 90);
-  color: oklch(0.99 0.002 90);
-}
-
-.mini-app-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.mini-app-tile {
-  position: relative;
-  border-radius: 9px;
-  overflow: hidden;
-  min-height: 98px;
-}
-
-.mini-app-tile-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mini-app-tile-label {
-  position: absolute;
-  left: 6px;
-  bottom: 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 9.5px;
-  font-weight: 500;
-  padding: 2px 7px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.55);
-  color: white;
-}
 
 .bento-network {
   position: relative;
@@ -1005,7 +927,6 @@ a:hover {
   .bento-grid {
     grid-template-columns: 1fr;
     grid-template-areas:
-      'tall'
       'wide'
       'maroon'
       'teal';
@@ -1159,6 +1080,10 @@ a:hover {
 }
 
 /* Feed filters */
+
+.projects-section {
+  position: relative;
+}
 
 .feed-filters {
   position: sticky;
@@ -1700,15 +1625,15 @@ a:hover {
 }
 
 .footer-wordmark {
-  font-size: clamp(96px, 14vw, 230px);
-  font-weight: 700;
-  line-height: 0.8;
-  letter-spacing: -0.03em;
-  color: oklch(0.16 0.004 90);
-  white-space: nowrap;
   overflow: hidden;
   padding-left: 40px;
   transform: translateY(30%);
+}
+
+.footer-wordmark img {
+  display: block;
+  width: clamp(420px, 60vw, 980px);
+  height: auto;
 }
 
 @media (max-width: 900px) {

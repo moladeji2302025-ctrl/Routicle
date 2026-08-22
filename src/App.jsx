@@ -20,8 +20,10 @@ export default function App() {
         <ProductShowcase />
         <Capabilities />
         <Stats />
-        <FeedFilters />
-        <FeedGrid items={FEED_ITEMS} />
+        <div className="projects-section">
+          <FeedFilters />
+          <FeedGrid items={FEED_ITEMS} />
+        </div>
         <Comparison />
         <Footer />
       </div>

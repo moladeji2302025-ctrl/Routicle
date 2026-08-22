@@ -42,7 +42,7 @@ export default function Footer() {
       </div>
 
       <Reveal as="div" className="footer-wordmark" delay={0}>
-        <span aria-hidden="true">Routicle</span>
+        <img src="/brand/routicle-wordmark-black.svg" alt="" aria-hidden="true" />
       </Reveal>
     </footer>
   )
