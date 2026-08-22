@@ -1,3 +1,5 @@
+import Reveal from './Reveal'
+
 const COLUMNS = [
   {
     heading: 'Product',
@@ -39,7 +41,9 @@ export default function Footer() {
         <p className="footer-copyright">© 2026 Routicle, Inc. All rights reserved.</p>
       </div>
 
-      <div className="footer-wordmark" aria-hidden="true">Routicle</div>
+      <Reveal as="div" className="footer-wordmark" delay={0}>
+        <span aria-hidden="true">Routicle</span>
+      </Reveal>
     </footer>
   )
 }

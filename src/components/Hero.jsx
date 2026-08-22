@@ -5,10 +5,6 @@ const PREVIEW_IMAGES = ['/images/t1.jpg', '/images/t2.jpg', '/images/t3.jpg', '/
 export default function Hero() {
   return (
     <section className="hero">
-      <div className="hero-bg-dark" />
-      <div className="hero-bg-wave" />
-      <div className="hero-bg-fade" />
-
       <div className="hero-content">
         <div className="hero-eyebrow">
           <img src="/brand/routicle-mark-violet.svg" alt="" className="hero-eyebrow-icon" />

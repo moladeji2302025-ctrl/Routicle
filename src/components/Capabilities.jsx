@@ -111,7 +111,7 @@ export default function Capabilities() {
             <img src="/images/t7.jpg" alt="" />
             <span className="bento-download-pill">Download</span>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   )

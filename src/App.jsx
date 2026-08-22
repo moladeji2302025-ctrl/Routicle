@@ -3,6 +3,7 @@ import Hero from './components/Hero'
 import ProductShowcase from './components/ProductShowcase'
 import Capabilities from './components/Capabilities'
 import FeedGrid from './components/FeedGrid'
+import Comparison from './components/Comparison'
 import Footer from './components/Footer'
 import IntroReveal from './components/IntroReveal'
 import { FEED_ITEMS } from './data/feedItems'
@@ -17,6 +18,7 @@ export default function App() {
         <ProductShowcase />
         <Capabilities />
         <FeedGrid items={FEED_ITEMS} />
+        <Comparison />
         <Footer />
       </div>
     </>

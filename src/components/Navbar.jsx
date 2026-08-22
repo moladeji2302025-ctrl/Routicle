@@ -1,8 +1,6 @@
 import { PlusIcon } from './icons'
 
-const SORTS = ['Recommended', 'Curated', 'Most appreciated', 'Most recent']
-
-export default function Navbar({ activeSort = 'Recommended' }) {
+export default function Navbar() {
   return (
     <div className="navbar">
       <div className="navbar-row">
@@ -24,16 +22,6 @@ export default function Navbar({ activeSort = 'Recommended' }) {
         </a>
         <a href="#" className="link-muted">Sign in</a>
         <a href="#" className="btn-solid">Sign up</a>
-      </div>
-
-      <div className="subnav-row">
-        <div className="sort-row">
-          {SORTS.map((sort) => (
-            <span key={sort} className={sort === activeSort ? 'sort-active' : 'sort-inactive'}>
-              {sort}
-            </span>
-          ))}
-        </div>
       </div>
     </div>
   )
