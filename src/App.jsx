@@ -8,6 +8,7 @@ import FeedGrid from './components/FeedGrid'
 import Comparison from './components/Comparison'
 import Footer from './components/Footer'
 import IntroReveal from './components/IntroReveal'
+import ScrollLines from './components/ScrollLines'
 import { FEED_ITEMS } from './data/feedItems'
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
     <>
       <IntroReveal />
       <div className="page">
+        <ScrollLines />
         <Navbar />
         <Hero />
         <ProductShowcase />
