@@ -348,47 +348,6 @@ a:hover {
   color: oklch(0.4 0.006 90);
 }
 
-.hero-app-frame {
-  position: relative;
-  z-index: 2;
-  margin-top: 40px;
-  width: min(760px, 90vw);
-  background: oklch(0.99 0.002 90);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 40px 80px -24px rgba(0, 0, 0, 0.3);
-}
-
-.hero-app-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-bottom: 1px solid oklch(0.92 0.003 90);
-  font-size: 12px;
-  font-weight: 500;
-  color: oklch(0.5 0.006 90);
-}
-
-.hero-app-bar-icon {
-  height: 13px;
-  width: auto;
-}
-
-.hero-app-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2px;
-  background: oklch(0.16 0.004 90);
-}
-
-.hero-app-grid-img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-}
-
 /* Product showcase */
 
 .showcase {
