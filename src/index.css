@@ -1161,9 +1161,14 @@ a:hover {
 /* Feed filters */
 
 .feed-filters {
+  position: sticky;
+  top: 68px;
+  z-index: 25;
   max-width: 1360px;
-  margin: 0 auto;
+  margin: 64px auto 0;
   padding: 0 44px 24px;
+  background: oklch(0.99 0.002 90 / 0.92);
+  backdrop-filter: blur(10px);
 }
 
 .feed-filters-row {
