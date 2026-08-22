@@ -61,9 +61,9 @@
 
 .reveal {
   opacity: 0;
-  filter: blur(16px);
-  transform: translateY(20px);
-  transition: opacity 0.9s ease, filter 0.9s ease, transform 0.9s ease;
+  filter: blur(6px);
+  transform: translateY(12px);
+  transition: opacity 0.7s ease, filter 0.7s ease, transform 0.7s ease;
 }
 
 .reveal-visible {
@@ -212,47 +212,48 @@ a:hover {
   justify-content: flex-start;
 }
 
-.hero-bg {
+.hero-cards {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-mini-card {
+  position: absolute;
+  border-radius: 14px;
   overflow: hidden;
-  background: oklch(0.09 0.012 290);
+  box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.18);
+  background: oklch(0.95 0.003 90);
 }
 
-.hero-bg-wave {
-  position: absolute;
-  top: 0;
-  left: 0;
+.hero-mini-card img {
+  display: block;
   width: 100%;
-  height: 460px;
-  filter: blur(45px);
-  transform: scale(1.1);
+  height: 100%;
+  object-fit: cover;
 }
 
-.hero-grain {
+.hero-mini-card-stat {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 460px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  background-size: 140px 140px;
-  opacity: 0.15;
-  mix-blend-mode: overlay;
-  pointer-events: none;
+  left: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: oklch(1 0 0 / 0.85);
+  color: oklch(0.16 0.004 90);
+  backdrop-filter: blur(4px);
 }
 
-.hero-bg-fade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 150px,
-    oklch(0.99 0.002 90) 320px
-  );
-  pointer-events: none;
+@media (max-width: 1200px) {
+  .hero-cards {
+    display: none;
+  }
 }
 
 .hero-content {
