@@ -19,6 +19,9 @@ const RIGHT_CARDS = [
 export default function Hero() {
   return (
     <section className="hero">
+      <img src="/images/hero-bg.jpg" alt="" className="hero-bg-image" />
+      <div className="hero-bg-fade" />
+
       <div className="hero-cards hero-cards-left">
         {LEFT_CARDS.map((card) => (
           <div key={card.image} className="hero-mini-card" style={card.style}>
