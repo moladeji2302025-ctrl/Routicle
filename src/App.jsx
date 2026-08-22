@@ -2,6 +2,7 @@ import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import ProductShowcase from './components/ProductShowcase'
 import Capabilities from './components/Capabilities'
+import FeedFilters from './components/FeedFilters'
 import FeedGrid from './components/FeedGrid'
 import Comparison from './components/Comparison'
 import Footer from './components/Footer'
@@ -17,6 +18,7 @@ export default function App() {
         <Hero />
         <ProductShowcase />
         <Capabilities />
+        <FeedFilters />
         <FeedGrid items={FEED_ITEMS} />
         <Comparison />
         <Footer />
