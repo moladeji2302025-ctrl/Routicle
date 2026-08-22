@@ -1,0 +1,344 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Work Sans', system-ui, sans-serif; background: oklch(0.985 0.004 80); color: oklch(0.22 0.01 80); }
+    a { color: oklch(0.22 0.01 80); text-decoration: none; }
+    a:hover { color: oklch(0.58 0.15 40); }
+    ::-webkit-scrollbar { height: 0; width: 0; }
+  </style>
+</helmet>
+
+<div style="min-height: 100%; width: 100%;">
+
+  <!-- Top nav -->
+  <div style="position: sticky; top: 0; z-index: 20; background: oklch(0.985 0.004 80); border-bottom: 1px solid oklch(0.9 0.005 80);">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 18px 40px; display: flex; align-items: center; gap: 32px;">
+      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -0.02em;">Routicle</div>
+
+      <div style="display: flex; align-items: center; gap: 24px; font-size: 14px; font-weight: 500;">
+        <a href="#" style="color: oklch(0.22 0.01 80);">Explore</a>
+        <a href="#" style="color: oklch(0.48 0.01 80);">For You</a>
+        <a href="#" style="color: oklch(0.48 0.01 80);">Following</a>
+      </div>
+
+      <div style="flex-grow: 1;"></div>
+
+      <a href="#" style="font-size: 14px; font-weight: 600; padding: 9px 18px; border: 1.5px solid oklch(0.22 0.01 80); border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Create
+      </a>
+      <a href="#" style="font-size: 14px; font-weight: 500; color: oklch(0.48 0.01 80);">Sign in</a>
+      <a href="#" style="font-size: 14px; font-weight: 600; padding: 9px 18px; border-radius: 999px; background: oklch(0.58 0.15 40); color: white;">Sign up</a>
+    </div>
+
+    <!-- Sort row -->
+    <div style="max-width: 1400px; margin: 0 auto; padding: 0 40px 14px; display: flex; align-items: center; gap: 22px; font-size: 13px; font-weight: 500;">
+      <span style="color: oklch(0.22 0.01 80); border-bottom: 2px solid oklch(0.58 0.15 40); padding-bottom: 4px;">Recommended</span>
+      <span style="color: oklch(0.48 0.01 80); padding-bottom: 4px;">Curated</span>
+      <span style="color: oklch(0.48 0.01 80); padding-bottom: 4px;">Most Appreciated</span>
+      <span style="color: oklch(0.48 0.01 80); padding-bottom: 4px;">Most Recent</span>
+    </div>
+
+    <!-- Department chips -->
+    <div style="max-width: 1400px; margin: 0 auto; padding: 0 40px 16px; display: flex; align-items: center; gap: 10px; overflow-x: auto;">
+      <span style="font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 999px; background: oklch(0.22 0.01 80); color: white; white-space: nowrap;">All</span>
+      <span style="font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 999px; background: oklch(0.95 0.005 80); white-space: nowrap; display: inline-flex; align-items: center; gap: 7px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.55 0.17 250); display: inline-block;"></span>Graphic Design
+      </span>
+      <span style="font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 999px; background: oklch(0.95 0.005 80); white-space: nowrap; display: inline-flex; align-items: center; gap: 7px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.55 0.17 30); display: inline-block;"></span>Motion Graphics
+      </span>
+      <span style="font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 999px; background: oklch(0.95 0.005 80); white-space: nowrap; display: inline-flex; align-items: center; gap: 7px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.55 0.17 150); display: inline-block;"></span>Illustration
+      </span>
+      <span style="font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 999px; background: oklch(0.95 0.005 80); white-space: nowrap; display: inline-flex; align-items: center; gap: 7px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.55 0.17 320); display: inline-block;"></span>AI-Generated Images
+      </span>
+      <span style="font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 999px; background: oklch(0.95 0.005 80); white-space: nowrap; display: inline-flex; align-items: center; gap: 7px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.55 0.17 90); display: inline-block;"></span>AI-Generated Video
+      </span>
+    </div>
+  </div>
+
+  <!-- Masonry feed -->
+  <div style="max-width: 1400px; margin: 0 auto; padding: 28px 40px 60px; column-count: 4; column-gap: 20px;">
+
+    <!-- Card 1: Graphic Design, watermarked -->
+    <div style="break-inside: avoid; margin-bottom: 20px; border-radius: 6px; overflow: hidden; position: relative; background: oklch(0.93 0.005 80);">
+      <img src="t1.jpg" style="display: block; width: 100%; height: auto;">
+      <div style="position: absolute; inset: 0; background-image: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='-10' y='90' font-size='22' font-family='sans-serif' fill='%23ffffff' fill-opacity='0.55' transform='rotate(-28 75 75)'>ROUTICLE</text></svg>&quot;); background-repeat: repeat; mix-blend-mode: overlay; pointer-events: none;"></div>
+      <div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 6px;">
+        <span style="font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 5px; background: oklch(0.55 0.17 250); color: white;">Graphic Design</span>
+      </div>
+      <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));">
+        <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Quarterly Ministry Report — Cover Series</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <img src="a1.jpg" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500;">Tunde A.</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="display: flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.9); font-size: 12px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.6-9C.7 8.6 2 5 5.3 5c1.9 0 3.3 1 4.7 2.7C11.4 6 12.8 5 14.7 5 18 5 19.3 8.6 21.6 12 19.5 16.4 12 21 12 21z"/></svg>
+              128
+            </span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 5px; margin-top: 7px;">
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">PSD</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">AI</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">Canva</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Motion Graphics, video preview -->
+    <div style="break-inside: avoid; margin-bottom: 20px; border-radius: 6px; overflow: hidden; position: relative; background: oklch(0.93 0.005 80);">
+      <img src="t2.jpg" style="display: block; width: 100%; height: auto;">
+      <div style="position: absolute; inset: 0; background-image: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='-10' y='90' font-size='22' font-family='sans-serif' fill='%23ffffff' fill-opacity='0.55' transform='rotate(-28 75 75)'>ROUTICLE</text></svg>&quot;); background-repeat: repeat; mix-blend-mode: overlay; pointer-events: none;"></div>
+      <div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 6px;">
+        <span style="font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 5px; background: oklch(0.55 0.17 30); color: white;">Motion Graphics</span>
+      </div>
+      <div style="position: absolute; bottom: 66px; left: 10px; width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><polygon points="8,6 8,18 18,12"/></svg>
+      </div>
+      <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));">
+        <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Kinetic Type Reel — Opener</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <img src="a2.jpg" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500;">Ngozi O.</span>
+          </div>
+          <span style="display: flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.9); font-size: 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.6-9C.7 8.6 2 5 5.3 5c1.9 0 3.3 1 4.7 2.7C11.4 6 12.8 5 14.7 5 18 5 19.3 8.6 21.6 12 19.5 16.4 12 21 12 21z"/></svg>
+            64
+          </span>
+        </div>
+        <div style="display: flex; gap: 5px; margin-top: 7px;">
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">AEP</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">PPRO</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: AI-Generated Images, FREE, no watermark -->
+    <div style="break-inside: avoid; margin-bottom: 20px; border-radius: 6px; overflow: hidden; position: relative; background: oklch(0.93 0.005 80);">
+      <img src="t3.jpg" style="display: block; width: 100%; height: auto;">
+      <div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 6px;">
+        <span style="font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 5px; background: oklch(0.55 0.17 320); color: white;">AI-Generated Images</span>
+        <span style="font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 5px; background: oklch(0.6 0.16 145); color: white;">Free</span>
+      </div>
+      <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));">
+        <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Desert Bloom — Prompted Concept Art</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <img src="a3.jpg" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500;">Kayode M.</span>
+          </div>
+          <span style="display: flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.9); font-size: 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.6-9C.7 8.6 2 5 5.3 5c1.9 0 3.3 1 4.7 2.7C11.4 6 12.8 5 14.7 5 18 5 19.3 8.6 21.6 12 19.5 16.4 12 21 12 21z"/></svg>
+            302
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Illustration -->
+    <div style="break-inside: avoid; margin-bottom: 20px; border-radius: 6px; overflow: hidden; position: relative; background: oklch(0.93 0.005 80);">
+      <img src="t4.jpg" style="display: block; width: 100%; height: auto;">
+      <div style="position: absolute; inset: 0; background-image: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='-10' y='90' font-size='22' font-family='sans-serif' fill='%23ffffff' fill-opacity='0.55' transform='rotate(-28 75 75)'>ROUTICLE</text></svg>&quot;); background-repeat: repeat; mix-blend-mode: overlay; pointer-events: none;"></div>
+      <div style="position: absolute; top: 10px; left: 10px;">
+        <span style="font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 5px; background: oklch(0.55 0.17 150); color: white;">Illustration</span>
+      </div>
+      <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));">
+        <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Mascot Study — Field Notes</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <img src="a4.jpg" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500;">Amara D.</span>
+          </div>
+          <span style="display: flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.9); font-size: 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.6-9C.7 8.6 2 5 5.3 5c1.9 0 3.3 1 4.7 2.7C11.4 6 12.8 5 14.7 5 18 5 19.3 8.6 21.6 12 19.5 16.4 12 21 12 21z"/></svg>
+            45
+          </span>
+        </div>
+        <div style="display: flex; gap: 5px; margin-top: 7px;">
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">PSD</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">AI</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5: Motion Graphics, video preview -->
+    <div style="break-inside: avoid; margin-bottom: 20px; border-radius: 6px; overflow: hidden; position: relative; background: oklch(0.93 0.005 80);">
+      <img src="t5.jpg" style="display: block; width: 100%; height: auto;">
+      <div style="position: absolute; inset: 0; background-image: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='-10' y='90' font-size='22' font-family='sans-serif' fill='%23ffffff' fill-opacity='0.55' transform='rotate(-28 75 75)'>ROUTICLE</text></svg>&quot;); background-repeat: repeat; mix-blend-mode: overlay; pointer-events: none;"></div>
+      <div style="position: absolute; top: 10px; left: 10px;">
+        <span style="font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 5px; background: oklch(0.55 0.17 30); color: white;">Motion Graphics</span>
+      </div>
+      <div style="position: absolute; bottom: 66px; left: 10px; width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><polygon points="8,6 8,18 18,12"/></svg>
+      </div>
+      <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));">
+        <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Lower Thirds Pack Vol. 2</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <img src="a5.jpg" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500;">Femi B.</span>
+          </div>
+          <span style="display: flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.9); font-size: 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.6-9C.7 8.6 2 5 5.3 5c1.9 0 3.3 1 4.7 2.7C11.4 6 12.8 5 14.7 5 18 5 19.3 8.6 21.6 12 19.5 16.4 12 21 12 21z"/></svg>
+            210
+          </span>
+        </div>
+        <div style="display: flex; gap: 5px; margin-top: 7px;">
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">AEP</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">PPRO</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6: Graphic Design -->
+    <div style="break-inside: avoid; margin-bottom: 20px; border-radius: 6px; overflow: hidden; position: relative; background: oklch(0.93 0.005 80);">
+      <img src="t6.jpg" style="display: block; width: 100%; height: auto;">
+      <div style="position: absolute; inset: 0; background-image: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='-10' y='90' font-size='22' font-family='sans-serif' fill='%23ffffff' fill-opacity='0.55' transform='rotate(-28 75 75)'>ROUTICLE</text></svg>&quot;); background-repeat: repeat; mix-blend-mode: overlay; pointer-events: none;"></div>
+      <div style="position: absolute; top: 10px; left: 10px;">
+        <span style="font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 5px; background: oklch(0.55 0.17 250); color: white;">Graphic Design</span>
+      </div>
+      <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));">
+        <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Carousel Set — Sunday Series</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <img src="a1.jpg" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500;">Zainab R.</span>
+          </div>
+          <span style="display: flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.9); font-size: 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.6-9C.7 8.6 2 5 5.3 5c1.9 0 3.3 1 4.7 2.7C11.4 6 12.8 5 14.7 5 18 5 19.3 8.6 21.6 12 19.5 16.4 12 21 12 21z"/></svg>
+            88
+          </span>
+        </div>
+        <div style="display: flex; gap: 5px; margin-top: 7px;">
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">Canva</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">PSD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 7: AI-Generated Video -->
+    <div style="break-inside: avoid; margin-bottom: 20px; border-radius: 6px; overflow: hidden; position: relative; background: oklch(0.93 0.005 80);">
+      <img src="t7.jpg" style="display: block; width: 100%; height: auto;">
+      <div style="position: absolute; top: 10px; left: 10px;">
+        <span style="font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 5px; background: oklch(0.55 0.17 90); color: white;">AI-Generated Video</span>
+      </div>
+      <div style="position: absolute; bottom: 66px; left: 10px; width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><polygon points="8,6 8,18 18,12"/></svg>
+      </div>
+      <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));">
+        <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Loop Study — Ember Field</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <img src="a2.jpg" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500;">Chidi E.</span>
+          </div>
+          <span style="display: flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.9); font-size: 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.6-9C.7 8.6 2 5 5.3 5c1.9 0 3.3 1 4.7 2.7C11.4 6 12.8 5 14.7 5 18 5 19.3 8.6 21.6 12 19.5 16.4 12 21 12 21z"/></svg>
+            156
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 8: Illustration -->
+    <div style="break-inside: avoid; margin-bottom: 20px; border-radius: 6px; overflow: hidden; position: relative; background: oklch(0.93 0.005 80);">
+      <img src="t8.jpg" style="display: block; width: 100%; height: auto;">
+      <div style="position: absolute; inset: 0; background-image: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='-10' y='90' font-size='22' font-family='sans-serif' fill='%23ffffff' fill-opacity='0.55' transform='rotate(-28 75 75)'>ROUTICLE</text></svg>&quot;); background-repeat: repeat; mix-blend-mode: overlay; pointer-events: none;"></div>
+      <div style="position: absolute; top: 10px; left: 10px;">
+        <span style="font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 5px; background: oklch(0.55 0.17 150); color: white;">Illustration</span>
+      </div>
+      <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));">
+        <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Icon System — Grace Notes</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <img src="a3.jpg" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500;">Bolu K.</span>
+          </div>
+          <span style="display: flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.9); font-size: 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.6-9C.7 8.6 2 5 5.3 5c1.9 0 3.3 1 4.7 2.7C11.4 6 12.8 5 14.7 5 18 5 19.3 8.6 21.6 12 19.5 16.4 12 21 12 21z"/></svg>
+            73
+          </span>
+        </div>
+        <div style="display: flex; gap: 5px; margin-top: 7px;">
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">AI</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">PSD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 9: Graphic Design -->
+    <div style="break-inside: avoid; margin-bottom: 20px; border-radius: 6px; overflow: hidden; position: relative; background: oklch(0.93 0.005 80);">
+      <img src="t9.jpg" style="display: block; width: 100%; height: auto;">
+      <div style="position: absolute; inset: 0; background-image: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><text x='-10' y='90' font-size='22' font-family='sans-serif' fill='%23ffffff' fill-opacity='0.55' transform='rotate(-28 75 75)'>ROUTICLE</text></svg>&quot;); background-repeat: repeat; mix-blend-mode: overlay; pointer-events: none;"></div>
+      <div style="position: absolute; top: 10px; left: 10px;">
+        <span style="font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 5px; background: oklch(0.55 0.17 250); color: white;">Graphic Design</span>
+      </div>
+      <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));">
+        <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 4px;">Brand Deck — Rivers &amp; Wells</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <img src="a4.jpg" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+            <span style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500;">Yemi S.</span>
+          </div>
+          <span style="display: flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.9); font-size: 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.6-9C.7 8.6 2 5 5.3 5c1.9 0 3.3 1 4.7 2.7C11.4 6 12.8 5 14.7 5 18 5 19.3 8.6 21.6 12 19.5 16.4 12 21 12 21z"/></svg>
+            190
+          </span>
+        </div>
+        <div style="display: flex; gap: 5px; margin-top: 7px;">
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">PSD</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">AI</span>
+          <span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.18); color: white;">Canva</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
