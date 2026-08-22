@@ -137,10 +137,15 @@ a:hover {
 .logo {
   display: inline-flex;
   align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 700;
+  color: oklch(0.16 0.004 90);
+  letter-spacing: -0.01em;
 }
 
-.logo img {
-  height: 16px;
+.logo-icon {
+  height: 20px;
   width: auto;
   display: block;
 }
@@ -148,13 +153,9 @@ a:hover {
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 22px;
   font-size: 13px;
   font-weight: 500;
-}
-
-.link-strong {
-  color: oklch(0.16 0.004 90);
 }
 
 .link-muted {
@@ -165,23 +166,6 @@ a:hover {
 
 .navbar-spacer {
   flex-grow: 1;
-}
-
-.btn-outline {
-  font-size: 13px;
-  font-weight: 500;
-  padding: 7px 14px;
-  border: 1px solid oklch(0.88 0.003 90);
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: border-color 0.15s ease;
-}
-
-.btn-outline:hover {
-  opacity: 1;
-  border-color: oklch(0.16 0.004 90);
 }
 
 .btn-solid {

@@ -1,26 +1,22 @@
-import { PlusIcon } from './icons'
+const NAV_LINKS = ['Explore', 'Departments', 'Pricing', 'AI Studio', 'Become a Creator', 'FAQ']
 
 export default function Navbar() {
   return (
     <div className="navbar">
       <div className="navbar-row">
         <a href="#" className="logo">
-          <img src="/brand/routicle-wordmark-black.svg" alt="Routicle" />
+          <img src="/brand/routicle-mark-black.svg" alt="" className="logo-icon" />
+          Routicle
         </a>
 
         <nav className="navbar-links">
-          <a href="#" className="link-strong">Explore</a>
-          <a href="#" className="link-muted">For You</a>
-          <a href="#" className="link-muted">Following</a>
+          {NAV_LINKS.map((link) => (
+            <a key={link} href="#" className="link-muted">{link}</a>
+          ))}
         </nav>
 
         <div className="navbar-spacer" />
 
-        <a href="#" className="btn-outline">
-          <PlusIcon size={14} />
-          Create
-        </a>
-        <a href="#" className="link-muted">Sign in</a>
         <a href="#" className="btn-solid">Sign up</a>
       </div>
     </div>
