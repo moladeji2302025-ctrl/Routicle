@@ -45,7 +45,7 @@ export default function Hero() {
 
       <div className="hero-content">
         <div className="hero-eyebrow">
-          <img src="/brand/routicle-mark-violet.svg" alt="" className="hero-eyebrow-icon" />
+          <img src="/brand/routicle-mark-white.svg" alt="" className="hero-eyebrow-icon" />
           The subscriber-share creative library
         </div>
 
