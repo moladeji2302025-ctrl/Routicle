@@ -113,6 +113,16 @@ export function ChevronRightIcon({ size = 15, color = 'currentColor' }) {
   )
 }
 
+export function SortIcon({ size = 14, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="4" y1="7" x2="20" y2="7" />
+      <line x1="4" y1="12" x2="15" y2="12" />
+      <line x1="4" y1="17" x2="10" y2="17" />
+    </svg>
+  )
+}
+
 export function PlusIcon({ size = 16, color = 'currentColor' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

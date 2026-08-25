@@ -12,7 +12,7 @@ export default function Navbar() {
         </nav>
 
         <a href="#" className="logo">
-          <img src="/brand/routicle-mark-white.svg" alt="" className="logo-icon" />
+          <img src="/brand/routicle-mark-black.svg" alt="" className="logo-icon" />
           Routicle
         </a>
 
