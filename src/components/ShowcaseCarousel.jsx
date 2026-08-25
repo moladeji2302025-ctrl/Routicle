@@ -13,7 +13,7 @@ export default function ShowcaseCarousel() {
     const id = setInterval(() => {
       setIndex((i) => (i + 1) % SHOWCASE_SLIDES.length)
       setBlurred(true)
-      setTimeout(() => setBlurred(false), 160)
+      setTimeout(() => setBlurred(false), 280)
     }, INTERVAL_MS)
     return () => clearInterval(id)
   }, [])
@@ -50,29 +50,31 @@ export default function ShowcaseCarousel() {
           <span className="floating-card-heading">Download</span>
         </div>
 
-        <div className="floating-card-preview">
-          <img src={active.avatar} alt="" className="floating-avatar" />
-          <div className="floating-preview-text">
-            <div className="floating-preview-title">{active.title}</div>
-            <div className="floating-preview-creator">{active.creator}</div>
+        <div className={blurred ? 'floating-card-content is-swapping' : 'floating-card-content'}>
+          <div className="floating-card-preview">
+            <img src={active.avatar} alt="" className="floating-avatar" />
+            <div className="floating-preview-text">
+              <div className="floating-preview-title">{active.title}</div>
+              <div className="floating-preview-creator">{active.creator}</div>
+            </div>
+            <span className="floating-appreciate">
+              <HeartIcon size={12} color="currentColor" />
+              {active.appreciations}
+            </span>
           </div>
-          <span className="floating-appreciate">
-            <HeartIcon size={12} color="currentColor" />
-            {active.appreciations}
-          </span>
-        </div>
 
-        <div className="floating-card-footer">
-          <div className="floating-formats">
-            {active.fileTypes.length > 0 ? (
-              active.fileTypes.map((ft) => (
-                <span key={ft} className="floating-format-badge">{ft}</span>
-              ))
-            ) : (
-              <span className="floating-format-badge">AI-Generated</span>
-            )}
+          <div className="floating-card-footer">
+            <div className="floating-formats">
+              {active.fileTypes.length > 0 ? (
+                active.fileTypes.map((ft) => (
+                  <span key={ft} className="floating-format-badge">{ft}</span>
+                ))
+              ) : (
+                <span className="floating-format-badge">AI-Generated</span>
+              )}
+            </div>
+            <span className="floating-tier">{active.tier}</span>
           </div>
-          <span className="floating-tier">{active.tier}</span>
         </div>
       </div>
     </div>

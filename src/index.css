@@ -268,7 +268,7 @@ a:hover {
 .hero-content {
   position: relative;
   z-index: 2;
-  max-width: 680px;
+  max-width: 760px;
   margin: 90px auto 0;
   display: flex;
   flex-direction: column;
@@ -278,20 +278,20 @@ a:hover {
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 9px;
+  font-size: 16px;
   font-weight: 500;
   color: oklch(0.22 0.004 90);
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .hero-eyebrow-icon {
-  width: 17px;
-  height: 17px;
+  width: 19px;
+  height: 19px;
 }
 
 .hero-title {
-  font-size: clamp(38px, 5.4vw, 66px);
+  font-size: clamp(48px, 6.5vw, 84px);
   font-weight: 700;
   line-height: 1.06;
   letter-spacing: -0.02em;
@@ -304,20 +304,20 @@ a:hover {
 }
 
 .hero-subtitle {
-  margin: 18px auto 0;
-  max-width: 520px;
-  font-size: 15px;
+  margin: 20px auto 0;
+  max-width: 560px;
+  font-size: 18px;
   line-height: 1.55;
   color: oklch(0.5 0.006 90);
 }
 
 .btn-hero-primary {
-  margin-top: 26px;
+  margin-top: 30px;
   display: inline-flex;
-  padding: 13px 28px;
+  padding: 15px 32px;
   border-radius: 999px;
   font-weight: 500;
-  font-size: 14.5px;
+  font-size: 16px;
   background: var(--brand-violet);
   color: oklch(0.99 0.002 90);
   transition: opacity 0.15s ease;
@@ -329,8 +329,8 @@ a:hover {
 }
 
 .hero-bullets {
-  margin: 18px 0 0;
-  font-size: 13px;
+  margin: 20px 0 0;
+  font-size: 14px;
   color: oklch(0.4 0.006 90);
 }
 
@@ -513,8 +513,8 @@ a:hover {
   height: 100%;
   will-change: transform, filter;
   transition:
-    transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 700ms ease-out;
+    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 800ms ease-out;
 }
 
 .carousel-card {
@@ -566,6 +566,17 @@ a:hover {
   border-radius: 12px;
   padding: 14px;
   box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.55);
+}
+
+.floating-card-content {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.floating-card-content.is-swapping {
+  opacity: 0;
+  transform: translateY(4px);
 }
 
 .floating-card-header {
@@ -679,9 +690,9 @@ a:hover {
 /* Capabilities bento */
 
 .capabilities {
-  max-width: 900px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 72px 28px 104px;
+  padding: 72px 44px 104px;
 }
 
 .capabilities-header {
@@ -733,12 +744,12 @@ a:hover {
   grid-template-areas:
     'wide wide'
     'maroon teal';
-  gap: 16px;
+  gap: 20px;
 }
 
 .bento-card {
-  border-radius: 18px;
-  padding: 20px;
+  border-radius: 20px;
+  padding: 36px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -746,24 +757,24 @@ a:hover {
 }
 
 .bento-title {
-  font-size: 15px;
+  font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin: 0 0 7px;
+  margin: 0 0 10px;
 }
 
 .bento-desc {
-  font-size: 12.5px;
-  line-height: 1.5;
+  font-size: 14.5px;
+  line-height: 1.55;
   margin: 0;
-  max-width: 300px;
+  max-width: 360px;
 }
 
 .bento-wide {
   grid-area: wide;
   background: oklch(0.14 0.004 90);
   color: oklch(0.99 0.002 90);
-  min-height: 260px;
+  min-height: 300px;
 }
 
 .bento-wide .bento-desc {
