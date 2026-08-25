@@ -140,13 +140,26 @@ a:hover {
 .navbar-row {
   max-width: 980px;
   margin: 0 auto;
-  padding: 8px 8px 8px 20px;
-  display: flex;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 24px;
-  background: oklch(0.99 0.002 90);
-  border-radius: 999px;
-  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.14);
+  background: oklch(0.95 0.003 90);
+  border: 1px solid oklch(0.9 0.003 90);
+  border-radius: 24px;
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-links-left {
+  justify-content: flex-start;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 28px;
 }
 
 .logo {
@@ -155,8 +168,11 @@ a:hover {
   gap: 9px;
   font-size: 15px;
   font-weight: 700;
-  color: oklch(0.16 0.004 90);
+  color: oklch(0.99 0.002 90);
   letter-spacing: -0.01em;
+  background: oklch(0.16 0.004 90);
+  border-radius: 16px;
+  padding: 10px 20px;
 }
 
 .logo-icon {
@@ -168,19 +184,15 @@ a:hover {
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 22px;
-  font-size: 13px;
+  gap: 28px;
+  font-size: 14.5px;
   font-weight: 500;
 }
 
 .link-muted {
-  color: oklch(0.6 0.005 90);
-  font-size: 13px;
+  color: oklch(0.45 0.006 90);
+  font-size: 14.5px;
   font-weight: 500;
-}
-
-.navbar-spacer {
-  flex-grow: 1;
 }
 
 .btn-solid {
@@ -209,28 +221,7 @@ a:hover {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-}
-
-.hero-bg-image {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero-bg-fade {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.5) 0%,
-    rgba(0, 0, 0, 0.4) 40%,
-    rgba(0, 0, 0, 0.55) 100%
-  );
-  pointer-events: none;
+  background: oklch(0.99 0.002 90);
 }
 
 .hero-cards {
@@ -293,7 +284,7 @@ a:hover {
   gap: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: white;
+  color: oklch(0.22 0.004 90);
   margin-bottom: 20px;
 }
 
@@ -307,12 +298,12 @@ a:hover {
   font-weight: 700;
   line-height: 1.06;
   letter-spacing: -0.02em;
-  color: white;
+  color: oklch(0.14 0.004 90);
   margin: 0;
 }
 
 .hero-accent {
-  color: white;
+  color: var(--brand-violet);
 }
 
 .hero-subtitle {
@@ -320,7 +311,7 @@ a:hover {
   max-width: 520px;
   font-size: 15px;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.85);
+  color: oklch(0.5 0.006 90);
 }
 
 .btn-hero-primary {
@@ -343,7 +334,7 @@ a:hover {
 .hero-bullets {
   margin: 18px 0 0;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  color: oklch(0.4 0.006 90);
 }
 
 /* Product showcase */

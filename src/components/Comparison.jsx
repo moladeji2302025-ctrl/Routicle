@@ -7,11 +7,6 @@ const ROWS = [
     after: 'Uploaded once, keeps earning every month it’s downloaded',
   },
   {
-    label: 'Getting paid',
-    before: 'No path to monetize passed-on concepts',
-    after: '50% of subscription revenue pooled and paid out monthly',
-  },
-  {
     label: 'File access',
     before: 'Screenshots or flattened exports only',
     after: 'Real PSD, AI, Canva, and video project files',

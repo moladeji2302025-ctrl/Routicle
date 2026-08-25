@@ -20,12 +20,12 @@ export default function App() {
         <Navbar />
         <Hero />
         <ProductShowcase />
-        <Capabilities />
-        <Stats />
         <div className="projects-section">
           <FeedFilters />
           <FeedGrid items={FEED_ITEMS} />
         </div>
+        <Capabilities />
+        <Stats />
         <Comparison />
         <Footer />
       </div>

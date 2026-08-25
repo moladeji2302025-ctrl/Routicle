@@ -17,9 +17,6 @@ const RIGHT_CARDS = [
 export default function Hero() {
   return (
     <section className="hero">
-      <img src="/images/hero-bg.jpg" alt="" className="hero-bg-image" />
-      <div className="hero-bg-fade" />
-
       <div className="hero-cards hero-cards-left">
         {LEFT_CARDS.map((card) => (
           <div key={card.image} className="hero-mini-card" style={card.style}>
@@ -45,7 +42,7 @@ export default function Hero() {
 
       <div className="hero-content">
         <div className="hero-eyebrow">
-          <img src="/brand/routicle-mark-white.svg" alt="" className="hero-eyebrow-icon" />
+          <img src="/brand/routicle-mark-violet.svg" alt="" className="hero-eyebrow-icon" />
           The subscriber-share creative library
         </div>
 
