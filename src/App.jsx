@@ -6,6 +6,7 @@ import Stats from './components/Stats'
 import FeedFilters from './components/FeedFilters'
 import FeedGrid from './components/FeedGrid'
 import Comparison from './components/Comparison'
+import FooterCta from './components/FooterCta'
 import Footer from './components/Footer'
 import IntroReveal from './components/IntroReveal'
 import ScrollLines from './components/ScrollLines'
@@ -27,6 +28,7 @@ export default function App() {
         <Capabilities />
         <Stats />
         <Comparison />
+        <FooterCta />
         <Footer />
       </div>
     </>
