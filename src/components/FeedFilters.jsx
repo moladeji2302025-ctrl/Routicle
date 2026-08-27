@@ -1,26 +1,7 @@
 import { SearchIcon, SlidersIcon, HeartIcon, ChevronDownIcon, ChevronRightIcon, StarIcon, SparkleIcon, SortIcon } from './icons'
+import { ART_STYLES, SOFTWARE } from '../data/software'
 
 const TABS = ['Projects', 'Creators', 'Assets', 'Files']
-
-const DEPARTMENT_CHIPS = [
-  { label: 'Graphic Design', image: '/images/t1.jpg' },
-  { label: 'Motion Graphics', image: '/images/t2.jpg' },
-  { label: 'Illustration', image: '/images/t4.jpg' },
-  { label: 'AI Images', image: '/images/t3.jpg' },
-  { label: 'AI Video', image: '/images/t7.jpg' },
-  { label: 'Templates', image: '/images/t6.jpg' },
-  { label: 'Social Media', image: '/images/t9.jpg' },
-  { label: 'Brand Identity', image: '/images/t5.jpg' },
-  { label: 'Presentations', image: '/images/t8.jpg' },
-  { label: 'Packaging', image: '/images/t1.jpg' },
-  { label: 'UI/UX', image: '/images/t2.jpg' },
-  { label: 'Print & Publication', image: '/images/t4.jpg' },
-  { label: 'Icon Sets', image: '/images/t3.jpg' },
-  { label: 'Kinetic Type', image: '/images/t7.jpg' },
-  { label: 'Title Sequences', image: '/images/t6.jpg' },
-  { label: 'Merchandise', image: '/images/t9.jpg' },
-  { label: 'Storyboards', image: '/images/t5.jpg' },
-]
 
 export default function FeedFilters() {
   return (
@@ -69,15 +50,20 @@ export default function FeedFilters() {
             <SparkleIcon size={12} />
             Featured
           </span>
-          {DEPARTMENT_CHIPS.map((chip) => (
+          {ART_STYLES.map((style) => (
             <span
-              key={chip.label}
+              key={style.name}
               className="chip chip-photo"
               style={{
-                backgroundImage: `linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.25)), url(${chip.image})`,
+                backgroundImage: `linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.25)), url(${style.image})`,
               }}
             >
-              {chip.label}
+              {style.name}
+            </span>
+          ))}
+          {SOFTWARE.map((s) => (
+            <span key={s.name} className="chip chip-software" style={{ background: s.bg, color: s.color }}>
+              {s.name}
             </span>
           ))}
         </div>

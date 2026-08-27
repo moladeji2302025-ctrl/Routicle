@@ -28,9 +28,6 @@ export default function Capabilities() {
           </p>
 
           <div className="bento-network">
-            <svg className="bento-network-line" viewBox="0 0 400 140" preserveAspectRatio="none">
-              <path d="M40,100 C140,20 260,120 360,40" fill="none" stroke="oklch(1 0 0 / 0.25)" strokeWidth="1.5" strokeDasharray="4 6" />
-            </svg>
             <div className="bento-network-node bento-network-node-a">
               <img src="/images/t6.jpg" alt="" />
               <span className="bento-network-tag">Zainab R.</span>

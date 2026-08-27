@@ -1,5 +1,6 @@
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
+import BrowseBySoftware from './components/BrowseBySoftware'
 import ProductShowcase from './components/ProductShowcase'
 import Capabilities from './components/Capabilities'
 import Stats from './components/Stats'
@@ -9,7 +10,6 @@ import Comparison from './components/Comparison'
 import FooterCta from './components/FooterCta'
 import Footer from './components/Footer'
 import IntroReveal from './components/IntroReveal'
-import ScrollLines from './components/ScrollLines'
 import { FEED_ITEMS } from './data/feedItems'
 
 export default function App() {
@@ -17,9 +17,9 @@ export default function App() {
     <>
       <IntroReveal />
       <div className="page">
-        <ScrollLines />
         <Navbar />
         <Hero />
+        <BrowseBySoftware />
         <ProductShowcase />
         <div className="projects-section">
           <FeedFilters />

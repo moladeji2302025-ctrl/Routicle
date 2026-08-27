@@ -51,9 +51,6 @@ export default function FooterCta() {
       <div className="footer-cta">
         <img src="/images/hero-bg.jpg" alt="" className="footer-cta-image" />
         <div className="footer-cta-fade" />
-        <svg className="footer-cta-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <line x1="0" y1="100" x2="100" y2="0" />
-        </svg>
 
         <div className="footer-cta-content">
           <h2 className="footer-cta-title" ref={titleRef}>Where Unused Work Earns</h2>
