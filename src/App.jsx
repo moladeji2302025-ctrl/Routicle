@@ -19,8 +19,8 @@ export default function App() {
       <div className="page">
         <Navbar />
         <Hero />
-        <ProductShowcase />
         <BrowseBySoftware />
+        <ProductShowcase />
         <div className="projects-section">
           <FeedFilters />
           <FeedGrid items={FEED_ITEMS} />
