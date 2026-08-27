@@ -1,12 +1,12 @@
 export const SOFTWARE = [
-  { name: 'Photoshop', mono: 'Ps', bg: '#001e36', color: '#31a8ff' },
-  { name: 'Illustrator', mono: 'Ai', bg: '#330000', color: '#ff9a00' },
-  { name: 'Premiere Pro', mono: 'Pr', bg: '#00005b', color: '#9999ff' },
-  { name: 'After Effects', mono: 'Ae', bg: '#1f003d', color: '#c9a6ff' },
-  { name: 'Canva', mono: 'Ca', bg: '#00c4cc', color: '#ffffff' },
-  { name: 'Figma', mono: 'Fi', bg: '#18a0fb', color: '#ffffff' },
-  { name: 'Blender', mono: 'Bl', bg: '#e87d0d', color: '#ffffff' },
-  { name: 'Procreate', mono: 'Pc', bg: '#111111', color: '#ffffff' },
+  { name: 'Photoshop', icon: '/software/photoshop.svg' },
+  { name: 'Illustrator', icon: '/software/illustrator.svg' },
+  { name: 'Premiere Pro', icon: '/software/premiere-pro.svg' },
+  { name: 'After Effects', icon: '/software/after-effects.svg' },
+  { name: 'Canva', icon: '/software/canva.svg' },
+  { name: 'Figma', icon: '/software/figma.svg' },
+  { name: 'Blender', icon: '/software/blender.svg' },
+  { name: 'Procreate', icon: '/software/procreate.svg' },
 ]
 
 export const ART_STYLES = [

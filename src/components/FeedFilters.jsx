@@ -62,7 +62,8 @@ export default function FeedFilters() {
             </span>
           ))}
           {SOFTWARE.map((s) => (
-            <span key={s.name} className="chip chip-software" style={{ background: s.bg, color: s.color }}>
+            <span key={s.name} className="chip chip-software">
+              <img src={s.icon} alt="" className="chip-software-icon" />
               {s.name}
             </span>
           ))}

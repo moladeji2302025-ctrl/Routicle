@@ -451,11 +451,17 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.3);
+  background: oklch(0.99 0.002 90);
+  border: 1px solid oklch(0.91 0.003 90);
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.14);
   transition: transform 0.2s ease;
+  overflow: hidden;
+}
+
+.software-icon-img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
 }
 
 .software-item:hover .software-icon {
@@ -1404,6 +1410,18 @@ a:hover {
 .chip-photo {
   background-size: cover;
   background-position: center;
+}
+
+.chip-software {
+  background: oklch(0.99 0.002 90);
+  border: 1px solid oklch(0.9 0.003 90);
+  color: oklch(0.16 0.004 90);
+}
+
+.chip-software-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
 }
 
 .chip-scroll-next {

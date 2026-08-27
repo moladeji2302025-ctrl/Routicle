@@ -8,8 +8,8 @@ export default function BrowseBySoftware() {
       <div className="software-grid">
         {SOFTWARE.map((s) => (
           <a href="#" key={s.name} className="software-item">
-            <span className="software-icon" style={{ background: s.bg, color: s.color }}>
-              {s.mono}
+            <span className="software-icon">
+              <img src={s.icon} alt={s.name} className="software-icon-img" />
             </span>
             <span className="software-name">{s.name}</span>
           </a>
