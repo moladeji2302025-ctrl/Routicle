@@ -111,6 +111,12 @@ a:hover {
 
 .page {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-main {
+  flex: 1 0 auto;
 }
 
 /* Navbar */
