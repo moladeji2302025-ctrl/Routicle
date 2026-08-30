@@ -1,13 +1,35 @@
+import { Link, useNavigate } from 'react-router-dom'
 import { HeartIcon, EyeIcon, BookmarkIcon, PlayIcon } from './icons'
 import { formatCount } from '../utils/format'
+import { useApp } from '../context/AppContext'
+import { getCreatorByName } from '../data/creators'
 
 const watermarkUrl =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='170'><text x='-10' y='100' font-size='20' font-family='sans-serif' fill='%23ffffff' fill-opacity='0.3' transform='rotate(-28 85 85)'>ROUTICLE</text></svg>\")"
 
 export default function FeedCard({ item }) {
+  const { currentUser, toggleAppreciate, toggleSave } = useApp()
+  const navigate = useNavigate()
+  const creator = getCreatorByName(item.creator)
+
+  const appreciated = currentUser?.appreciatedItemIds.includes(item.id)
+  const saved = currentUser?.savedItemIds.includes(item.id)
+
+  function requireAuth(action) {
+    return (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      if (!currentUser) {
+        navigate('/signup')
+        return
+      }
+      action()
+    }
+  }
+
   return (
     <div className="feed-card">
-      <div className="feed-card-media">
+      <Link to={`/design/${item.id}`} className="feed-card-media">
         <img src={item.image} alt={item.title} className="feed-card-image" />
 
         {!item.free && (
@@ -26,19 +48,28 @@ export default function FeedCard({ item }) {
           </div>
         )}
 
-        <div className="save-badge">
+        <button
+          type="button"
+          className={saved ? 'save-badge save-badge-active' : 'save-badge'}
+          onClick={requireAuth(() => toggleSave(item.id))}
+          aria-label={saved ? 'Remove from collection' : 'Save to collection'}
+        >
           <BookmarkIcon size={14} color="white" />
-        </div>
-      </div>
+        </button>
+      </Link>
 
       <div className="feed-card-caption">
         <div className="caption-row">
-          <div className="caption-title">{item.title}</div>
+          <Link to={`/design/${item.id}`} className="caption-title">{item.title}</Link>
           <div className="caption-stats">
-            <span className="stat">
+            <button
+              type="button"
+              className={appreciated ? 'stat stat-button stat-active' : 'stat stat-button'}
+              onClick={requireAuth(() => toggleAppreciate(item.id))}
+            >
               <HeartIcon size={12} color="currentColor" />
               {formatCount(item.appreciations)}
-            </span>
+            </button>
             <span className="stat">
               <EyeIcon size={13} color="currentColor" />
               {formatCount(item.views)}
@@ -46,10 +77,10 @@ export default function FeedCard({ item }) {
           </div>
         </div>
         <div className="caption-bottom-row">
-          <div className="caption-creator">
+          <Link to={creator ? `/creator/${creator.id}` : '#'} className="caption-creator">
             <img src={item.avatar} alt={item.creator} className="avatar" />
             <span className="creator-name">{item.creator}</span>
-          </div>
+          </Link>
           {item.fileTypes.length > 0 && (
             <div className="filetype-row">
               {item.fileTypes.map((ft) => (
