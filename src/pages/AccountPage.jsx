@@ -61,7 +61,7 @@ export default function AccountPage() {
           </div>
 
           <h3 className="dashboard-panel-spacer">Session</h3>
-          <button type="button" className="btn-hero-secondary" onClick={() => { signOut(); navigate('/') }}>Sign out</button>
+          <button type="button" className="btn-hero-secondary" onClick={async () => { await signOut(); navigate('/') }}>Sign out</button>
         </div>
       </div>
     </div>

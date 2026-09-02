@@ -6,7 +6,13 @@ async function request(path, options = {}) {
     headers: { 'Content-Type': 'application/json', ...options.headers },
   })
   const isJson = res.headers.get('content-type')?.includes('application/json')
-  const body = isJson ? await res.json() : null
+  if (!isJson) {
+    // Vite's local dev server has no /api routes of its own and falls back to serving
+    // index.html (status 200) for anything it doesn't recognize — treat that the same as
+    // a failure rather than silently returning null, which crashes callers expecting an array/object.
+    throw new Error(`${path} did not return JSON (status ${res.status}) — the API isn't reachable here.`)
+  }
+  const body = await res.json()
   if (!res.ok) {
     throw new Error(body?.error || `Request to ${path} failed (${res.status})`)
   }

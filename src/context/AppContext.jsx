@@ -2,20 +2,24 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState, useCal
 import { FEED_ITEMS } from '../data/feedItems'
 import { TIERS } from '../data/pricing'
 import * as api from '../lib/api'
+import { authClient } from '../lib/authClient'
 
 const STORAGE_KEY = 'routicle_mock_state_v1'
+const PENDING_INTENT_KEY = 'routicle_pending_signup_intent'
 
 const AppContext = createContext(null)
 
 function loadInitialState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) return { profiles: {}, pendingIntentRedirect: null, ...JSON.parse(raw) }
   } catch {
     // ignore corrupt/blocked storage, fall through to defaults
   }
   return {
     currentUser: null,
+    profiles: {},
+    pendingIntentRedirect: null,
     contentItems: FEED_ITEMS.map((item) => ({ ...item, moderationStatus: 'approved' })),
     pendingSubmissions: [],
   }
@@ -107,28 +111,84 @@ export function AppProvider({ children }) {
     refreshPending()
   }, [refreshLiveContent, refreshPending])
 
+  /**
+   * Pulls the real Neon Auth session and merges it with this browser's locally-persisted
+   * profile for that account (role/credits/saved items/etc. — still client-side prototype
+   * state, just now keyed to a real, durable identity instead of a throwaway fake one).
+   * Returns the signup intent that applied ('browse'/'sell'), so callers can route on it.
+   */
+  const hydrateFromSession = useCallback(async (intentOverride) => {
+    const result = await authClient.getSession()
+    const authUser = result.data?.user
+    if (!authUser) return null
+
+    const pendingIntent = intentOverride || sessionStorage.getItem(PENDING_INTENT_KEY) || null
+    sessionStorage.removeItem(PENDING_INTENT_KEY)
+
+    let isNewProfile = false
+    setState((prev) => {
+      const existing = prev.profiles[authUser.id]
+      isNewProfile = !existing
+      const base =
+        existing ||
+        newUser({ name: authUser.name || authUser.email.split('@')[0], email: authUser.email, intent: pendingIntent || 'browse' })
+      const profile = {
+        ...base,
+        id: authUser.id,
+        name: authUser.name || base.name,
+        email: authUser.email || base.email,
+        image: authUser.image || base.image || null,
+      }
+      return {
+        ...prev,
+        currentUser: profile,
+        profiles: { ...prev.profiles, [authUser.id]: profile },
+        pendingIntentRedirect: isNewProfile && pendingIntent === 'sell' ? 'become-creator' : prev.pendingIntentRedirect,
+      }
+    })
+    return pendingIntent
+  }, [])
+
+  // Pick up an existing session on load, and after redirect-based OAuth flows return here.
+  useEffect(() => {
+    hydrateFromSession()
+  }, [hydrateFromSession])
+
   const actions = useMemo(() => {
     const updateUser = (updater) => {
       setState((prev) => {
         if (!prev.currentUser) return prev
-        return { ...prev, currentUser: updater(prev.currentUser) }
+        const nextUser = updater(prev.currentUser)
+        return { ...prev, currentUser: nextUser, profiles: { ...prev.profiles, [nextUser.id]: nextUser } }
       })
     }
 
     return {
-      signUp({ name, email, intent }) {
-        setState((prev) => ({ ...prev, currentUser: newUser({ name, email, intent }) }))
+      async signUpWithEmail({ name, email, password, intent }) {
+        const result = await authClient.signUp.email({ name, email, password })
+        if (result.error) throw new Error(result.error.message || 'Sign up failed')
+        return hydrateFromSession(intent)
       },
 
-      signIn({ email }) {
-        setState((prev) => {
-          if (prev.currentUser && prev.currentUser.email === email) return prev
-          return { ...prev, currentUser: newUser({ name: email.split('@')[0], email, intent: 'browse' }) }
-        })
+      async signInWithEmail({ email, password }) {
+        const result = await authClient.signIn.email({ email, password })
+        if (result.error) throw new Error(result.error.message || 'Sign in failed')
+        return hydrateFromSession()
       },
 
-      signOut() {
+      /** Redirects to Google — the browser navigates away, so there's nothing to await here. */
+      async signInWithGoogle(intent) {
+        if (intent) sessionStorage.setItem(PENDING_INTENT_KEY, intent)
+        await authClient.signIn.social({ provider: 'google', callbackURL: window.location.origin })
+      },
+
+      async signOut() {
+        await authClient.signOut()
         setState((prev) => ({ ...prev, currentUser: null }))
+      },
+
+      clearPendingIntentRedirect() {
+        setState((prev) => ({ ...prev, pendingIntentRedirect: null }))
       },
 
       subscribe({ tier, billingMode, cadence }) {
@@ -282,7 +342,7 @@ export function AppProvider({ children }) {
         updateUser((user) => ({ ...user, ...partial }))
       },
     }
-  }, [liveContentItems, refreshLiveContent, refreshPending])
+  }, [liveContentItems, refreshLiveContent, refreshPending, hydrateFromSession])
 
   const mergedContentItems = useMemo(
     () => [...liveContentItems, ...state.contentItems],
