@@ -12,6 +12,30 @@
   --brand-lavender: #e3dbfc;
   --brand-ink: #000000;
   --brand-white: #ffffff;
+
+  /* App-shell theme tokens (sidebar + in-app dashboard). Light is the default; [data-theme="dark"]
+     below overrides. Scoped to .app-shell/.app-* classes so the existing marketing-site CSS is untouched. */
+  --app-bg: oklch(0.99 0.002 90);
+  --app-bg-elevated: #ffffff;
+  --app-sidebar-bg: oklch(0.98 0.002 90);
+  --app-border: oklch(0.9 0.003 90);
+  --app-text: oklch(0.16 0.004 90);
+  --app-text-muted: oklch(0.52 0.006 90);
+  --app-hover: oklch(0.95 0.003 90);
+  --app-card-bg: #ffffff;
+  --app-shadow: 0 20px 44px -28px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme='dark'] {
+  --app-bg: oklch(0.15 0.004 290);
+  --app-bg-elevated: oklch(0.19 0.005 290);
+  --app-sidebar-bg: oklch(0.12 0.004 290);
+  --app-border: oklch(1 0 0 / 0.09);
+  --app-text: oklch(0.97 0.002 90);
+  --app-text-muted: oklch(0.62 0.006 90);
+  --app-hover: oklch(0.24 0.006 290);
+  --app-card-bg: oklch(0.18 0.005 290);
+  --app-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.6);
 }
 
 /* Intro reveal (one-time, on page load) */
@@ -718,6 +742,7 @@ a:hover {
   bottom: 18px;
   z-index: 3;
   width: 212px;
+  max-width: calc(100% - 32px);
   background: oklch(0.24 0.006 90);
   border: 1px solid oklch(1 0 0 / 0.08);
   border-radius: 12px;
@@ -829,7 +854,7 @@ a:hover {
   color: var(--brand-lavender);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1040px) {
   .showcase-panel {
     flex-direction: column;
     padding: 30px 24px;
@@ -3136,5 +3161,391 @@ a:hover {
   .detail-page {
     grid-template-columns: 1fr;
     gap: 32px;
+  }
+}
+
+/* ============================================================
+   App shell (authenticated experience) — sidebar + dashboard home.
+   Uses --app-* tokens (see :root / [data-theme="dark"] at top of file)
+   so it fully supports both light and dark, independent of the
+   marketing site's own styling above.
+   ============================================================ */
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+.app-sidebar {
+  flex: 0 0 232px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 22px 16px;
+  background: var(--app-sidebar-bg);
+  border-right: 1px solid var(--app-border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.app-logo-icon {
+  width: 22px;
+  height: 22px;
+}
+
+[data-theme='dark'] .app-logo-icon {
+  filter: invert(1);
+}
+
+.app-create-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--brand-violet);
+  color: white;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.app-create-btn:hover {
+  opacity: 0.88;
+}
+
+.app-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.app-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--app-text-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-nav-item:hover {
+  background: var(--app-hover);
+  color: var(--app-text);
+}
+
+.app-nav-item-active {
+  background: var(--app-hover);
+  color: var(--app-text);
+}
+
+.app-sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--app-border);
+}
+
+.app-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-icon-btn:hover {
+  background: var(--app-hover);
+  color: var(--app-text);
+}
+
+.app-avatar-link {
+  margin-left: auto;
+  display: flex;
+}
+
+.app-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.app-avatar-fallback {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-hover);
+  color: var(--app-text-muted);
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .app-sidebar {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .app-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .app-sidebar-bottom {
+    margin-left: auto;
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+/* App home dashboard */
+
+.app-home {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 64px 32px 96px;
+}
+
+.app-home-greeting {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 28px;
+  color: var(--app-text);
+}
+
+.app-home-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--app-card-bg);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-muted);
+  margin-bottom: 40px;
+}
+
+.app-home-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--app-text);
+}
+
+.app-home-search input::placeholder {
+  color: var(--app-text-muted);
+}
+
+.app-home-search kbd {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--app-border);
+  color: var(--app-text-muted);
+}
+
+.app-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 8px;
+  margin-bottom: 44px;
+}
+
+.app-tool-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 8px;
+  border-radius: 14px;
+  color: var(--app-text);
+  text-align: center;
+  transition: background 0.15s ease;
+}
+
+.app-tool-tile:hover {
+  background: var(--app-hover);
+}
+
+.app-tool-tile-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-card-bg);
+  border: 1px solid var(--app-border);
+}
+
+.app-tool-tile-label {
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.app-panel-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.app-panel {
+  border-radius: 16px;
+  background: var(--app-card-bg);
+  border: 1px solid var(--app-border);
+  padding: 20px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.app-panel-head h3 {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.app-panel-head a {
+  font-size: 12.5px;
+  color: var(--app-text-muted);
+}
+
+.app-panel-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  color: var(--app-text-muted);
+  font-size: 13px;
+  padding: 12px;
+}
+
+.app-collection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-collection-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border-radius: 10px;
+  color: var(--app-text);
+}
+
+.app-collection-row:hover {
+  background: var(--app-hover);
+}
+
+.app-collection-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.app-collection-title {
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-cta-panel {
+  background: linear-gradient(135deg, var(--brand-violet), var(--brand-purple));
+  color: white;
+  border: none;
+}
+
+.app-cta-panel .app-panel-head h3 {
+  color: white;
+}
+
+.app-cta-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.92;
+  margin: 0 0 16px;
+  flex: 1;
+}
+
+.app-cta-btn {
+  align-self: flex-start;
+  padding: 9px 16px;
+  border-radius: 9px;
+  background: white;
+  color: var(--brand-violet);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .app-panel-row {
+    grid-template-columns: 1fr;
   }
 }

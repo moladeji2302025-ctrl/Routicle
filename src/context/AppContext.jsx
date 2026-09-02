@@ -6,8 +6,19 @@ import { authClient } from '../lib/authClient'
 
 const STORAGE_KEY = 'routicle_mock_state_v1'
 const PENDING_INTENT_KEY = 'routicle_pending_signup_intent'
+const THEME_KEY = 'routicle_app_theme'
 
 const AppContext = createContext(null)
+
+function loadInitialTheme() {
+  try {
+    const stored = localStorage.getItem(THEME_KEY)
+    if (stored === 'light' || stored === 'dark') return stored
+  } catch {
+    // ignore
+  }
+  return 'dark'
+}
 
 function loadInitialState() {
   try {
@@ -64,6 +75,16 @@ export function AppProvider({ children }) {
   // Real, server-backed data — fetched fresh from Postgres/Object Storage rather than persisted locally.
   const [liveContentItems, setLiveContentItems] = useState([])
   const [livePendingSubmissions, setLivePendingSubmissions] = useState([])
+  const [theme, setTheme] = useState(loadInitialTheme)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    try {
+      localStorage.setItem(THEME_KEY, theme)
+    } catch {
+      // ignore
+    }
+  }, [theme])
 
   // Mirrors `state` so stable action callbacks can read the latest currentUser without
   // being recreated every render (actions below intentionally have a narrow dependency list).
@@ -189,6 +210,10 @@ export function AppProvider({ children }) {
 
       clearPendingIntentRedirect() {
         setState((prev) => ({ ...prev, pendingIntentRedirect: null }))
+      },
+
+      toggleTheme() {
+        setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
       },
 
       subscribe({ tier, billingMode, cadence }) {
@@ -350,8 +375,8 @@ export function AppProvider({ children }) {
   )
 
   const value = useMemo(
-    () => ({ ...state, ...actions, contentItems: mergedContentItems, pendingSubmissions: livePendingSubmissions }),
-    [state, actions, mergedContentItems, livePendingSubmissions]
+    () => ({ ...state, ...actions, contentItems: mergedContentItems, pendingSubmissions: livePendingSubmissions, theme }),
+    [state, actions, mergedContentItems, livePendingSubmissions, theme]
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

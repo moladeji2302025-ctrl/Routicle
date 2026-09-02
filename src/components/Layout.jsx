@@ -2,10 +2,11 @@ import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import Navbar from './Navbar'
 import Footer from './Footer'
+import AppShell from './AppShell'
 import { useApp } from '../context/AppContext'
 
 export default function Layout() {
-  const { pendingIntentRedirect, clearPendingIntentRedirect } = useApp()
+  const { currentUser, pendingIntentRedirect, clearPendingIntentRedirect } = useApp()
   const navigate = useNavigate()
 
   // Fires once after a brand-new "I'm here to sell" signup completes via the Google
@@ -16,6 +17,12 @@ export default function Layout() {
       navigate('/become-creator')
     }
   }, [pendingIntentRedirect, clearPendingIntentRedirect, navigate])
+
+  // Signed-in users get the app shell (sidebar) across every route; signed-out visitors
+  // get the marketing site's navbar/footer chrome.
+  if (currentUser) {
+    return <AppShell />
+  }
 
   return (
     <div className="page">

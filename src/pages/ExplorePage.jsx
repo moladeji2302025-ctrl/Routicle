@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { DEPARTMENTS } from '../data/departments'
 import FeedGrid from '../components/FeedGrid'
@@ -6,8 +7,9 @@ import { SearchIcon } from '../components/icons'
 
 export default function ExplorePage() {
   const { contentItems } = useApp()
+  const [searchParams] = useSearchParams()
   const [department, setDepartment] = useState(null)
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(searchParams.get('q') || '')
   const [peopleOnly, setPeopleOnly] = useState(false)
   const [fileType, setFileType] = useState(null)
 

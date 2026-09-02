@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
 import Layout from './components/Layout'
 import IntroReveal from './components/IntroReveal'
-import HomePage from './pages/HomePage'
+import HomeRouter from './components/HomeRouter'
 import DesignDetailPage from './pages/DesignDetailPage'
 import ExplorePage from './pages/ExplorePage'
 import PricingPage from './pages/PricingPage'
@@ -25,7 +25,7 @@ export default function App() {
         <IntroReveal />
         <Routes>
           <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomeRouter />} />
             <Route path="/design/:id" element={<DesignDetailPage />} />
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/pricing" element={<PricingPage />} />
