@@ -12,14 +12,17 @@ export default function CreatorUploadPage() {
   const navigate = useNavigate()
 
   const [formats, setFormats] = useState([])
-  const [thumbnailName, setThumbnailName] = useState('')
-  const [previewName, setPreviewName] = useState('')
+  const [sourceFiles, setSourceFiles] = useState({}) // { format: File }
+  const [thumbnailFile, setThumbnailFile] = useState(null)
+  const [previewVideoFile, setPreviewVideoFile] = useState(null)
   const [department, setDepartment] = useState(DEPARTMENTS[0].id)
   const [tags, setTags] = useState('')
   const [description, setDescription] = useState('')
   const [behindTheDesign, setBehindTheDesign] = useState('')
   const [rightsConfirmed, setRightsConfirmed] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const needsVideoPreview = formats.some((f) => EXPRESS_FORMATS.includes(f))
   const derivedTier = needsVideoPreview ? TIERS.express : formats.length > 0 ? TIERS.standard : null
@@ -27,34 +30,49 @@ export default function CreatorUploadPage() {
   const canSubmit = useMemo(() => {
     return (
       formats.length > 0 &&
-      thumbnailName &&
-      (!needsVideoPreview || previewName) &&
+      formats.every((f) => sourceFiles[f]) &&
+      thumbnailFile &&
+      (!needsVideoPreview || previewVideoFile) &&
       description.trim() &&
-      rightsConfirmed
+      rightsConfirmed &&
+      !submitting
     )
-  }, [formats, thumbnailName, needsVideoPreview, previewName, description, rightsConfirmed])
+  }, [formats, sourceFiles, thumbnailFile, needsVideoPreview, previewVideoFile, description, rightsConfirmed, submitting])
 
   function toggleFormat(format) {
     setFormats((prev) => (prev.includes(format) ? prev.filter((f) => f !== format) : [...prev, format]))
   }
 
-  function handleSubmit(event) {
+  function setSourceFile(format, file) {
+    setSourceFiles((prev) => ({ ...prev, [format]: file }))
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault()
     if (!currentUser) {
       navigate('/signup')
       return
     }
     if (!canSubmit) return
-    submitUpload({
-      title: tags.split(',')[0]?.trim() || 'Untitled upload',
-      department,
-      fileTypes: formats,
-      thumbnail: '/images/t1.jpg',
-      description,
-      behindTheDesign,
-      tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
-    })
-    setSubmitted(true)
+    setSubmitting(true)
+    setError('')
+    try {
+      await submitUpload({
+        title: tags.split(',')[0]?.trim() || 'Untitled upload',
+        department,
+        description,
+        behindTheDesign,
+        isAiGenerated: false,
+        thumbnailFile,
+        previewVideoFile: needsVideoPreview ? previewVideoFile : null,
+        sourceFiles: formats.map((format) => ({ label: format, file: sourceFiles[format] })),
+      })
+      setSubmitted(true)
+    } catch (err) {
+      setError(err.message || 'Upload failed — try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (!currentUser?.isCreator) {
@@ -73,7 +91,10 @@ export default function CreatorUploadPage() {
     return (
       <div className="upload-page upload-gate">
         <h1>Submitted for review</h1>
-        <p>An admin will review your upload before it goes live. You'll see it in your dashboard once approved.</p>
+        <p>
+          Your files are safely stored — an admin will review this submission before it goes live. You'll see it in
+          your dashboard once approved.
+        </p>
         <button type="button" className="btn-hero-primary" onClick={() => navigate('/dashboard')}>
           Go to your dashboard
         </button>
@@ -99,8 +120,8 @@ export default function CreatorUploadPage() {
           </div>
           {formats.map((format) => (
             <div key={format} className="upload-slot">
-              <span>{format} file</span>
-              <input type="file" onChange={(e) => e.target.files[0] && setFormats((f) => f)} />
+              <span>{format} file {sourceFiles[format] ? `— ${sourceFiles[format].name}` : '(required)'}</span>
+              <input type="file" onChange={(e) => setSourceFile(format, e.target.files[0] || null)} />
             </div>
           ))}
           {derivedTier && (
@@ -113,13 +134,15 @@ export default function CreatorUploadPage() {
         <div className="upload-section">
           <h3>2. Thumbnail {needsVideoPreview && '& MP4 preview'}</h3>
           <div className="upload-slot">
-            <span>Thumbnail (JPEG/PNG) — required</span>
-            <input type="file" accept="image/*" onChange={(e) => setThumbnailName(e.target.files[0]?.name || '')} />
+            <span>Thumbnail (JPEG/PNG) — required{thumbnailFile ? ` — ${thumbnailFile.name}` : ''}</span>
+            <input type="file" accept="image/*" onChange={(e) => setThumbnailFile(e.target.files[0] || null)} />
           </div>
           {needsVideoPreview && (
             <div className="upload-slot">
-              <span>MP4 preview clip — required for video formats</span>
-              <input type="file" accept="video/mp4" onChange={(e) => setPreviewName(e.target.files[0]?.name || '')} />
+              <span>
+                MP4 preview clip — required for video formats{previewVideoFile ? ` — ${previewVideoFile.name}` : ''}
+              </span>
+              <input type="file" accept="video/mp4" onChange={(e) => setPreviewVideoFile(e.target.files[0] || null)} />
             </div>
           )}
         </div>
@@ -154,8 +177,10 @@ export default function CreatorUploadPage() {
           confidential material.
         </label>
 
+        {error && <p className="upload-error">{error}</p>}
+
         <button type="submit" className="btn-hero-primary auth-submit" disabled={!canSubmit}>
-          Submit for review
+          {submitting ? 'Uploading…' : 'Submit for review'}
         </button>
       </form>
     </div>

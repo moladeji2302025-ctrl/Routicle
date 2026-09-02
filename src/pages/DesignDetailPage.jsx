@@ -5,6 +5,7 @@ import { getCreatorByName } from '../data/creators'
 import { evaluateDownload, requiredTier, TIERS } from '../data/pricing'
 import { HeartIcon, EyeIcon, PlayIcon } from '../components/icons'
 import { formatCount } from '../utils/format'
+import { requestDownload, triggerFileDownload } from '../lib/api'
 
 export default function DesignDetailPage() {
   const { id } = useParams()
@@ -39,7 +40,17 @@ export default function DesignDetailPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  function handleDownloadClick() {
+  async function deliverRealFiles() {
+    if (!item.isLive || !item.sourceObjectKeys?.length) return
+    try {
+      const { files } = await requestDownload(item.id, currentUser.email)
+      files.forEach((file) => triggerFileDownload(file.url, file.label))
+    } catch (err) {
+      console.error('download failed', err)
+    }
+  }
+
+  async function handleDownloadClick() {
     if (decision.state === 'signed-out') {
       navigate('/signup')
       return
@@ -51,11 +62,13 @@ export default function DesignDetailPage() {
     if (decision.state === 'pay-per-download') {
       purchaseDownload(item.id)
       setJustDownloaded(true)
+      await deliverRealFiles()
       setTimeout(() => setJustDownloaded(false), 2500)
       return
     }
-    // free-download, subscriber-download, owned — all simulate an immediate clean download
+    // free-download, subscriber-download, owned
     setJustDownloaded(true)
+    await deliverRealFiles()
     setTimeout(() => setJustDownloaded(false), 2500)
   }
 

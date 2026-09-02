@@ -19,15 +19,23 @@ export default function BecomeCreatorPage() {
   const [bio, setBio] = useState('')
   const [payoutMethod, setPayoutMethod] = useState('')
 
-  function handleSubmit(event) {
+  const [submitting, setSubmitting] = useState(false)
+
+  async function handleSubmit(event) {
     event.preventDefault()
     if (!currentUser) {
       navigate('/signup')
       return
     }
-    if (!rightsConfirmed || !payoutMethod.trim()) return
-    applyAsCreator({ bio, payoutMethod, social: {} })
-    navigate('/upload')
+    if (!rightsConfirmed || !payoutMethod.trim() || submitting) return
+    setSubmitting(true)
+    try {
+      await applyAsCreator({ bio, payoutMethod, social: {} })
+      navigate('/upload')
+    } catch (err) {
+      console.error('applyAsCreator failed', err)
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -86,8 +94,8 @@ export default function BecomeCreatorPage() {
           I confirm I hold full commercial rights to the work I'll upload, with no client-owned trademarks or
           confidential material I'm not cleared to redistribute.
         </label>
-        <button type="submit" className="btn-hero-primary auth-submit" disabled={!rightsConfirmed}>
-          Apply and start uploading
+        <button type="submit" className="btn-hero-primary auth-submit" disabled={!rightsConfirmed || submitting}>
+          {submitting ? 'Applying…' : 'Apply and start uploading'}
         </button>
       </form>
     </div>

@@ -2709,6 +2709,12 @@ a:hover {
   color: var(--brand-violet);
 }
 
+.upload-error {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: oklch(0.55 0.2 25);
+}
+
 .upload-gate,
 .studio-gate,
 .dashboard-gate {

@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { FEED_ITEMS } from '../data/feedItems'
 import { TIERS } from '../data/pricing'
+import * as api from '../lib/api'
 
 const STORAGE_KEY = 'routicle_mock_state_v1'
 
@@ -56,6 +57,16 @@ function newUser({ name, email, intent }) {
 
 export function AppProvider({ children }) {
   const [state, setState] = useState(loadInitialState)
+  // Real, server-backed data — fetched fresh from Postgres/Object Storage rather than persisted locally.
+  const [liveContentItems, setLiveContentItems] = useState([])
+  const [livePendingSubmissions, setLivePendingSubmissions] = useState([])
+
+  // Mirrors `state` so stable action callbacks can read the latest currentUser without
+  // being recreated every render (actions below intentionally have a narrow dependency list).
+  const stateRef = useRef(state)
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   useEffect(() => {
     try {
@@ -64,6 +75,37 @@ export function AppProvider({ children }) {
       // storage full/blocked — degrade silently, session state still works in-memory
     }
   }, [state])
+
+  const refreshLiveContent = useCallback(() => {
+    api.fetchApprovedContent().then(setLiveContentItems).catch((err) => console.error('fetchApprovedContent failed', err))
+  }, [])
+
+  const refreshPending = useCallback(() => {
+    api
+      .fetchPendingSubmissions()
+      .then((rows) =>
+        setLivePendingSubmissions(
+          rows.map((row) => ({
+            id: row.id,
+            creatorId: row.creator_id,
+            creatorName: row.creator_name,
+            submittedAt: new Date(row.created_at).getTime(),
+            status: row.moderation_status,
+            title: row.title,
+            department: row.department,
+            fileTypes: row.file_types || [],
+            behindTheDesign: row.behind_the_design || '',
+            thumbnail: row.thumbnail_key,
+          }))
+        )
+      )
+      .catch((err) => console.error('fetchPendingSubmissions failed', err))
+  }, [])
+
+  useEffect(() => {
+    refreshLiveContent()
+    refreshPending()
+  }, [refreshLiveContent, refreshPending])
 
   const actions = useMemo(() => {
     const updateUser = (updater) => {
@@ -108,9 +150,10 @@ export function AppProvider({ children }) {
       },
 
       toggleAppreciate(itemId) {
+        let has = false
         setState((prev) => {
           if (!prev.currentUser) return prev
-          const has = prev.currentUser.appreciatedItemIds.includes(itemId)
+          has = prev.currentUser.appreciatedItemIds.includes(itemId)
           const appreciatedItemIds = has
             ? prev.currentUser.appreciatedItemIds.filter((id) => id !== itemId)
             : [...prev.currentUser.appreciatedItemIds, itemId]
@@ -119,6 +162,11 @@ export function AppProvider({ children }) {
           )
           return { ...prev, currentUser: { ...prev.currentUser, appreciatedItemIds }, contentItems }
         })
+        setLiveContentItems((prev) =>
+          prev.map((item) =>
+            String(item.id) === String(itemId) ? { ...item, appreciations: item.appreciations + (has ? -1 : 1) } : item
+          )
+        )
       },
 
       toggleSave(itemId) {
@@ -187,7 +235,7 @@ export function AppProvider({ children }) {
         return ok
       },
 
-      applyAsCreator(data) {
+      async applyAsCreator(data) {
         updateUser((user) => ({
           ...user,
           isCreator: true,
@@ -195,55 +243,34 @@ export function AppProvider({ children }) {
           social: { ...user.social, ...data.social },
           payoutMethod: data.payoutMethod || user.payoutMethod,
         }))
+        const user = stateRef.current.currentUser
+        if (!user) return
+        await api.upsertCreator({ name: user.name, email: user.email, bio: data.bio, social: data.social })
       },
 
-      submitUpload(data) {
-        setState((prev) => {
-          if (!prev.currentUser) return prev
-          const submission = {
-            id: `pending-${Date.now()}`,
-            creatorId: prev.currentUser.id,
-            creatorName: prev.currentUser.name,
-            submittedAt: Date.now(),
-            status: 'pending',
-            ...data,
-          }
-          return { ...prev, pendingSubmissions: [submission, ...prev.pendingSubmissions] }
-        })
+      /** Uploads real files to Neon Object Storage and records the submission in Postgres. */
+      async submitUpload(data) {
+        const email = stateRef.current.currentUser?.email
+        if (!email) throw new Error('Sign in first')
+        await api.submitRealUpload({ creatorEmail: email, ...data })
+        refreshPending()
       },
 
-      moderateSubmission(submissionId, action) {
-        setState((prev) => {
-          const submission = prev.pendingSubmissions.find((s) => s.id === submissionId)
-          if (!submission) return prev
-          const pendingSubmissions = prev.pendingSubmissions.filter((s) => s.id !== submissionId)
-          if (action !== 'approve') {
-            return { ...prev, pendingSubmissions }
-          }
-          const approvedItem = {
-            id: Date.now(),
-            image: submission.thumbnail || '/images/t1.jpg',
-            avatar: '/images/a1.jpg',
-            title: submission.title,
-            creator: submission.creatorName,
-            department: submission.department,
-            appreciations: 0,
-            views: 0,
-            fileTypes: submission.fileTypes || [],
-            free: false,
-            hasVideo: (submission.fileTypes || []).some((f) => ['AEP', 'PPRO'].includes(f)),
-            moderationStatus: 'approved',
-            behindTheDesign: submission.behindTheDesign || '',
-          }
-          return {
-            ...prev,
-            pendingSubmissions,
-            contentItems: [approvedItem, ...prev.contentItems],
-          }
-        })
+      async moderateSubmission(submissionId, action) {
+        await api.moderateSubmission(submissionId, action)
+        refreshPending()
+        if (action === 'approve') refreshLiveContent()
       },
 
       markItemFree(itemId, isFree) {
+        const isLiveItem = liveContentItems.some((item) => String(item.id) === String(itemId))
+        if (isLiveItem) {
+          api
+            .markItemFreeRemote(itemId, isFree)
+            .then(refreshLiveContent)
+            .catch((err) => console.error('markItemFreeRemote failed', err))
+          return
+        }
         setState((prev) => ({
           ...prev,
           contentItems: prev.contentItems.map((item) => (item.id === itemId ? { ...item, free: isFree } : item)),
@@ -255,9 +282,17 @@ export function AppProvider({ children }) {
         updateUser((user) => ({ ...user, ...partial }))
       },
     }
-  }, [])
+  }, [liveContentItems, refreshLiveContent, refreshPending])
 
-  const value = useMemo(() => ({ ...state, ...actions }), [state, actions])
+  const mergedContentItems = useMemo(
+    () => [...liveContentItems, ...state.contentItems],
+    [liveContentItems, state.contentItems]
+  )
+
+  const value = useMemo(
+    () => ({ ...state, ...actions, contentItems: mergedContentItems, pendingSubmissions: livePendingSubmissions }),
+    [state, actions, mergedContentItems, livePendingSubmissions]
+  )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }
