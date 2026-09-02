@@ -28,9 +28,33 @@ API layer (no separate server to host).
 5. A download click on an approved item calls `/api/downloads`, which presigns short-lived GET
    URLs for that item's real source files and logs the download.
 
-Auth stays mocked (per an earlier explicit decision) — every API call is trusted based on the
-email the client sends, the same trust level the rest of this prototype already runs on. Only
-the storage/database layer is real.
+**Auth is real** (Neon Auth / Managed Better Auth — see below). The `/api/*` endpoints
+themselves still trust whatever email the client sends rather than verifying a session token
+server-side — fine while the API is only called from our own frontend, but worth hardening
+(verify the Neon Auth session JWT in each handler) before this is a real multi-party API.
+
+## Auth (Neon Auth / Managed Better Auth)
+
+Google sign-in and email/password, provisioned directly on the same Postgres branch as
+everything else above — no separate provider. Google works out of the box with Neon's shared
+dev OAuth credentials (no Google Cloud project needed to get started). Users land in
+`neon_auth.user`, queryable like any other table.
+
+- Client: `src/lib/authClient.js` (`@neondatabase/neon-js` SDK), talking directly to Neon's
+  hosted auth service at `VITE_NEON_AUTH_URL` — **not** through our own `/api` layer, so this
+  part actually works in local `npm run dev` too (unlike the Postgres/storage endpoints).
+- Wired into `AppContext.jsx`: `signUpWithEmail`, `signInWithEmail`, `signInWithGoogle`,
+  `signOut`. Routicle's own profile fields (role, credits, saved items, etc.) stay client-side
+  as before, just now keyed to each account's real user id instead of a fake one-off id, so
+  they persist across sign-outs for the same account.
+- Trusted origins currently allowlisted: `https://routicle.vercel.app` and
+  `http://localhost:5173`. Add more (e.g. a custom domain) via `add_auth_trusted_domain` or the
+  Console's Auth page before users on that origin can complete a sign-in redirect.
+- **Before going properly live**: Google's shared dev credentials show a generic consent
+  screen. For real branding (and to lift Google's test-user cap), create your own Google OAuth
+  client and follow [Neon's OAuth setup guide](https://neon.com/docs/auth/guides/setup-oauth) —
+  register `{VITE_NEON_AUTH_URL}/callback/google` as the redirect URI, then paste the client
+  ID/secret into the Console's Auth page for this branch.
 
 ## One-time setup required (can't be done from here)
 
@@ -47,6 +71,9 @@ them back later, so this has to happen in the console:
    - `DATABASE_URL` — see `.env.local` for the value already in this repo (gitignored).
    - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION` — from
      step 3.
+   - `VITE_NEON_AUTH_URL` — the Auth base URL from the Console's Auth page (also in
+     `.env.local`). **Build-time only** — Vite bakes `VITE_`-prefixed vars into the bundle, so
+     this one specifically must be set before the build runs, not just at runtime.
 5. Redeploy (Vercel only picks up new env vars on the next deploy — push any commit, or use
    **Redeploy** in the dashboard).
 
