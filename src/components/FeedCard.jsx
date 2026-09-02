@@ -11,6 +11,7 @@ export default function FeedCard({ item }) {
   const { currentUser, toggleAppreciate, toggleSave } = useApp()
   const navigate = useNavigate()
   const creator = getCreatorByName(item.creator)
+  const following = creator && currentUser?.followingCreatorIds.includes(creator.id)
 
   const appreciated = currentUser?.appreciatedItemIds.includes(item.id)
   const saved = currentUser?.savedItemIds.includes(item.id)
@@ -29,18 +30,17 @@ export default function FeedCard({ item }) {
 
   return (
     <div className="feed-card">
-      <Link to={`/design/${item.id}`} className="feed-card-media">
+      <Link to={`/design/${item.id}`} className="feed-card-media" title={item.title}>
         <img src={item.image} alt={item.title} className="feed-card-image" />
 
         {!item.free && (
           <div className="feed-card-watermark" style={{ backgroundImage: watermarkUrl }} />
         )}
 
-        {item.free && (
-          <div className="feed-card-top">
-            <span className="tag tag-free">Free</span>
-          </div>
-        )}
+        <div className="feed-card-top">
+          {item.free && <span className="tag tag-free">Free</span>}
+          {following && <span className="tag tag-following">Following</span>}
+        </div>
 
         {item.hasVideo && (
           <div className="play-badge">
@@ -59,35 +59,24 @@ export default function FeedCard({ item }) {
       </Link>
 
       <div className="feed-card-caption">
-        <div className="caption-row">
-          <Link to={`/design/${item.id}`} className="caption-title">{item.title}</Link>
-          <div className="caption-stats">
-            <button
-              type="button"
-              className={appreciated ? 'stat stat-button stat-active' : 'stat stat-button'}
-              onClick={requireAuth(() => toggleAppreciate(item.id))}
-            >
-              <HeartIcon size={12} color="currentColor" />
-              {formatCount(item.appreciations)}
-            </button>
-            <span className="stat">
-              <EyeIcon size={13} color="currentColor" />
-              {formatCount(item.views)}
-            </span>
-          </div>
-        </div>
-        <div className="caption-bottom-row">
-          <Link to={creator ? `/creator/${creator.id}` : '#'} className="caption-creator">
-            <img src={item.avatar} alt={item.creator} className="avatar" />
-            <span className="creator-name">{item.creator}</span>
-          </Link>
-          {item.fileTypes.length > 0 && (
-            <div className="filetype-row">
-              {item.fileTypes.map((ft) => (
-                <span key={ft} className="filetype-badge">{ft}</span>
-              ))}
-            </div>
-          )}
+        <Link to={creator ? `/creator/${creator.id}` : '#'} className="caption-creator">
+          <img src={item.avatar} alt={item.creator} className="avatar" />
+          <span className="creator-name">{item.creator}</span>
+        </Link>
+
+        <div className="caption-stats">
+          <button
+            type="button"
+            className={appreciated ? 'stat stat-button stat-active' : 'stat stat-button'}
+            onClick={requireAuth(() => toggleAppreciate(item.id))}
+          >
+            <HeartIcon size={12} color="currentColor" />
+            {formatCount(item.appreciations)}
+          </button>
+          <span className="stat">
+            <EyeIcon size={13} color="currentColor" />
+            {formatCount(item.views)}
+          </span>
         </div>
       </div>
     </div>

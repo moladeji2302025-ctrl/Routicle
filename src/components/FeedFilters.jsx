@@ -1,14 +1,24 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { SearchIcon, SlidersIcon, HeartIcon, ChevronDownIcon, ChevronRightIcon, StarIcon, SparkleIcon, SortIcon } from './icons'
-import { ART_STYLES, SOFTWARE, FILE_TYPE_BY_SOFTWARE } from '../data/software'
+import { DEPARTMENTS } from '../data/departments'
 
 const TABS = [
   { label: 'Projects', to: '/explore' },
-  { label: 'Creators', to: '/explore' },
+  { label: 'People', to: '/explore' },
   { label: 'Assets', to: '/explore' },
-  { label: 'Files', to: '/explore' },
+  { label: 'Images', to: '/explore' },
 ]
+
+// A representative image per department for the photo-backed category chips (matches
+// Behance's "Graphic Design / Photography / Illustration / ..." pill row).
+const DEPARTMENT_CHIP_IMAGE = {
+  'graphic-design': '/images/t1.jpg',
+  'motion-graphics': '/images/t5.jpg',
+  illustration: '/images/t7.jpg',
+  'ai-images': '/images/t3.jpg',
+  'ai-video': '/images/t9.jpg',
+}
 
 export default function FeedFilters() {
   const navigate = useNavigate()
@@ -65,7 +75,7 @@ export default function FeedFilters() {
 
       <div className="chip-scroll">
         <div className="chip-row">
-          <Link to="/explore" className="chip chip-dark">
+          <Link to="/explore" className="chip chip-active">
             <StarIcon size={12} />
             For You
           </Link>
@@ -73,32 +83,22 @@ export default function FeedFilters() {
             <HeartIcon size={12} color="currentColor" />
             Following
           </Link>
-          <Link to="/explore" className="chip chip-dark">
+          <Link to="/explore" className="chip chip-maroon">
             <SparkleIcon size={12} />
-            Featured
+            Best of Routicle
           </Link>
-          {ART_STYLES.map((style) => (
+          {DEPARTMENTS.map((dept) => (
             <Link
-              key={style.name}
-              to="/explore"
+              key={dept.id}
+              to={`/explore?department=${dept.id}`}
               className="chip chip-photo"
               style={{
-                backgroundImage: `linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.25)), url(${style.image})`,
+                backgroundImage: `linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.25)), url(${DEPARTMENT_CHIP_IMAGE[dept.id]})`,
               }}
             >
-              {style.name}
+              {dept.label}
             </Link>
           ))}
-          {SOFTWARE.map((s) => {
-            const fileType = FILE_TYPE_BY_SOFTWARE[s.name]
-            const to = fileType ? `/explore?fileType=${encodeURIComponent(fileType)}` : '/explore'
-            return (
-              <Link key={s.name} to={to} className="chip chip-software">
-                <img src={s.icon} alt="" className="chip-software-icon" />
-                {s.name}
-              </Link>
-            )
-          })}
         </div>
         <button type="button" className="chip-scroll-next" onClick={scrollChipsNext}>
           <ChevronRightIcon size={16} />
