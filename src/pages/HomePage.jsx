@@ -16,12 +16,12 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <ProductShowcase />
-      <BrowseBySoftware />
       <div className="projects-section">
         <FeedFilters />
         <FeedGrid items={approved} />
       </div>
+      <ProductShowcase />
+      <BrowseBySoftware />
       <Capabilities />
       <Stats />
       <Comparison />

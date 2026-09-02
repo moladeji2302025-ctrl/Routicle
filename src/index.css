@@ -242,9 +242,9 @@ a:hover {
 .hero {
   position: relative;
   overflow: hidden;
-  padding: 104px 28px 72px;
+  padding: 96px 28px 64px;
   text-align: center;
-  min-height: 100vh;
+  min-height: 640px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -413,6 +413,13 @@ a:hover {
   color: oklch(0.5 0.006 90);
 }
 
+.hero-cta-row {
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .btn-hero-primary {
   margin-top: 30px;
   display: inline-flex;
@@ -425,9 +432,30 @@ a:hover {
   transition: opacity 0.15s ease;
 }
 
+.hero-cta-row .btn-hero-primary,
+.hero-cta-row .btn-hero-secondary {
+  margin-top: 0;
+}
+
 .btn-hero-primary:hover {
   color: oklch(0.99 0.002 90);
   opacity: 0.82;
+}
+
+.btn-hero-secondary {
+  display: inline-flex;
+  padding: 15px 32px;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 16px;
+  background: var(--brand-lavender);
+  color: var(--brand-violet);
+  transition: opacity 0.15s ease;
+}
+
+.btn-hero-secondary:hover {
+  color: var(--brand-violet);
+  opacity: 0.8;
 }
 
 .hero-bullets {

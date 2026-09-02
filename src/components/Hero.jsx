@@ -1,17 +1,21 @@
-import { HeartIcon } from './icons'
+import { Link } from 'react-router-dom'
 
 const BULLETS = ['Free to browse', 'Real creators, real files', 'Cancel anytime', 'AI Studio included']
 
 const LEFT_CARDS = [
-  { image: '/images/t6.jpg', appreciations: 88, style: { top: '6%', left: '3%', width: '11vw', maxWidth: 140, aspectRatio: '4 / 5', transform: 'rotate(-3deg)' } },
-  { image: '/images/t5.jpg', appreciations: 210, style: { top: '46%', left: '11%', width: '9vw', maxWidth: 118, aspectRatio: '1 / 1', transform: 'rotate(2deg)' } },
-  { image: '/images/t7.jpg', appreciations: 156, style: { top: '74%', left: '2%', width: '9.5vw', maxWidth: 122, aspectRatio: '5 / 4', transform: 'rotate(-2deg)' } },
+  { image: '/images/t6.jpg', style: { top: '4%', left: '3%', width: '10.5vw', maxWidth: 132, aspectRatio: '4 / 5' } },
+  { image: '/images/a2.jpg', style: { top: '2%', left: '17%', width: '8.5vw', maxWidth: 108, aspectRatio: '1 / 1' } },
+  { image: '/images/t5.jpg', style: { top: '40%', left: '9%', width: '9vw', maxWidth: 116, aspectRatio: '3 / 4' } },
+  { image: '/images/t7.jpg', style: { top: '68%', left: '4%', width: '11vw', maxWidth: 142, aspectRatio: '5 / 4' } },
+  { image: '/images/a4.jpg', style: { top: '66%', left: '20%', width: '7.5vw', maxWidth: 96, aspectRatio: '1 / 1' } },
 ]
 
 const RIGHT_CARDS = [
-  { image: '/images/t9.jpg', appreciations: 190, style: { top: '5%', right: '3%', width: '11vw', maxWidth: 140, aspectRatio: '4 / 5', transform: 'rotate(3deg)' } },
-  { image: '/images/t3.jpg', appreciations: 302, style: { top: '46%', right: '12%', width: '9vw', maxWidth: 118, aspectRatio: '1 / 1', transform: 'rotate(-2deg)' } },
-  { image: '/images/t8.jpg', appreciations: 73, style: { top: '74%', right: '2%', width: '9.5vw', maxWidth: 122, aspectRatio: '5 / 4', transform: 'rotate(2deg)' } },
+  { image: '/images/t9.jpg', style: { top: '3%', right: '17%', width: '9vw', maxWidth: 112, aspectRatio: '1 / 1' } },
+  { image: '/images/t3.jpg', style: { top: '3%', right: '3%', width: '10.5vw', maxWidth: 132, aspectRatio: '4 / 5' } },
+  { image: '/images/a1.jpg', style: { top: '42%', right: '10%', width: '8.5vw', maxWidth: 112, aspectRatio: '1 / 1' } },
+  { image: '/images/t8.jpg', style: { top: '68%', right: '18%', width: '9vw', maxWidth: 116, aspectRatio: '4 / 5' } },
+  { image: '/images/t4.jpg', style: { top: '66%', right: '3%', width: '11vw', maxWidth: 142, aspectRatio: '5 / 4' } },
 ]
 
 export default function Hero() {
@@ -21,10 +25,6 @@ export default function Hero() {
         {LEFT_CARDS.map((card) => (
           <div key={card.image} className="hero-mini-card" style={card.style}>
             <img src={card.image} alt="" />
-            <span className="hero-mini-card-stat">
-              <HeartIcon size={10} color="currentColor" />
-              {card.appreciations}
-            </span>
           </div>
         ))}
       </div>
@@ -32,24 +32,15 @@ export default function Hero() {
         {RIGHT_CARDS.map((card) => (
           <div key={card.image} className="hero-mini-card" style={card.style}>
             <img src={card.image} alt="" />
-            <span className="hero-mini-card-stat">
-              <HeartIcon size={10} color="currentColor" />
-              {card.appreciations}
-            </span>
           </div>
         ))}
       </div>
 
       <div className="hero-content">
-        <div className="hero-eyebrow">
-          <img src="/brand/routicle-mark-violet.svg" alt="" className="hero-eyebrow-icon" />
-          The subscriber-share creative library
-        </div>
-
         <h1 className="hero-title">
-          Your Unused Work
+          Real Creative Work
           <br />
-          <span className="hero-accent">Is Worth Something</span>
+          <span className="hero-accent">Is On Routicle</span>
         </h1>
 
         <p className="hero-subtitle">
@@ -57,7 +48,10 @@ export default function Hero() {
           you get paid every month — non-exclusive, no strings attached.
         </p>
 
-        <a href="#" className="btn-hero-primary">Browse the library</a>
+        <div className="hero-cta-row">
+          <Link to="/explore" className="btn-hero-primary">Browse the library</Link>
+          <Link to="/become-creator" className="btn-hero-secondary">Become a Creator</Link>
+        </div>
 
         <p className="hero-bullets">{BULLETS.join(' · ')}</p>
       </div>
