@@ -1,4 +1,6 @@
+import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
+import { getCreatorByName } from '../data/creators'
 
 export default function Capabilities() {
   return (
@@ -14,9 +16,9 @@ export default function Capabilities() {
             From casual browsing to full source files and AI generation — go at your own pace.
           </p>
         </div>
-        <a href="#" className="capabilities-cta">
+        <Link to="/explore" className="capabilities-cta">
           Start browsing <span aria-hidden="true">→</span>
-        </a>
+        </Link>
       </div>
 
       <div className="bento-grid">
@@ -28,14 +30,14 @@ export default function Capabilities() {
           </p>
 
           <div className="bento-network">
-            <div className="bento-network-node bento-network-node-a">
+            <Link to={`/creator/${getCreatorByName('Zainab R.')?.id}`} className="bento-network-node bento-network-node-a">
               <img src="/images/t6.jpg" alt="" />
               <span className="bento-network-tag">Zainab R.</span>
-            </div>
-            <div className="bento-network-node bento-network-node-b">
+            </Link>
+            <Link to={`/creator/${getCreatorByName('Yemi S.')?.id}`} className="bento-network-node bento-network-node-b">
               <img src="/images/t9.jpg" alt="" />
               <span className="bento-network-tag">Yemi S.</span>
-            </div>
+            </Link>
           </div>
         </Reveal>
 

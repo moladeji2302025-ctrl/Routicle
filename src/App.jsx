@@ -17,6 +17,7 @@ import CreatorProfilePage from './pages/CreatorProfilePage'
 import AccountPage from './pages/AccountPage'
 import CollectionsPage from './pages/CollectionsPage'
 import AdminModerationPage from './pages/AdminModerationPage'
+import StaticPage from './pages/StaticPage'
 
 export default function App() {
   return (
@@ -40,6 +41,14 @@ export default function App() {
             <Route path="/account" element={<AccountPage />} />
             <Route path="/collections" element={<CollectionsPage />} />
             <Route path="/admin" element={<AdminModerationPage />} />
+            <Route path="/about" element={<StaticPage slug="about" />} />
+            <Route path="/careers" element={<StaticPage slug="careers" />} />
+            <Route path="/brand" element={<StaticPage slug="brand" />} />
+            <Route path="/contact" element={<StaticPage slug="contact" />} />
+            <Route path="/blog" element={<StaticPage slug="blog" />} />
+            <Route path="/help" element={<StaticPage slug="help" />} />
+            <Route path="/terms" element={<StaticPage slug="terms" />} />
+            <Route path="/privacy" element={<StaticPage slug="privacy" />} />
           </Route>
         </Routes>
       </BrowserRouter>

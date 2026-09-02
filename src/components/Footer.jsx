@@ -1,21 +1,44 @@
+import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
 
 const COLUMNS = [
   {
     heading: 'Product',
-    links: ['Explore', 'AI Studio', 'Pricing', 'Become a Creator'],
+    links: [
+      { label: 'Explore', to: '/explore' },
+      { label: 'AI Studio', to: '/studio/image' },
+      { label: 'Pricing', to: '/pricing' },
+      { label: 'Become a Creator', to: '/become-creator' },
+    ],
   },
   {
     heading: 'Company',
-    links: ['About', 'Careers', 'Brand', 'Contact', 'Blog'],
+    links: [
+      { label: 'About', to: '/about' },
+      { label: 'Careers', to: '/careers' },
+      { label: 'Brand', to: '/brand' },
+      { label: 'Contact', to: '/contact' },
+      { label: 'Blog', to: '/blog' },
+    ],
   },
   {
     heading: 'Resources',
-    links: ['Help Center', 'Terms of Service', 'Privacy Policy', 'Support'],
+    links: [
+      { label: 'Help Center', to: '/help' },
+      { label: 'Terms of Service', to: '/terms' },
+      { label: 'Privacy Policy', to: '/privacy' },
+      { label: 'Support', to: '/help' },
+    ],
   },
   {
+    // No real social accounts yet — kept as visible placeholders until there's something to link to.
     heading: 'Connect',
-    links: ['X (Twitter)', 'Instagram', 'LinkedIn', 'YouTube'],
+    links: [
+      { label: 'X (Twitter)', to: '#' },
+      { label: 'Instagram', to: '#' },
+      { label: 'LinkedIn', to: '#' },
+      { label: 'YouTube', to: '#' },
+    ],
   },
 ]
 
@@ -31,9 +54,15 @@ export default function Footer() {
           {COLUMNS.map((col) => (
             <div key={col.heading} className="footer-col">
               <h4 className="footer-col-heading">{col.heading}</h4>
-              {col.links.map((link) => (
-                <a key={link} href="#" className="footer-link">{link}</a>
-              ))}
+              {col.links.map((link) =>
+                link.to === '#' ? (
+                  <a key={link.label} href="#" className="footer-link" onClick={(e) => e.preventDefault()}>
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link key={link.label} to={link.to} className="footer-link">{link.label}</Link>
+                )
+              )}
             </div>
           ))}
         </div>

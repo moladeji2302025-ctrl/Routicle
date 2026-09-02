@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 
 export default function FooterCta() {
   const wrapperRef = useRef(null)
@@ -54,9 +55,9 @@ export default function FooterCta() {
 
         <div className="footer-cta-content">
           <h2 className="footer-cta-title" ref={titleRef}>Where Unused Work Earns</h2>
-          <a href="#" className="footer-cta-button" ref={buttonRef}>
+          <Link to="/become-creator" className="footer-cta-button" ref={buttonRef}>
             Start earning <span aria-hidden="true">→</span>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

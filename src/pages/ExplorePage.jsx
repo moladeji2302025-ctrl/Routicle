@@ -2,16 +2,18 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { DEPARTMENTS } from '../data/departments'
+import { getCreatorByName } from '../data/creators'
 import FeedGrid from '../components/FeedGrid'
 import { SearchIcon } from '../components/icons'
 
 export default function ExplorePage() {
-  const { contentItems } = useApp()
+  const { contentItems, currentUser } = useApp()
   const [searchParams] = useSearchParams()
-  const [department, setDepartment] = useState(null)
+  const [department, setDepartment] = useState(searchParams.get('department') || null)
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [peopleOnly, setPeopleOnly] = useState(false)
-  const [fileType, setFileType] = useState(null)
+  const [fileType, setFileType] = useState(searchParams.get('fileType') || null)
+  const [followingOnly, setFollowingOnly] = useState(searchParams.get('following') === '1')
 
   const fileTypes = useMemo(() => {
     const set = new Set()
@@ -25,13 +27,17 @@ export default function ExplorePage() {
       if (department && item.department !== department) return false
       if (fileType && !item.fileTypes.includes(fileType)) return false
       if (peopleOnly && item.department !== 'ai-images') return false
+      if (followingOnly) {
+        const creatorId = getCreatorByName(item.creator)?.id
+        if (!creatorId || !currentUser?.followingCreatorIds?.includes(creatorId)) return false
+      }
       if (query.trim()) {
         const q = query.trim().toLowerCase()
         if (!item.title.toLowerCase().includes(q) && !item.creator.toLowerCase().includes(q)) return false
       }
       return true
     })
-  }, [contentItems, department, fileType, peopleOnly, query])
+  }, [contentItems, department, fileType, peopleOnly, followingOnly, currentUser, query])
 
   return (
     <div className="explore-page">
@@ -98,6 +104,12 @@ export default function ExplorePage() {
               <input type="checkbox" checked={peopleOnly} onChange={(e) => setPeopleOnly(e.target.checked)} />
               AI-generated only
             </label>
+            {currentUser && (
+              <label className="explore-checkbox">
+                <input type="checkbox" checked={followingOnly} onChange={(e) => setFollowingOnly(e.target.checked)} />
+                Creators I follow
+              </label>
+            )}
           </div>
         </aside>
 

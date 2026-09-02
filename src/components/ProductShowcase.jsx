@@ -1,13 +1,14 @@
+import { Link } from 'react-router-dom'
 import { ImageIcon, VideoIcon, PenIcon, SparkleIcon } from './icons'
 import ShowcaseCarousel from './ShowcaseCarousel'
 import Reveal from './Reveal'
 
 const TABS = [
-  { label: 'Library', active: true },
-  { label: 'AI Studio', badge: 'New' },
-  { label: 'For Creators', badge: 'New' },
-  { label: 'Departments' },
-  { label: 'Pricing' },
+  { label: 'Library', to: '/explore', active: true },
+  { label: 'AI Studio', to: '/studio/image', badge: 'New' },
+  { label: 'For Creators', to: '/become-creator', badge: 'New' },
+  { label: 'Departments', to: '/explore' },
+  { label: 'Pricing', to: '/pricing' },
 ]
 
 const FEATURES = [
@@ -16,22 +17,26 @@ const FEATURES = [
     label: 'Graphic Design',
     icon: ImageIcon,
     desc: 'Templates, decks, and social graphics — ready to open in Canva, Illustrator, or Photoshop.',
+    to: '/explore?department=graphic-design',
     active: true,
   },
   {
     id: 'motion-graphics',
     label: 'Motion Graphics',
     icon: VideoIcon,
+    to: '/explore?department=motion-graphics',
   },
   {
     id: 'illustration',
     label: 'Illustration',
     icon: PenIcon,
+    to: '/explore?department=illustration',
   },
   {
     id: 'ai-generation',
     label: 'AI Image & Video Studio',
     icon: SparkleIcon,
+    to: '/studio/image',
   },
 ]
 
@@ -47,10 +52,10 @@ export default function ProductShowcase() {
 
         <div className="showcase-tabs">
           {TABS.map((tab) => (
-            <span key={tab.label} className={tab.active ? 'showcase-tab showcase-tab-active' : 'showcase-tab'}>
+            <Link key={tab.label} to={tab.to} className={tab.active ? 'showcase-tab showcase-tab-active' : 'showcase-tab'}>
               {tab.label}
               {tab.badge && <span className="showcase-tab-badge">{tab.badge}</span>}
-            </span>
+            </Link>
           ))}
         </div>
       </div>
@@ -62,15 +67,19 @@ export default function ProductShowcase() {
             Explore a growing library of finished design and video work — real files from real
             creators. Need something exact instead? Generate it yourself in the built-in AI Studio.
           </p>
-          <a href="#" className="showcase-tour-link">
+          <Link to="/explore" className="showcase-tour-link">
             Take a tour <span aria-hidden="true">→</span>
-          </a>
+          </Link>
 
           <div className="feature-list">
             {FEATURES.map((feature) => {
               const Icon = feature.icon
               return (
-                <div key={feature.id} className={feature.active ? 'feature-item feature-item-active' : 'feature-item'}>
+                <Link
+                  key={feature.id}
+                  to={feature.to}
+                  className={feature.active ? 'feature-item feature-item-active' : 'feature-item'}
+                >
                   <div className="feature-item-head">
                     <Icon size={17} color="currentColor" />
                     <span>{feature.label}</span>
@@ -83,7 +92,7 @@ export default function ProductShowcase() {
                       </div>
                     </>
                   )}
-                </div>
+                </Link>
               )
             })}
           </div>

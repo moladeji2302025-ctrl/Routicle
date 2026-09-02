@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { HeartIcon } from './icons'
 import { SHOWCASE_SLIDES } from '../data/showcaseSlides'
+import { useApp } from '../context/AppContext'
 
 const INTERVAL_MS = 4200
 const PEEK_PX = 86
 
 export default function ShowcaseCarousel() {
+  const { contentItems } = useApp()
   const [index, setIndex] = useState(0)
   const [blurred, setBlurred] = useState(false)
 
@@ -19,6 +22,8 @@ export default function ShowcaseCarousel() {
   }, [])
 
   const active = SHOWCASE_SLIDES[index]
+  const idFor = (slide) => contentItems.find((item) => item.title === slide.title)?.id
+  const activeId = idFor(active)
 
   return (
     <div className="showcase-panel-right">
@@ -30,11 +35,18 @@ export default function ShowcaseCarousel() {
             filter: blurred ? 'blur(6px)' : 'blur(0px)',
           }}
         >
-          {SHOWCASE_SLIDES.map((slide) => (
-            <div key={slide.image} className="carousel-card">
-              <img src={slide.image} alt="" className="carousel-card-image" />
-            </div>
-          ))}
+          {SHOWCASE_SLIDES.map((slide) => {
+            const slideId = idFor(slide)
+            return (
+              <Link
+                key={slide.image}
+                to={slideId ? `/design/${slideId}` : '/explore'}
+                className="carousel-card"
+              >
+                <img src={slide.image} alt="" className="carousel-card-image" />
+              </Link>
+            )
+          })}
         </div>
       </div>
 
@@ -44,7 +56,7 @@ export default function ShowcaseCarousel() {
         ))}
       </div>
 
-      <div className="showcase-floating-card">
+      <Link to={activeId ? `/design/${activeId}` : '/explore'} className="showcase-floating-card">
         <div className="floating-card-header">
           <span className="floating-card-label">Tools</span>
           <span className="floating-card-heading">Download</span>
@@ -76,7 +88,7 @@ export default function ShowcaseCarousel() {
             <span className="floating-tier">{active.tier}</span>
           </div>
         </div>
-      </div>
+      </Link>
     </div>
   )
 }

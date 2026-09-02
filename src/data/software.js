@@ -9,6 +9,17 @@ export const SOFTWARE = [
   { name: 'Procreate', icon: '/software/procreate.svg' },
 ]
 
+// Maps a software name to the fileType token used to filter the library (see CreatorUploadPage's
+// FORMATS list). Blender/Procreate have no matching format in the data yet.
+export const FILE_TYPE_BY_SOFTWARE = {
+  Photoshop: 'PSD',
+  Illustrator: 'AI',
+  'Premiere Pro': 'PPRO',
+  'After Effects': 'AEP',
+  Canva: 'Canva',
+  Figma: 'Figma',
+}
+
 export const ART_STYLES = [
   { name: 'Minimalist', image: '/images/t2.jpg' },
   { name: 'Retro', image: '/images/t8.jpg' },
