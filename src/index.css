@@ -4448,7 +4448,7 @@ a:hover {
   }
 }
 
-.showcase-grid-tile img {
+.showcase-grid-tile > img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -4458,7 +4458,7 @@ a:hover {
   transition: transform 0.4s ease;
 }
 
-.showcase-grid-tile:hover img {
+.showcase-grid-tile:hover > img {
   transform: scale(1.05);
 }
 
