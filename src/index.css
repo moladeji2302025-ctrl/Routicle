@@ -134,6 +134,17 @@
   box-sizing: border-box;
 }
 
+/* Form controls don't inherit font-family by default in any browser's UA
+   stylesheet — without this, every <button>/<input>/<select>/<textarea>
+   on the site falls back to the OS UI font instead of the Satoshi brand
+   font set on body, no matter what body/parent elements declare. */
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
 html,
 body,
 #root {
