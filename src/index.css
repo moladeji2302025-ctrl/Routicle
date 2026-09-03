@@ -4334,45 +4334,46 @@ a:hover {
   background: var(--surface);
   color: var(--text);
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(240px, 380px) minmax(360px, 480px);
+  justify-content: center;
   align-items: center;
-  gap: 48px;
-  padding: 120px 64px;
+  gap: 56px;
+  padding: 72px 64px;
   transition: background 0.25s ease, color 0.25s ease;
 }
 
 .showcase-deck-num {
   display: block;
-  font-size: 44px;
+  font-size: 36px;
   font-weight: 300;
   color: var(--text);
-  margin-top: 28px;
+  margin-top: 18px;
 }
 
 .showcase-deck-num-total {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--text-muted);
 }
 
 .showcase-deck-desc {
-  margin: 18px 0 0;
-  font-size: 14.5px;
-  line-height: 1.6;
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
   color: var(--text-muted);
-  max-width: 360px;
+  max-width: 320px;
 }
 
 .showcase-deck-cta-row {
-  margin-top: 28px;
+  margin-top: 20px;
 }
 
 .showcase-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1.1fr 1fr;
-  gap: 10px;
-  aspect-ratio: 1 / 0.92;
+  gap: 8px;
+  aspect-ratio: 1 / 0.85;
 }
 
 .showcase-grid-tile {
