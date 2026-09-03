@@ -4,7 +4,13 @@ import { useApp } from '../context/AppContext'
 import { DEPARTMENTS } from '../data/departments'
 import { getCreatorByName } from '../data/creators'
 import FeedGrid from '../components/FeedGrid'
-import { SearchIcon } from '../components/icons'
+import { SearchIcon, SlidersIcon, ChevronDownIcon } from '../components/icons'
+
+const SORTS = [
+  { id: 'recommended', label: 'Recommended' },
+  { id: 'recent', label: 'Most Recent' },
+  { id: 'appreciated', label: 'Most Appreciated' },
+]
 
 export default function ExplorePage() {
   const { contentItems, currentUser } = useApp()
@@ -14,6 +20,9 @@ export default function ExplorePage() {
   const [peopleOnly, setPeopleOnly] = useState(false)
   const [fileType, setFileType] = useState(searchParams.get('fileType') || null)
   const [followingOnly, setFollowingOnly] = useState(searchParams.get('following') === '1')
+  const [sort, setSort] = useState('recommended')
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [sortOpen, setSortOpen] = useState(false)
 
   const fileTypes = useMemo(() => {
     const set = new Set()
@@ -22,7 +31,7 @@ export default function ExplorePage() {
   }, [contentItems])
 
   const results = useMemo(() => {
-    return contentItems.filter((item) => {
+    let list = contentItems.filter((item) => {
       if (item.moderationStatus !== 'approved') return false
       if (department && item.department !== department) return false
       if (fileType && !item.fileTypes.includes(fileType)) return false
@@ -37,13 +46,28 @@ export default function ExplorePage() {
       }
       return true
     })
-  }, [contentItems, department, fileType, peopleOnly, followingOnly, currentUser, query])
+
+    if (sort === 'appreciated') list = [...list].sort((a, b) => b.appreciations - a.appreciations)
+    else if (sort === 'recent') list = [...list].sort((a, b) => b.id - a.id)
+
+    return list
+  }, [contentItems, department, fileType, peopleOnly, followingOnly, currentUser, query, sort])
+
+  const chips = [{ id: null, label: 'All' }, ...DEPARTMENTS]
 
   return (
     <div className="explore-page">
-      <div className="explore-header">
-        <h1 className="explore-title">Department &amp; search</h1>
-        <div className="explore-search">
+      <div className="explore-toolbar">
+        <button
+          type="button"
+          className={filterOpen ? 'explore-filter-btn explore-filter-btn-active' : 'explore-filter-btn'}
+          onClick={() => setFilterOpen((v) => !v)}
+        >
+          <SlidersIcon size={14} color="currentColor" />
+          Filter
+        </button>
+
+        <div className="explore-search-bar">
           <SearchIcon size={14} color="currentColor" />
           <input
             type="text"
@@ -52,76 +76,93 @@ export default function ExplorePage() {
             onChange={(event) => setQuery(event.target.value)}
           />
         </div>
+
+        <div className="explore-sort">
+          <button type="button" className="explore-sort-btn" onClick={() => setSortOpen((v) => !v)}>
+            {SORTS.find((s) => s.id === sort).label}
+            <ChevronDownIcon size={11} color="currentColor" />
+          </button>
+          {sortOpen && (
+            <div className="explore-sort-menu">
+              {SORTS.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={s.id === sort ? 'explore-sort-item explore-sort-item-active' : 'explore-sort-item'}
+                  onClick={() => { setSort(s.id); setSortOpen(false) }}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="explore-body">
-        <aside className="explore-sidebar">
-          <div className="explore-facet">
-            <h4>Department</h4>
-            <button
-              type="button"
-              className={department === null ? 'explore-facet-item explore-facet-active' : 'explore-facet-item'}
-              onClick={() => setDepartment(null)}
-            >
-              All departments
-            </button>
-            {DEPARTMENTS.map((dept) => (
-              <button
-                key={dept.id}
-                type="button"
-                className={department === dept.id ? 'explore-facet-item explore-facet-active' : 'explore-facet-item'}
-                onClick={() => setDepartment(dept.id)}
-              >
-                {dept.label}
-              </button>
-            ))}
-          </div>
+      <div className="explore-chip-row">
+        {chips.map((chip) => (
+          <button
+            key={chip.id ?? 'all'}
+            type="button"
+            className={department === chip.id ? 'explore-chip explore-chip-active' : 'explore-chip'}
+            onClick={() => setDepartment(chip.id)}
+          >
+            {chip.label}
+          </button>
+        ))}
+        {currentUser && (
+          <button
+            type="button"
+            className={followingOnly ? 'explore-chip explore-chip-active' : 'explore-chip'}
+            onClick={() => setFollowingOnly((v) => !v)}
+          >
+            Following
+          </button>
+        )}
+      </div>
 
-          <div className="explore-facet">
+      {filterOpen && (
+        <div className="explore-filter-panel">
+          <div className="explore-filter-group">
             <h4>File type</h4>
-            <button
-              type="button"
-              className={fileType === null ? 'explore-facet-item explore-facet-active' : 'explore-facet-item'}
-              onClick={() => setFileType(null)}
-            >
-              Any file type
-            </button>
-            {fileTypes.map((ft) => (
+            <div className="explore-filter-options">
               <button
-                key={ft}
                 type="button"
-                className={fileType === ft ? 'explore-facet-item explore-facet-active' : 'explore-facet-item'}
-                onClick={() => setFileType(ft)}
+                className={fileType === null ? 'explore-facet-item explore-facet-active' : 'explore-facet-item'}
+                onClick={() => setFileType(null)}
               >
-                {ft}
+                Any file type
               </button>
-            ))}
+              {fileTypes.map((ft) => (
+                <button
+                  key={ft}
+                  type="button"
+                  className={fileType === ft ? 'explore-facet-item explore-facet-active' : 'explore-facet-item'}
+                  onClick={() => setFileType(ft)}
+                >
+                  {ft}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="explore-facet">
+          <div className="explore-filter-group">
             <h4>People</h4>
             <label className="explore-checkbox">
               <input type="checkbox" checked={peopleOnly} onChange={(e) => setPeopleOnly(e.target.checked)} />
               AI-generated only
             </label>
-            {currentUser && (
-              <label className="explore-checkbox">
-                <input type="checkbox" checked={followingOnly} onChange={(e) => setFollowingOnly(e.target.checked)} />
-                Creators I follow
-              </label>
-            )}
           </div>
-        </aside>
-
-        <div className="explore-results">
-          <p className="explore-count">{results.length} result{results.length === 1 ? '' : 's'}</p>
-          {results.length > 0 ? (
-            <FeedGrid items={results} />
-          ) : (
-            <p className="explore-empty">Nothing matches those filters yet.</p>
-          )}
         </div>
-      </div>
+      )}
+
+      <p className="explore-count">{results.length} result{results.length === 1 ? '' : 's'}</p>
+
+      {results.length > 0 ? (
+        <FeedGrid items={results} />
+      ) : (
+        <p className="explore-empty">Nothing matches those filters yet.</p>
+      )}
     </div>
   )
 }

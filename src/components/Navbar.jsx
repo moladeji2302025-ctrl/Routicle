@@ -5,7 +5,7 @@ import { SunIcon, MoonIcon, SearchIcon } from './icons'
 
 const NAV_LINKS = [
   { label: 'Explore', to: '/explore' },
-  { label: 'Departments', to: '/explore' },
+  { label: 'Departments', to: '/departments' },
   { label: 'AI Studio', to: '/studio/image' },
   { label: 'Pricing', to: '/pricing' },
   { label: 'Become a Creator', to: '/become-creator' },
