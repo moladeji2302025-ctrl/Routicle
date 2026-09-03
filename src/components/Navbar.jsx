@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { SunIcon, MoonIcon, SearchIcon } from './icons'
+import { SearchIcon } from './icons'
 
 const NAV_LINKS = [
   { label: 'Explore', to: '/explore' },
@@ -14,7 +14,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [hidden, setHidden] = useState(false)
   const [query, setQuery] = useState('')
-  const { currentUser, theme, toggleTheme } = useApp()
+  const { currentUser } = useApp()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -58,9 +58,6 @@ export default function Navbar() {
               onChange={(e) => setQuery(e.target.value)}
             />
           </form>
-          <button type="button" className="navbar-theme-btn" onClick={toggleTheme} aria-label="Toggle theme">
-            {theme === 'dark' ? <SunIcon size={15} color="currentColor" /> : <MoonIcon size={15} color="currentColor" />}
-          </button>
           {currentUser ? (
             <Link to="/account" className="btn-solid">{currentUser.name.split(' ')[0]}</Link>
           ) : (

@@ -11,6 +11,10 @@ const THEME_KEY = 'routicle_app_theme'
 const AppContext = createContext(null)
 
 function loadInitialTheme() {
+  // Dark mode was removed from the homepage/marketing chrome only (see
+  // index.css — --surface/--text/etc no longer respond to
+  // [data-theme='dark']). The signed-in AppShell keeps its own independent
+  // dark mode, so this still reads/persists a real preference for that.
   try {
     const stored = localStorage.getItem(THEME_KEY)
     if (stored === 'light' || stored === 'dark') return stored

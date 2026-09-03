@@ -19,9 +19,9 @@
      are untouched. */
   --bg-base: #f5f7fc;
 
-  /* Site-wide theme tokens (marketing pages + app shell). Light is the default;
-     [data-theme="dark"] below overrides. Toggled by AppContext's theme state, applied as
-     data-theme on <html>, so it's global rather than scoped to any one section. */
+  /* Site-wide theme tokens (marketing pages, incl. the homepage). Dark mode
+     was removed from this surface — these are fixed at their light values
+     and no longer have a [data-theme="dark"] override. */
   --surface: var(--bg-base);
   --surface-2: #ffffff;
   --text: oklch(0.16 0.004 90);
@@ -30,36 +30,29 @@
   --glow-1: color-mix(in srgb, var(--brand-violet) 55%, transparent);
   --glow-2: color-mix(in srgb, var(--brand-purple) 45%, transparent);
 
-  /* App-shell aliases (sidebar + in-app dashboard) — kept for the existing .app-* components,
-     now just pointing at the site-wide tokens above so both stay in sync. */
-  --app-bg: var(--surface);
-  --app-bg-elevated: var(--surface-2);
+  /* App-shell tokens (signed-in sidebar + dashboard) — independent of the
+     tokens above; this is the only surface with a working dark mode,
+     toggled by AppContext's theme state via [data-theme] on <html>. */
+  --app-bg: var(--bg-base);
+  --app-bg-elevated: #ffffff;
   --app-sidebar-bg: oklch(0.98 0.002 90);
-  --app-border: var(--border);
-  --app-text: var(--text);
-  --app-text-muted: var(--text-muted);
+  --app-border: oklch(0.9 0.003 90);
+  --app-text: oklch(0.16 0.004 90);
+  --app-text-muted: oklch(0.5 0.006 90);
   --app-hover: oklch(0.95 0.003 90);
-  --app-card-bg: var(--surface-2);
+  --app-card-bg: #ffffff;
   --app-shadow: 0 20px 44px -28px rgba(0, 0, 0, 0.22);
 }
 
 [data-theme='dark'] {
-  --surface: oklch(0.09 0.01 290);
-  --surface-2: oklch(0.14 0.012 290);
-  --text: oklch(0.97 0.004 90);
-  --text-muted: oklch(0.66 0.01 290);
-  --border: oklch(1 0 0 / 0.1);
-  --glow-1: color-mix(in srgb, var(--brand-violet) 70%, transparent);
-  --glow-2: color-mix(in srgb, var(--brand-purple) 55%, transparent);
-
-  --app-bg: var(--surface);
-  --app-bg-elevated: var(--surface-2);
+  --app-bg: oklch(0.09 0.01 290);
+  --app-bg-elevated: oklch(0.14 0.012 290);
   --app-sidebar-bg: oklch(0.07 0.01 290);
-  --app-border: var(--border);
-  --app-text: var(--text);
-  --app-text-muted: var(--text-muted);
+  --app-border: oklch(1 0 0 / 0.1);
+  --app-text: oklch(0.97 0.004 90);
+  --app-text-muted: oklch(0.66 0.01 290);
   --app-hover: oklch(0.2 0.014 290);
-  --app-card-bg: var(--surface-2);
+  --app-card-bg: oklch(0.14 0.012 290);
   --app-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.6);
 }
 
@@ -238,10 +231,6 @@ a:hover {
   height: 22px;
   width: auto;
   display: block;
-}
-
-[data-theme='dark'] .logo-icon {
-  filter: invert(1);
 }
 
 .navbar-links {
@@ -1900,11 +1889,6 @@ a:hover {
   opacity: 0.9;
 }
 
-[data-theme='dark'] .footer-wordmark img,
-[data-theme='dark'] .footer-logo {
-  filter: invert(1);
-}
-
 .footer-wordmark img {
   display: block;
   width: clamp(420px, 60vw, 980px);
@@ -2697,7 +2681,7 @@ a:hover {
 
 .creator-apply-hero p {
   font-size: 15px;
-  color: oklch(0.5 0.006 90);
+  color: var(--app-text-muted);
   max-width: 560px;
 }
 
@@ -2722,14 +2706,14 @@ a:hover {
   gap: 10px;
   font-size: 13.5px;
   line-height: 1.55;
-  color: oklch(0.35 0.006 90);
+  color: var(--app-text);
 }
 
 .creator-apply-note {
   font-size: 12.5px;
   line-height: 1.55;
-  color: oklch(0.55 0.005 90);
-  background: oklch(0.96 0.004 90);
+  color: var(--app-text-muted);
+  background: var(--app-hover);
   border-radius: 10px;
   padding: 14px 16px;
 }
@@ -2742,12 +2726,26 @@ a:hover {
   gap: 18px;
 }
 
+/* .auth-field is shared with the signed-out sign-in/sign-up pages, which
+   stay light-only — scope these overrides to just this (AppShell, theme-
+   aware) page so its inputs don't stay hardcoded white/dark-text there. */
+.creator-apply-form .auth-field {
+  color: var(--app-text-muted);
+}
+
+.creator-apply-form .auth-field input,
+.creator-apply-form .auth-field textarea {
+  border-color: var(--app-border);
+  color: var(--app-text);
+  background: var(--app-bg-elevated);
+}
+
 .creator-apply-rights {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   font-size: 12.5px;
-  color: oklch(0.4 0.006 90);
+  color: var(--app-text-muted);
   line-height: 1.5;
 }
 
@@ -3234,6 +3232,18 @@ a:hover {
    ============================================================ */
 
 .app-shell {
+  /* Re-scope the shared site-wide tokens to the app-shell's own
+     (dark-capable) ones for everything rendered inside it — so pages
+     like Explore/Departments, which are shared between the signed-out
+     marketing chrome and the signed-in app, pick up real dark mode here
+     without needing their own per-page theme logic. Outside the shell
+     (signed-out), --surface/--text stay forced-light at :root. */
+  --surface: var(--app-bg);
+  --surface-2: var(--app-bg-elevated);
+  --text: var(--app-text);
+  --text-muted: var(--app-text-muted);
+  --border: var(--app-border);
+
   display: flex;
   min-height: 100vh;
   background: var(--app-bg);
@@ -3350,9 +3360,16 @@ a:hover {
   color: var(--app-text);
 }
 
+.account-menu {
+  position: relative;
+}
+
 .app-avatar-link {
-  margin-left: auto;
   display: flex;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .app-avatar-img {
@@ -3378,6 +3395,157 @@ a:hover {
   min-width: 0;
   background: var(--app-bg);
   color: var(--app-text);
+}
+
+/* Account dropdown menu */
+
+.account-menu-panel {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  z-index: 40;
+  width: 260px;
+  padding: 8px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+  background: var(--app-card-bg);
+  box-shadow: var(--app-shadow);
+}
+
+.account-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 12px;
+}
+
+.account-menu-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.account-menu-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-hover);
+  color: var(--app-text-muted);
+}
+
+.account-menu-name {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--app-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-menu-email {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--app-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-menu-cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: none;
+  background: var(--brand-violet);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-menu-cta:hover {
+  opacity: 0.88;
+}
+
+.account-menu-divider {
+  height: 1px;
+  margin: 8px 4px;
+  background: var(--app-border);
+}
+
+.account-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--app-text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-menu-item:hover {
+  background: var(--app-hover);
+}
+
+.account-menu-item-danger:hover {
+  background: color-mix(in srgb, #e5484d 16%, var(--app-hover));
+  color: #e5484d;
+}
+
+.account-menu-badge {
+  margin-left: auto;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--app-hover);
+  color: var(--app-text-muted);
+}
+
+.account-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 8px;
+  color: var(--app-text);
+  font-size: 13px;
+}
+
+.account-menu-segmented {
+  margin-left: auto;
+  display: flex;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--app-hover);
+}
+
+.account-menu-segmented button {
+  border: none;
+  background: none;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--app-text-muted);
+  cursor: pointer;
+}
+
+.account-menu-seg-active {
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 @media (max-width: 760px) {
@@ -3472,11 +3640,11 @@ a:hover {
   border-radius: 14px;
   color: var(--app-text);
   text-align: center;
-  transition: background 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
 .app-tool-tile:hover {
-  background: var(--app-hover);
+  transform: scale(1.05);
 }
 
 .app-tool-tile-icon {
@@ -3488,6 +3656,7 @@ a:hover {
   justify-content: center;
   background: var(--app-card-bg);
   border: 1px solid var(--app-border);
+  color: var(--app-text);
 }
 
 .app-tool-tile-label {

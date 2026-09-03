@@ -1,5 +1,6 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import AccountMenu from './AccountMenu'
 import {
   HomeIcon,
   SearchIcon,
@@ -7,10 +8,6 @@ import {
   FolderIcon,
   ChartIcon,
   UploadIcon,
-  UserIcon,
-  SunIcon,
-  MoonIcon,
-  LogOutIcon,
   PlusIcon,
 } from './icons'
 
@@ -22,14 +19,9 @@ const NAV_ITEMS = [
 ]
 
 export default function AppShell() {
-  const { currentUser, theme, toggleTheme, signOut } = useApp()
+  const { currentUser } = useApp()
   const navigate = useNavigate()
   const location = useLocation()
-
-  async function handleSignOut() {
-    await signOut()
-    navigate('/')
-  }
 
   return (
     <div className="app-shell">
@@ -83,21 +75,7 @@ export default function AppShell() {
         </nav>
 
         <div className="app-sidebar-bottom">
-          <button type="button" className="app-icon-btn" onClick={toggleTheme} title="Toggle theme">
-            {theme === 'dark' ? <SunIcon size={16} color="currentColor" /> : <MoonIcon size={16} color="currentColor" />}
-          </button>
-          <button type="button" className="app-icon-btn" onClick={handleSignOut} title="Sign out">
-            <LogOutIcon size={16} color="currentColor" />
-          </button>
-          <Link to="/account" className="app-avatar-link" title={currentUser?.name}>
-            {currentUser?.image ? (
-              <img src={currentUser.image} alt="" className="app-avatar-img" />
-            ) : (
-              <span className="app-avatar-fallback">
-                <UserIcon size={15} color="currentColor" />
-              </span>
-            )}
-          </Link>
+          <AccountMenu />
         </div>
       </aside>
 
