@@ -1,43 +1,54 @@
 import { Link } from 'react-router-dom'
+import { useApp } from '../context/AppContext'
 
 export default function Hero() {
+  const { contentItems } = useApp()
+  const approved = contentItems.filter((item) => item.moderationStatus === 'approved')
+  const gallery = approved.slice(0, 8).map((item) => item.image)
+  // Pad out with a repeat if the library has fewer than 8 approved items yet.
+  while (gallery.length > 0 && gallery.length < 8) gallery.push(gallery[gallery.length % approved.length])
+
+  const left = gallery.slice(0, 4)
+  const right = gallery.slice(4, 8)
+
   return (
-    <section className="hero-deck">
-      <div className="glow glow-hero" aria-hidden="true" />
+    <section className="hero-behance">
+      {left.length === 4 && (
+        <div className="hero-behance-cluster hero-behance-cluster-left" aria-hidden="true">
+          {left.map((src, i) => (
+            <div key={i} className={`hero-behance-card hero-behance-card-${i}`}>
+              <img src={src} alt="" />
+            </div>
+          ))}
+        </div>
+      )}
 
-      <div className="hero-deck-top">
-        <span className="hero-deck-brand">
-          <img src="/brand/routicle-mark-white.svg" alt="" className="hero-deck-brand-icon" />
-          Routicle
-        </span>
-        <Link to="/explore" className="hero-deck-arrow" aria-label="Browse the library">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M7 17L17 7M17 7H9M17 7v8" />
-          </svg>
-        </Link>
-      </div>
-
-      <div className="hero-deck-mid">
-        <h1 className="hero-deck-title">
-          Your Unused
+      <div className="hero-behance-text">
+        <h1 className="hero-behance-title">
+          Your Unused Work
           <br />
-          Work
+          <span className="hero-behance-accent">Finally Earns.</span>
         </h1>
-        <div className="hero-deck-accent" aria-hidden="true" />
-        <p className="hero-deck-subtitle">
-          Upload finished designs and video you never got to use. Subscribers download the real
-          source files, you get paid every month — non-exclusive, no strings attached.
+        <p className="hero-behance-subtitle">
+          A comprehensive marketplace for creators to turn finished-but-unused designs and video
+          into a real, recurring income — and for subscribers to download the source files behind
+          them.
         </p>
-        <div className="hero-deck-cta-row">
+        <div className="hero-behance-cta-row">
           <Link to="/explore" className="hero-deck-btn-primary">Browse the library</Link>
           <Link to="/become-creator" className="hero-deck-btn-secondary">Become a Creator</Link>
         </div>
       </div>
 
-      <div className="hero-deck-bottom">
-        <span className="hero-deck-tag">The subscriber-share creative library</span>
-        <span className="hero-deck-link">routicle.app</span>
-      </div>
+      {right.length === 4 && (
+        <div className="hero-behance-cluster hero-behance-cluster-right" aria-hidden="true">
+          {right.map((src, i) => (
+            <div key={i} className={`hero-behance-card hero-behance-card-${i}`}>
+              <img src={src} alt="" />
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   )
 }
