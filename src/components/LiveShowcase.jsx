@@ -62,25 +62,30 @@ export default function LiveShowcase() {
         </Reveal>
       </div>
 
-      <Reveal delay={100} className="showcase-grid">
-        {slide.map((item, i) => (
-          <button
-            type="button"
-            key={item.id}
-            className={`showcase-grid-tile showcase-grid-tile-${i}`}
-            onClick={() => openProject(item)}
-          >
-            <img src={item.image} alt={item.title} />
-            <span className="showcase-grid-dept">{departmentLabel(item.department)}</span>
-            <span className="showcase-grid-credit">
-              <img src={item.avatar} alt="" className="showcase-grid-avatar" />
-              <span>
-                <span className="showcase-grid-title">{item.title}</span>
-                <span className="showcase-grid-creator">by {item.creator}</span>
+      <Reveal delay={100} className="showcase-grid-reveal">
+        {/* Keyed on the slide index so only this inner track replays the
+            glide-in animation on rotation — the outer Reveal above stays
+            mounted once, so its own scroll-reveal never resets. */}
+        <div className="showcase-grid" key={index}>
+          {slide.map((item, i) => (
+            <button
+              type="button"
+              key={item.id}
+              className={`showcase-grid-tile showcase-grid-tile-${i}`}
+              onClick={() => openProject(item)}
+            >
+              <img src={item.image} alt={item.title} />
+              <span className="showcase-grid-dept">{departmentLabel(item.department)}</span>
+              <span className="showcase-grid-credit">
+                <img src={item.avatar} alt="" className="showcase-grid-avatar" />
+                <span>
+                  <span className="showcase-grid-title">{item.title}</span>
+                  <span className="showcase-grid-creator">by {item.creator}</span>
+                </span>
               </span>
-            </span>
-          </button>
-        ))}
+            </button>
+          ))}
+        </div>
       </Reveal>
     </section>
   )
