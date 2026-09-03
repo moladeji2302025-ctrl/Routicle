@@ -1741,12 +1741,13 @@ a:hover {
   position: relative;
   overflow: hidden;
   background: var(--surface);
-  padding: 160px 28px;
+  border-top: 1px solid var(--border);
+  padding: 100px 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  transition: background 0.25s ease;
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .glow-cta {
@@ -4189,8 +4190,9 @@ a:hover {
 .overview-deck {
   background: var(--surface);
   color: var(--text);
-  padding: 120px 56px;
-  transition: background 0.25s ease, color 0.25s ease;
+  border-top: 1px solid var(--border);
+  padding: 100px 64px;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .overview-deck-head {
@@ -4272,18 +4274,30 @@ a:hover {
 .intro-deck {
   background: var(--surface);
   color: var(--text);
+  border-top: 1px solid var(--border);
+  padding: 100px 64px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: 640px;
-  transition: background 0.25s ease, color 0.25s ease;
+  align-items: center;
+  gap: 64px;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .intro-deck-media {
   position: relative;
   overflow: hidden;
+  border-radius: 14px;
+  /* Explicit height, not min-height: on a CSS grid row sized to content
+     (the default here), a stretched item's height:100% child can't
+     resolve against it — the percentage falls back to auto and the
+     image renders at its full natural height instead of being capped.
+     A definite height here sizes the row itself, so both columns match. */
+  height: 420px;
 }
 
 .intro-deck-media img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -4292,7 +4306,6 @@ a:hover {
 }
 
 .intro-deck-text {
-  padding: 80px 64px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -4317,14 +4330,12 @@ a:hover {
 @media (max-width: 900px) {
   .intro-deck {
     grid-template-columns: 1fr;
+    padding: 64px 28px;
+    gap: 32px;
   }
 
   .intro-deck-media {
-    min-height: 320px;
-  }
-
-  .intro-deck-text {
-    padding: 56px 28px;
+    height: 280px;
   }
 }
 
@@ -4333,13 +4344,14 @@ a:hover {
 .showcase-deck {
   background: var(--surface);
   color: var(--text);
+  border-top: 1px solid var(--border);
   display: grid;
   grid-template-columns: minmax(240px, 380px) minmax(360px, 480px);
   justify-content: center;
   align-items: center;
   gap: 56px;
-  padding: 72px 64px;
-  transition: background 0.25s ease, color 0.25s ease;
+  padding: 100px 64px;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .showcase-deck-num {
@@ -4370,10 +4382,32 @@ a:hover {
 
 .showcase-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1.1fr 1fr;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: 1fr 1fr;
   gap: 8px;
-  aspect-ratio: 1 / 0.85;
+  aspect-ratio: 1 / 0.88;
+}
+
+/* Uneven tile widths per row, alternating which side is wider — matches
+   the brick-like asymmetry of the reference rather than a uniform 2x2. */
+.showcase-grid-tile-0 {
+  grid-column: 1 / 5;
+  grid-row: 1;
+}
+
+.showcase-grid-tile-1 {
+  grid-column: 5 / 11;
+  grid-row: 1;
+}
+
+.showcase-grid-tile-2 {
+  grid-column: 1 / 7;
+  grid-row: 2;
+}
+
+.showcase-grid-tile-3 {
+  grid-column: 7 / 11;
+  grid-row: 2;
 }
 
 .showcase-grid-tile {
@@ -4386,6 +4420,32 @@ a:hover {
   cursor: pointer;
   background: var(--surface-2);
   text-align: left;
+  /* Each rotation mounts fresh tiles (new item key), so this animation
+     replays automatically on every carousel tick — a soft staggered
+     glide instead of a hard instant swap. */
+  animation: showcase-tile-in 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.showcase-grid-tile-0 { animation-delay: 0ms; }
+.showcase-grid-tile-1 { animation-delay: 70ms; }
+.showcase-grid-tile-2 { animation-delay: 140ms; }
+.showcase-grid-tile-3 { animation-delay: 210ms; }
+
+@keyframes showcase-tile-in {
+  from {
+    opacity: 0;
+    transform: scale(1.035);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-grid-tile {
+    animation: none;
+  }
 }
 
 .showcase-grid-tile img {
@@ -4490,8 +4550,9 @@ a:hover {
 .works-deck {
   background: var(--surface);
   color: var(--text);
-  padding: 120px 64px;
-  transition: background 0.25s ease, color 0.25s ease;
+  border-top: 1px solid var(--border);
+  padding: 100px 64px;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .works-deck-head {
@@ -4553,11 +4614,12 @@ a:hover {
 .stats-deck {
   background: var(--surface);
   color: var(--text);
-  padding: 120px 64px;
+  border-top: 1px solid var(--border);
+  padding: 100px 64px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 64px;
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .stats-deck-intro {
