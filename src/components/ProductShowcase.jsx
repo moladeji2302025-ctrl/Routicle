@@ -3,14 +3,6 @@ import { ImageIcon, VideoIcon, PenIcon, SparkleIcon } from './icons'
 import ShowcaseCarousel from './ShowcaseCarousel'
 import Reveal from './Reveal'
 
-const TABS = [
-  { label: 'Library', to: '/explore', active: true },
-  { label: 'AI Studio', to: '/studio/image', badge: 'New' },
-  { label: 'For Creators', to: '/become-creator', badge: 'New' },
-  { label: 'Departments', to: '/explore' },
-  { label: 'Pricing', to: '/pricing' },
-]
-
 const FEATURES = [
   {
     id: 'graphic-design',
@@ -49,15 +41,6 @@ export default function ProductShowcase() {
           Browse real, finished work from real creatives — or generate something new yourself,
           right inside Routicle.
         </p>
-
-        <div className="showcase-tabs">
-          {TABS.map((tab) => (
-            <Link key={tab.label} to={tab.to} className={tab.active ? 'showcase-tab showcase-tab-active' : 'showcase-tab'}>
-              {tab.label}
-              {tab.badge && <span className="showcase-tab-badge">{tab.badge}</span>}
-            </Link>
-          ))}
-        </div>
       </div>
 
       <Reveal className="showcase-panel">
@@ -84,14 +67,7 @@ export default function ProductShowcase() {
                     <Icon size={17} color="currentColor" />
                     <span>{feature.label}</span>
                   </div>
-                  {feature.active && (
-                    <>
-                      <p className="feature-desc">{feature.desc}</p>
-                      <div className="feature-progress">
-                        <div className="feature-progress-fill" />
-                      </div>
-                    </>
-                  )}
+                  {feature.active && <p className="feature-desc">{feature.desc}</p>}
                 </Link>
               )
             })}

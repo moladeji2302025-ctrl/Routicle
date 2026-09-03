@@ -3,19 +3,13 @@ import { Link } from 'react-router-dom'
 const BULLETS = ['Free to browse', 'Real creators, real files', 'Cancel anytime', 'AI Studio included']
 
 const LEFT_CARDS = [
-  { image: '/images/t6.jpg', style: { top: '4%', left: '3%', width: '10.5vw', maxWidth: 132, aspectRatio: '4 / 5' } },
-  { image: '/images/a2.jpg', style: { top: '2%', left: '17%', width: '8.5vw', maxWidth: 108, aspectRatio: '1 / 1' } },
-  { image: '/images/t5.jpg', style: { top: '40%', left: '9%', width: '9vw', maxWidth: 116, aspectRatio: '3 / 4' } },
-  { image: '/images/t7.jpg', style: { top: '68%', left: '4%', width: '11vw', maxWidth: 142, aspectRatio: '5 / 4' } },
-  { image: '/images/a4.jpg', style: { top: '66%', left: '20%', width: '7.5vw', maxWidth: 96, aspectRatio: '1 / 1' } },
+  { image: '/images/t6.jpg', style: { top: '8%', left: '6%', width: '12vw', maxWidth: 160, aspectRatio: '4 / 5' } },
+  { image: '/images/t5.jpg', style: { top: '58%', left: '2%', width: '10vw', maxWidth: 132, aspectRatio: '1 / 1' } },
 ]
 
 const RIGHT_CARDS = [
-  { image: '/images/t9.jpg', style: { top: '3%', right: '17%', width: '9vw', maxWidth: 112, aspectRatio: '1 / 1' } },
-  { image: '/images/t3.jpg', style: { top: '3%', right: '3%', width: '10.5vw', maxWidth: 132, aspectRatio: '4 / 5' } },
-  { image: '/images/a1.jpg', style: { top: '42%', right: '10%', width: '8.5vw', maxWidth: 112, aspectRatio: '1 / 1' } },
-  { image: '/images/t8.jpg', style: { top: '68%', right: '18%', width: '9vw', maxWidth: 116, aspectRatio: '4 / 5' } },
-  { image: '/images/t4.jpg', style: { top: '66%', right: '3%', width: '11vw', maxWidth: 142, aspectRatio: '5 / 4' } },
+  { image: '/images/t3.jpg', style: { top: '8%', right: '6%', width: '12vw', maxWidth: 160, aspectRatio: '4 / 5' } },
+  { image: '/images/t9.jpg', style: { top: '58%', right: '2%', width: '10vw', maxWidth: 132, aspectRatio: '1 / 1' } },
 ]
 
 export default function Hero() {
