@@ -1757,12 +1757,27 @@ a:hover {
 
 /* Footer CTA banner */
 
-.footer-cta {
+/* Pinned scroll-reveal: the wrapper is taller than the viewport so there's
+   scroll distance to consume; the actual visible section is sticky inside
+   it and stays pinned to the top of the screen for that whole distance.
+   The background image is static (always visible); FooterCta.jsx maps
+   scroll progress through that distance to the text, then the buttons,
+   staging in via inline opacity/transform — the footer below can't scroll
+   into view until the wrapper's full height has been scrolled past and
+   the sticky section un-pins naturally. */
+.footer-cta-pin-wrapper {
   position: relative;
+  height: 220vh;
+}
+
+.footer-cta {
+  position: sticky;
+  top: 0;
+  height: 100vh;
   overflow: hidden;
   background: var(--surface);
   border-top: 1px solid var(--border);
-  padding: 100px 28px;
+  padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1770,18 +1785,28 @@ a:hover {
   transition: background 0.25s ease, border-color 0.25s ease;
 }
 
-.glow-cta {
-  top: -20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 640px;
-  height: 640px;
-  background: radial-gradient(circle, var(--glow-1) 0%, transparent 70%);
-  opacity: 0.6;
+.footer-cta-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.footer-cta-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Show the bottom of the image (the village/hillside), not its middle. */
+  object-position: bottom center;
+  display: block;
+  /* Fades in from transparent at the top (blends with the section-before's
+     solid color) down into the fully visible image. */
+  mask-image: linear-gradient(to bottom, transparent 0%, black 38%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 38%, black 100%);
 }
 
 .footer-cta-content {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4140,6 +4165,7 @@ a:hover {
 
 .hero-behance {
   position: relative;
+  overflow: hidden;
   /* Full viewport height minus the sticky navbar above it, capped so it
      can't balloon on unusually tall screens (same guard as the old
      deck hero). */
@@ -4152,6 +4178,30 @@ a:hover {
   justify-content: center;
   gap: 48px;
   transition: background 0.25s ease, color 0.25s ease;
+}
+
+.hero-behance-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-behance-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Show the top of the image (the birds/sky), not its middle. */
+  object-position: top center;
+  display: block;
+  /* Only the top portion stays opaque; it fades out well before the
+     midpoint so the section's own solid background takes over. */
+  mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 62%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 62%);
+}
+
+.hero-behance-text {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-behance-text {

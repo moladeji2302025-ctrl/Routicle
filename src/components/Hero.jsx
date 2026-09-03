@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom'
 export default function Hero() {
   return (
     <section className="hero-behance">
+      <div className="hero-behance-bg" aria-hidden="true">
+        <img src="/images/hero-sunset-reeds.jpg" alt="" />
+      </div>
+
       <div className="hero-behance-text">
         <h1 className="hero-behance-title">
           Your Unused Work
