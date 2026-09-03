@@ -1,53 +1,42 @@
 import { Link } from 'react-router-dom'
 
-const BULLETS = ['Free to browse', 'Real creators, real files', 'Cancel anytime', 'AI Studio included']
-
-const LEFT_CARDS = [
-  { image: '/images/t6.jpg', style: { top: '8%', left: '6%', width: '12vw', maxWidth: 160, aspectRatio: '4 / 5' } },
-  { image: '/images/t5.jpg', style: { top: '58%', left: '2%', width: '10vw', maxWidth: 132, aspectRatio: '1 / 1' } },
-]
-
-const RIGHT_CARDS = [
-  { image: '/images/t3.jpg', style: { top: '8%', right: '6%', width: '12vw', maxWidth: 160, aspectRatio: '4 / 5' } },
-  { image: '/images/t9.jpg', style: { top: '58%', right: '2%', width: '10vw', maxWidth: 132, aspectRatio: '1 / 1' } },
-]
-
 export default function Hero() {
   return (
-    <section className="hero">
-      <div className="hero-cards hero-cards-left">
-        {LEFT_CARDS.map((card) => (
-          <div key={card.image} className="hero-mini-card" style={card.style}>
-            <img src={card.image} alt="" />
-          </div>
-        ))}
-      </div>
-      <div className="hero-cards hero-cards-right">
-        {RIGHT_CARDS.map((card) => (
-          <div key={card.image} className="hero-mini-card" style={card.style}>
-            <img src={card.image} alt="" />
-          </div>
-        ))}
+    <section className="hero-deck">
+      <div className="glow glow-hero" aria-hidden="true" />
+
+      <div className="hero-deck-top">
+        <span className="hero-deck-brand">
+          <img src="/brand/routicle-mark-white.svg" alt="" className="hero-deck-brand-icon" />
+          Routicle
+        </span>
+        <Link to="/explore" className="hero-deck-arrow" aria-label="Browse the library">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M7 17L17 7M17 7H9M17 7v8" />
+          </svg>
+        </Link>
       </div>
 
-      <div className="hero-content">
-        <h1 className="hero-title">
-          Real Creative Work
+      <div className="hero-deck-mid">
+        <h1 className="hero-deck-title">
+          Your Unused
           <br />
-          <span className="hero-accent">Is On Routicle</span>
+          Work
         </h1>
-
-        <p className="hero-subtitle">
-          Upload finished designs and video you never got to use. Subscribers download the files,
-          you get paid every month — non-exclusive, no strings attached.
+        <div className="hero-deck-accent" aria-hidden="true" />
+        <p className="hero-deck-subtitle">
+          Upload finished designs and video you never got to use. Subscribers download the real
+          source files, you get paid every month — non-exclusive, no strings attached.
         </p>
-
-        <div className="hero-cta-row">
-          <Link to="/explore" className="btn-hero-primary">Browse the library</Link>
-          <Link to="/become-creator" className="btn-hero-secondary">Become a Creator</Link>
+        <div className="hero-deck-cta-row">
+          <Link to="/explore" className="hero-deck-btn-primary">Browse the library</Link>
+          <Link to="/become-creator" className="hero-deck-btn-secondary">Become a Creator</Link>
         </div>
+      </div>
 
-        <p className="hero-bullets">{BULLETS.join(' · ')}</p>
+      <div className="hero-deck-bottom">
+        <span className="hero-deck-tag">The subscriber-share creative library</span>
+        <span className="hero-deck-link">routicle.app</span>
       </div>
     </section>
   )
