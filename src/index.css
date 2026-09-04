@@ -3779,6 +3779,12 @@ a:hover {
   color: var(--brand-violet);
   font-size: 13px;
   font-weight: 600;
+  transition: transform 0.15s ease;
+}
+
+.app-cta-btn:hover {
+  color: var(--brand-violet);
+  transform: scale(1.05);
 }
 
 @media (max-width: 640px) {
