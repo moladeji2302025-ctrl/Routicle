@@ -20,6 +20,18 @@ export function payPerDownloadPrice(item) {
 }
 
 /**
+ * A team's shared plan extends access to whichever member is viewing, for as
+ * long as that team is their active workspace — mirrors how personal
+ * billing already works here (subscribe() just flips a local tier flag;
+ * there's no live payment gateway wired up on either side yet).
+ */
+export function effectiveViewer(user, activeTeam) {
+  if (!user || !activeTeam?.tier) return user
+  if (TIER_RANK[activeTeam.tier] <= TIER_RANK[user.role]) return user
+  return { ...user, role: activeTeam.tier, billingMode: 'monthly' }
+}
+
+/**
  * Works out what the download button should show/do for a given item + viewer.
  * Mirrors the paywall states described in the product spec.
  */

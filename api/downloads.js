@@ -3,15 +3,32 @@ import { send, methodGuard, withErrorHandling } from './_lib/http.js'
 import { presignDownload, SOURCE_BUCKET } from './_lib/s3.js'
 
 /**
- * Issues short-lived presigned GET URLs for a content item's real source files.
- * Entitlement (tier/paywall) is decided client-side same as the rest of this prototype's
- * mocked auth — this endpoint trusts the caller already ran evaluateDownload().
+ * POST issues short-lived presigned GET URLs for a content item's real source
+ * files. Entitlement (tier/paywall) is decided client-side same as the rest
+ * of this prototype's mocked auth — this endpoint trusts the caller already
+ * ran evaluateDownload().
+ *
+ * GET ?organizationId=  returns a team's shared download history.
  */
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
-    if (!methodGuard(req, res, ['POST'])) return
+    if (!methodGuard(req, res, ['GET', 'POST'])) return
 
-    const { itemId, userEmail } = req.body || {}
+    if (req.method === 'GET') {
+      const { organizationId } = req.query || {}
+      if (!organizationId) return send(res, 400, { error: 'organizationId is required' })
+      const rows = await sql`
+        SELECT d.content_item_id, d.user_email, d.downloaded_at, c.title
+        FROM downloads d
+        JOIN content_items c ON c.id = d.content_item_id
+        WHERE d.organization_id = ${organizationId}
+        ORDER BY d.downloaded_at DESC
+        LIMIT 100
+      `
+      return send(res, 200, { downloads: rows })
+    }
+
+    const { itemId, userEmail, organizationId } = req.body || {}
     if (!itemId || !userEmail) return send(res, 400, { error: 'itemId and userEmail are required' })
 
     const rows = await sql`SELECT * FROM content_items WHERE id = ${itemId} AND moderation_status = 'approved'`
@@ -32,7 +49,7 @@ export default async function handler(req, res) {
       }))
     )
 
-    await sql`INSERT INTO downloads (content_item_id, user_email) VALUES (${itemId}, ${userEmail.toLowerCase().trim()})`
+    await sql`INSERT INTO downloads (content_item_id, user_email, organization_id) VALUES (${itemId}, ${userEmail.toLowerCase().trim()}, ${organizationId || null})`
     await sql`UPDATE content_items SET download_count = download_count + 1 WHERE id = ${itemId}`
 
     send(res, 200, { files })

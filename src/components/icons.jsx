@@ -165,6 +165,17 @@ export function UserIcon({ size = 18, color = 'currentColor' }) {
   )
 }
 
+export function UsersIcon({ size = 18, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M2.5 20c0-3.3 2.9-6 6.5-6s6.5 2.7 6.5 6" />
+      <path d="M16 4.3c1.6.5 2.8 2 2.8 3.7 0 1.7-1.2 3.2-2.8 3.7" />
+      <path d="M18 14.2c2.2.6 3.8 2.4 3.8 4.8" />
+    </svg>
+  )
+}
+
 export function SunIcon({ size = 16, color = 'currentColor' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getCreatorByName } from '../data/creators'
-import { evaluateDownload, requiredTier, TIERS } from '../data/pricing'
+import { evaluateDownload, effectiveViewer, requiredTier, TIERS } from '../data/pricing'
 import { HeartIcon, EyeIcon, PlayIcon } from '../components/icons'
 import { formatCount } from '../utils/format'
 import { requestDownload, triggerFileDownload } from '../lib/api'
@@ -10,7 +10,7 @@ import { requestDownload, triggerFileDownload } from '../lib/api'
 export default function DesignDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { contentItems, currentUser, toggleAppreciate, purchaseDownload } = useApp()
+  const { contentItems, currentUser, activeTeam, toggleAppreciate, purchaseDownload } = useApp()
   const [copied, setCopied] = useState(false)
   const [justDownloaded, setJustDownloaded] = useState(false)
 
@@ -28,7 +28,7 @@ export default function DesignDetailPage() {
 
   const creator = getCreatorByName(item.creator)
   const tier = requiredTier(item)
-  const decision = evaluateDownload(item, currentUser)
+  const decision = evaluateDownload(item, effectiveViewer(currentUser, activeTeam))
   const appreciated = currentUser?.appreciatedItemIds.includes(item.id)
 
   function handleShare() {
@@ -43,7 +43,7 @@ export default function DesignDetailPage() {
   async function deliverRealFiles() {
     if (!item.isLive || !item.sourceObjectKeys?.length) return
     try {
-      const { files } = await requestDownload(item.id, currentUser.email)
+      const { files } = await requestDownload(item.id, currentUser.email, activeTeam?.id)
       files.forEach((file) => triggerFileDownload(file.url, file.label))
     } catch (err) {
       console.error('download failed', err)

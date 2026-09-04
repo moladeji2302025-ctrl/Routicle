@@ -103,8 +103,33 @@ export function markItemFreeRemote(id, isFree) {
 }
 
 /** Returns presigned, time-limited download URLs for a live item's real source files. */
-export function requestDownload(itemId, userEmail) {
-  return request('/downloads', { method: 'POST', body: JSON.stringify({ itemId, userEmail }) })
+export function requestDownload(itemId, userEmail, organizationId) {
+  return request('/downloads', { method: 'POST', body: JSON.stringify({ itemId, userEmail, organizationId }) })
+}
+
+/** A team's shared download history. */
+export function fetchTeamDownloads(organizationId) {
+  return request(`/downloads?organizationId=${encodeURIComponent(organizationId)}`)
+}
+
+/** Personal (organizationId omitted) or team-shared saved items — real, server-side Collections. */
+export function fetchSavedItems({ userId, organizationId }) {
+  const query = organizationId ? `?userId=${userId}&organizationId=${organizationId}` : `?userId=${userId}`
+  return request(`/collections${query}`)
+}
+
+export function saveItemRemote({ userId, organizationId, contentItemId, savedByUserId }) {
+  return request('/collections', {
+    method: 'POST',
+    body: JSON.stringify({ userId, organizationId, contentItemId, savedByUserId }),
+  })
+}
+
+export function unsaveItemRemote({ userId, organizationId, contentItemId }) {
+  const query = organizationId
+    ? `?userId=${userId}&organizationId=${organizationId}&contentItemId=${contentItemId}`
+    : `?userId=${userId}&contentItemId=${contentItemId}`
+  return request(`/collections${query}`, { method: 'DELETE' })
 }
 
 export function triggerFileDownload(url, fileName) {

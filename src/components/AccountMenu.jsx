@@ -10,12 +10,13 @@ import {
   MoonIcon,
   HelpIcon,
   LogOutIcon,
+  UsersIcon,
 } from './icons'
 
 const ROLE_LABEL = { free: 'Free', standard: 'Standard', express: 'Express' }
 
 export default function AccountMenu() {
-  const { currentUser, theme, toggleTheme, signOut } = useApp()
+  const { currentUser, teams, activeTeam, activeTeamId, theme, toggleTheme, setActiveTeam, signOut } = useApp()
   const [open, setOpen] = useState(false)
   const rootRef = useRef(null)
   const navigate = useNavigate()
@@ -89,10 +90,37 @@ export default function AccountMenu() {
 
           <div className="account-menu-divider" />
 
-          <button type="button" className="account-menu-item" onClick={() => go('/account')}>
+          <p className="account-menu-label">Workspace</p>
+          <button
+            type="button"
+            className={!activeTeamId ? 'account-menu-item account-menu-item-selected' : 'account-menu-item'}
+            onClick={() => setActiveTeam(null)}
+          >
+            <UserIcon size={16} color="currentColor" />
+            Personal
+          </button>
+          {teams.map((team) => (
+            <button
+              key={team.id}
+              type="button"
+              className={activeTeamId === team.id ? 'account-menu-item account-menu-item-selected' : 'account-menu-item'}
+              onClick={() => setActiveTeam(team.id)}
+            >
+              <UsersIcon size={16} color="currentColor" />
+              {team.name}
+            </button>
+          ))}
+          <button type="button" className="account-menu-item account-menu-item-muted" onClick={() => go('/team')}>
+            <UsersIcon size={16} color="currentColor" />
+            {teams.length > 0 ? 'Manage teams' : 'Create a team'}
+          </button>
+
+          <div className="account-menu-divider" />
+
+          <button type="button" className="account-menu-item" onClick={() => go(activeTeamId ? '/team' : '/account')}>
             <CardIcon size={16} color="currentColor" />
             Plan &amp; billing
-            <span className="account-menu-badge">{ROLE_LABEL[currentUser.role] ?? 'Free'}</span>
+            <span className="account-menu-badge">{ROLE_LABEL[activeTeam?.tier || currentUser.role] ?? 'Free'}</span>
           </button>
           <button type="button" className="account-menu-item" onClick={() => go('/account')}>
             <SettingsIcon size={16} color="currentColor" />
@@ -100,7 +128,7 @@ export default function AccountMenu() {
           </button>
           <button type="button" className="account-menu-item" onClick={() => go('/collections')}>
             <FolderIcon size={16} color="currentColor" />
-            My collections
+            {activeTeam ? `${activeTeam.name}'s collection` : 'My collections'}
           </button>
 
           <div className="account-menu-row">

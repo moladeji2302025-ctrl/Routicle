@@ -44,7 +44,11 @@
   --app-shadow: 0 20px 44px -28px rgba(0, 0, 0, 0.22);
 }
 
-[data-theme='dark'] {
+/* Scoped to .app-shell's own subtree, not :root/html — otherwise these dark
+   values would leak into any page reachable while signed out too (Team,
+   Collections), since [data-theme] lives on <html> and custom properties
+   set there would otherwise cascade everywhere, not just inside the shell. */
+[data-theme='dark'] .app-shell {
   --app-bg: oklch(0.09 0.01 290);
   --app-bg-elevated: oklch(0.14 0.012 290);
   --app-sidebar-bg: oklch(0.07 0.01 290);
@@ -3497,6 +3501,24 @@ a:hover {
   background: var(--app-hover);
 }
 
+.account-menu-label {
+  margin: 4px 8px 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.account-menu-item-selected {
+  background: color-mix(in srgb, var(--brand-violet) 12%, transparent);
+  color: var(--brand-violet);
+}
+
+.account-menu-item-muted {
+  color: var(--app-text-muted);
+}
+
 .account-menu-item-danger:hover {
   background: color-mix(in srgb, #e5484d 16%, var(--app-hover));
   color: #e5484d;
@@ -5094,4 +5116,234 @@ a:hover {
   .departments-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Team workspace page */
+
+.team-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 40px 96px;
+  color: var(--app-text);
+}
+
+.team-page-intro {
+  margin: 18px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--app-text-muted);
+  max-width: 540px;
+}
+
+.team-page-error {
+  margin: 20px 0 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: color-mix(in srgb, #e5484d 14%, transparent);
+  color: #e5484d;
+  font-size: 13px;
+}
+
+.team-page-notice {
+  margin: 20px 0 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--brand-violet) 14%, transparent);
+  color: var(--brand-violet);
+  font-size: 13px;
+}
+
+.team-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.team-picker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: var(--app-card-bg);
+  color: var(--app-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.team-picker-item-active {
+  border-color: var(--brand-violet);
+  color: var(--brand-violet);
+}
+
+.team-panel {
+  margin-top: 32px;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  background: var(--app-card-bg);
+  padding: 24px;
+}
+
+.team-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.team-panel-head h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.team-page-role {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--app-text-muted);
+}
+
+.team-section {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--app-border);
+}
+
+.team-section h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.team-section-desc {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--app-text-muted);
+  max-width: 460px;
+}
+
+.team-plan-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.team-plan-btn {
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: var(--app-bg);
+  color: var(--app-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.team-plan-btn-active {
+  border-color: var(--brand-violet);
+  background: var(--brand-violet);
+  color: white;
+}
+
+.team-plan-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.team-member-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.team-member-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.team-member-row:hover {
+  background: var(--app-hover);
+}
+
+.team-member-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.team-member-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-hover);
+  color: var(--app-text-muted);
+}
+
+.team-member-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.team-member-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.team-member-email {
+  font-size: 12px;
+  color: var(--app-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-member-remove {
+  border: none;
+  background: none;
+  color: var(--app-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.team-member-remove:hover {
+  color: #e5484d;
+}
+
+.team-invite-form,
+.team-create-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.team-invite-form input,
+.team-create-row input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--app-border);
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-size: 13.5px;
+}
+
+.team-create-form {
+  margin-top: 32px;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  background: var(--app-card-bg);
+  padding: 24px;
+}
+
+.team-create-form h2 {
+  margin: 0;
+  font-size: 19px;
 }

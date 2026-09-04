@@ -17,6 +17,7 @@ import CreatorDashboardPage from './pages/CreatorDashboardPage'
 import CreatorProfilePage from './pages/CreatorProfilePage'
 import AccountPage from './pages/AccountPage'
 import CollectionsPage from './pages/CollectionsPage'
+import TeamPage from './pages/TeamPage'
 import AdminModerationPage from './pages/AdminModerationPage'
 import StaticPage from './pages/StaticPage'
 
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="/creator/:id" element={<CreatorProfilePage />} />
             <Route path="/account" element={<AccountPage />} />
             <Route path="/collections" element={<CollectionsPage />} />
+            <Route path="/team" element={<TeamPage />} />
             <Route path="/admin" element={<AdminModerationPage />} />
             <Route path="/about" element={<StaticPage slug="about" />} />
             <Route path="/careers" element={<StaticPage slug="careers" />} />

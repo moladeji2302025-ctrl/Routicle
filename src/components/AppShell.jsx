@@ -9,6 +9,7 @@ import {
   ChartIcon,
   UploadIcon,
   PlusIcon,
+  UsersIcon,
 } from './icons'
 
 const NAV_ITEMS = [
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
   { label: 'Explore', to: '/explore', icon: SearchIcon, match: (p) => p.startsWith('/explore') },
   { label: 'AI Studio', to: '/studio/image', icon: SparkleIcon, match: (p) => p.startsWith('/studio') },
   { label: 'Collections', to: '/collections', icon: FolderIcon, match: (p) => p.startsWith('/collections') },
+  { label: 'Team', to: '/team', icon: UsersIcon, match: (p) => p.startsWith('/team') },
 ]
 
 export default function AppShell() {
