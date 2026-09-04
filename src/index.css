@@ -1400,51 +1400,35 @@ a:hover {
 
 /* Feed grid */
 
-/* Masonry via CSS columns: every card gets the same left/right/top/bottom
-   margin (column-gap + margin-bottom, both 20px), and each card's height
-   still varies with its image's natural aspect ratio — so sizes differ
-   without the gaps between them ever being uneven. */
+/* Real masonry (JS-computed shortest-column-first placement in FeedGrid.jsx),
+   not CSS `column-count` — columns fill top-to-bottom independently with no
+   awareness of each other's height, so the last row is always ragged. Each
+   card's height still varies with its image's natural aspect ratio, but
+   every column now ends up close to the same total height. */
 .feed-grid {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
   padding: 24px 28px 88px;
-  column-count: 5;
-  column-gap: 20px;
 }
 
-@media (max-width: 1440px) {
-  .feed-grid {
-    column-count: 4;
-  }
-}
-
-@media (max-width: 1100px) {
-  .feed-grid {
-    column-count: 3;
-  }
+.feed-grid-column {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 @media (max-width: 780px) {
   .feed-grid {
-    column-count: 2;
-    column-gap: 12px;
+    gap: 12px;
     padding-left: 24px;
     padding-right: 24px;
   }
-}
 
-@media (max-width: 520px) {
-  .feed-grid {
-    column-count: 1;
-  }
-}
-
-.feed-card-wrap {
-  break-inside: avoid;
-  margin-bottom: 20px;
-}
-
-@media (max-width: 780px) {
-  .feed-card-wrap {
-    margin-bottom: 12px;
+  .feed-grid-column {
+    gap: 12px;
   }
 }
 
