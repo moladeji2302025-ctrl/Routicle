@@ -1,46 +1,90 @@
+import { importJWK, jwtVerify, decodeProtectedHeader } from 'jose'
 import { sql } from './db.js'
 import { send } from './http.js'
 
 /**
  * Server-side session verification.
  *
- * Neon Auth is hosted on its own domain (…neonauth.…aws.neon.tech), so its
- * session cookie is scoped there and is *never* sent to this app's origin —
- * reading req.headers.cookie here always comes up empty. Instead the client
- * sends the session token it already holds as a bearer header, and this
- * verifies it against neon_auth.session, which is the same table Neon Auth
- * itself checks.
+ * Neon Auth is hosted on its own domain, so its session cookie is scoped there
+ * and never reaches this app's origin — req.headers.cookie on a Vercel function
+ * is always empty for it, and the session token itself is httpOnly so the
+ * browser can't read it either.
  *
- * The token is a bearer credential: it only ever travels same-origin over
- * HTTPS, and is held in memory client-side rather than localStorage.
+ * What the browser *can* do is ask Neon Auth for a signed JWT (its /token
+ * endpoint, which requires a live session) and send that here as a bearer
+ * token. Neon Auth signs those with a key it keeps in neon_auth.jwks — the same
+ * database this app already connects to — so the signature is verified locally
+ * against the public key. Nothing is trusted on the client's word: a forged or
+ * expired token fails the signature or the exp check.
  *
  * Everything under /api/admin/* goes through requireAdmin(). The rest of the
  * API still trusts caller-supplied ids — a known gap, but not one that should
  * extend to endpoints which can change the platform for everyone.
  */
 
+// Signing keys rotate rarely; caching across warm invocations avoids a query
+// per request, and a `kid` miss falls through to a re-read below.
+let keyCache = new Map()
+
+async function loadKeys() {
+  const rows = await sql`SELECT id, "publicKey" FROM neon_auth.jwks`
+  const next = new Map()
+  for (const row of rows) {
+    try {
+      const jwk = typeof row.publicKey === 'string' ? JSON.parse(row.publicKey) : row.publicKey
+      // Neon Auth stores the bare JWK; `alg` is required to import an OKP key.
+      next.set(row.id, await importJWK({ alg: 'EdDSA', ...jwk }, 'EdDSA'))
+    } catch (err) {
+      console.error('skipping unreadable JWK', row.id, err.message)
+    }
+  }
+  keyCache = next
+  return next
+}
+
+async function keyFor(kid) {
+  if (keyCache.has(kid)) return keyCache.get(kid)
+  const keys = await loadKeys()
+  if (kid && keys.has(kid)) return keys.get(kid)
+  // No kid on the header (or an unknown one) — fall back to the only key when
+  // there is exactly one, which is the normal single-key case.
+  return keys.size === 1 ? [...keys.values()][0] : null
+}
+
 function bearerToken(req) {
   const header = req.headers?.authorization || req.headers?.Authorization
   if (!header || !/^Bearer\s+/i.test(header)) return null
-  const token = header.replace(/^Bearer\s+/i, '').trim()
-  return token || null
+  return header.replace(/^Bearer\s+/i, '').trim() || null
 }
 
 export async function getSession(req) {
   const token = bearerToken(req)
   if (!token) return null
 
-  const rows = await sql`
-    SELECT u.id, u.email, u.name, u.image, s."expiresAt"
-    FROM neon_auth.session s
-    JOIN neon_auth."user" u ON u.id = s."userId"
-    WHERE s.token = ${token} AND s."expiresAt" > now()
-    LIMIT 1
-  `
-  if (rows.length === 0) return null
+  try {
+    const { kid } = decodeProtectedHeader(token)
+    const key = await keyFor(kid)
+    if (!key) {
+      console.error('no verification key available for kid', kid)
+      return null
+    }
 
-  const r = rows[0]
-  return { user: { id: r.id, email: r.email, name: r.name, image: r.image } }
+    // jwtVerify enforces the signature and the exp/nbf claims.
+    const { payload } = await jwtVerify(token, key)
+    const userId = payload.sub || payload.id
+    if (!userId) return null
+
+    // Read identity from our own tables rather than the token body, so a claim
+    // set that drifts from the database can't grant access to the wrong row.
+    const rows = await sql`SELECT id, email, name, image FROM neon_auth."user" WHERE id = ${userId} LIMIT 1`
+    if (rows.length === 0) return null
+
+    return { user: rows[0] }
+  } catch (err) {
+    // Expired or tampered tokens land here; that's a normal 401, not a fault.
+    if (err?.code !== 'ERR_JWT_EXPIRED') console.error('JWT verification failed:', err.message)
+    return null
+  }
 }
 
 /**

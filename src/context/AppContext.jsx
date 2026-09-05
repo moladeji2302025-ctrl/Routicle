@@ -385,16 +385,13 @@ export function AppProvider({ children }) {
     const result = await authClient.getSession()
     const authUser = result.data?.user
     if (!authUser) {
-      api.setSessionToken(null)
+      api.clearAuthToken()
       return null
     }
 
-    // Neon Auth is on its own domain, so its cookie never reaches /api/*.
-    // Hand the token to the API client so authenticated endpoints can verify
-    // it as a bearer credential (see api/_lib/auth.js).
-    const token = result.data?.session?.token
-    if (token) api.setSessionToken(token)
-    else console.warn('No session token in the Neon Auth response — /api/admin/* will reject this session')
+    // A fresh sign-in must not reuse the previous account's cached JWT; the
+    // API client mints a new one on the next request (see lib/authToken.js).
+    api.clearAuthToken()
 
     const pendingIntent = intentOverride || sessionStorage.getItem(PENDING_INTENT_KEY) || null
     sessionStorage.removeItem(PENDING_INTENT_KEY)
@@ -458,7 +455,7 @@ export function AppProvider({ children }) {
 
       async signOut() {
         await authClient.signOut()
-        api.setSessionToken(null)
+        api.clearAuthToken()
         setState((prev) => ({ ...prev, currentUser: null }))
         setActiveTeamId(null)
       },

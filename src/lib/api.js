@@ -1,29 +1,31 @@
 /** Thin client for the real backend (/api/*) — Postgres metadata + Neon Object Storage files. */
 
-/**
- * The Neon Auth session token, held in memory only.
- *
- * Neon Auth runs on its own domain, so its session cookie is scoped there and
- * never reaches /api/* on this origin. Endpoints that need to know who is
- * calling get this token as a bearer header instead, and verify it against the
- * session table server-side. AppContext sets it whenever the session is
- * hydrated, and clears it on sign-out.
- */
-let sessionToken = null
+import { getAuthToken, clearAuthToken } from './authToken'
 
-export function setSessionToken(token) {
-  sessionToken = token || null
-}
+export { clearAuthToken }
 
-async function request(path, options = {}) {
-  const res = await fetch(`/api${path}`, {
+async function send(path, options, token) {
+  return fetch(`/api${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   })
+}
+
+async function request(path, options = {}) {
+  let res = await send(path, options, await getAuthToken())
+
+  // The JWT is short-lived. If one expires between being minted and arriving,
+  // drop the cached copy and try once with a fresh one rather than surfacing a
+  // spurious "sign in required" to someone who is signed in.
+  if (res.status === 401) {
+    clearAuthToken()
+    const retryToken = await getAuthToken()
+    if (retryToken) res = await send(path, options, retryToken)
+  }
   const isJson = res.headers.get('content-type')?.includes('application/json')
   if (!isJson) {
     // /api/* are Vercel serverless functions. `npm run dev` and `npm run preview`
