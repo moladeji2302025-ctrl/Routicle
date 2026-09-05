@@ -22,8 +22,6 @@ import {
   ChevronRightIcon,
 } from '../components/icons'
 
-const BANNER_KEY = 'routicle_home_banner_dismissed'
-
 function greeting() {
   const hour = new Date().getHours()
   if (hour < 12) return 'Good morning'
@@ -40,7 +38,6 @@ export default function AppHomePage() {
     activeTeam,
     teamMembers,
     recentlyViewed,
-    pendingSubmissions,
     toggleFollow,
   } = useApp()
   const navigate = useNavigate()
@@ -49,13 +46,6 @@ export default function AppHomePage() {
   const [openSuggestions, setOpenSuggestions] = useState(false)
   const [cursor, setCursor] = useState(0)
   const searchRef = useRef(null)
-  const [bannerDismissed, setBannerDismissed] = useState(() => {
-    try {
-      return localStorage.getItem(BANNER_KEY) === '1'
-    } catch {
-      return false
-    }
-  })
 
   const approved = useMemo(
     () => contentItems.filter((item) => item.moderationStatus === 'approved'),
@@ -160,11 +150,6 @@ export default function AppHomePage() {
       .slice(0, 4)
   }, [approved, currentUser])
 
-  const myPending = useMemo(
-    () => (currentUser?.isCreator ? pendingSubmissions.filter((s) => s.creatorName === currentUser.name) : []),
-    [pendingSubmissions, currentUser]
-  )
-
   const tier = subscription?.tier || 'free'
   const plan = TIERS[tier]
   const imageMax = plan?.imageCredits || 0
@@ -186,58 +171,8 @@ export default function AppHomePage() {
     ...(currentUser?.isAdmin ? [{ label: 'Moderation', to: '/admin', icon: SparkleIcon }] : []),
   ]
 
-  function dismissBanner() {
-    setBannerDismissed(true)
-    try {
-      localStorage.setItem(BANNER_KEY, '1')
-    } catch {
-      // ignore
-    }
-  }
-
-  // The banner only appears when it has something real to say — it's driven by
-  // actual state (queue depth, plan, creator status), never shown just to fill space.
-  const banner = !bannerDismissed
-    ? currentUser?.isAdmin && pendingSubmissions.length > 0
-      ? {
-          tag: 'Moderation',
-          text: `${pendingSubmissions.length} submission${pendingSubmissions.length === 1 ? '' : 's'} waiting for review.`,
-          cta: { label: 'Review queue', to: '/admin' },
-        }
-      : myPending.length > 0
-        ? {
-            tag: 'In review',
-            text: `${myPending.length} of your upload${myPending.length === 1 ? ' is' : 's are'} being checked before going live.`,
-            cta: { label: 'View dashboard', to: '/dashboard' },
-          }
-        : tier === 'free'
-          ? {
-              tag: 'Free plan',
-              text: 'You can browse everything, but source files stay locked until you subscribe.',
-              cta: { label: 'See plans', to: '/pricing' },
-            }
-          : !currentUser?.isCreator
-            ? {
-                tag: 'Earn',
-                text: 'Sitting on finished work you never used? Upload it and take a share of the pool.',
-                cta: { label: 'Become a Creator', to: '/become-creator' },
-              }
-            : null
-    : null
-
   return (
     <div className="app-home">
-      {banner && (
-        <div className="app-banner">
-          <span className="app-banner-tag">{banner.tag}</span>
-          <span className="app-banner-text">{banner.text}</span>
-          <Link to={banner.cta.to} className="app-banner-cta">{banner.cta.label}</Link>
-          <button type="button" className="app-banner-close" onClick={dismissBanner} aria-label="Dismiss">
-            ×
-          </button>
-        </div>
-      )}
-
       <h1 className="app-home-greeting">
         {greeting()}, {currentUser?.name?.split(' ')[0] || 'there'}
       </h1>
