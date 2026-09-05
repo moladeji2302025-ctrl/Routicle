@@ -7,10 +7,15 @@ async function request(path, options = {}) {
   })
   const isJson = res.headers.get('content-type')?.includes('application/json')
   if (!isJson) {
-    // Vite's local dev server has no /api routes of its own and falls back to serving
-    // index.html (status 200) for anything it doesn't recognize — treat that the same as
-    // a failure rather than silently returning null, which crashes callers expecting an array/object.
-    throw new Error(`${path} did not return JSON (status ${res.status}) — the API isn't reachable here.`)
+    // /api/* are Vercel serverless functions. `npm run dev` and `npm run preview`
+    // are Vite only — they don't run functions, so these paths 404 (or fall through
+    // to index.html). Fail loudly rather than returning null, which would crash
+    // callers expecting an object, and say how to actually run them locally.
+    const localHint =
+      typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+        ? " Run `npx vercel dev` instead of `npm run dev` to serve /api locally."
+        : ''
+    throw new Error(`${path} did not return JSON (status ${res.status}) — the API isn't reachable here.${localHint}`)
   }
   const body = await res.json()
   if (!res.ok) {
