@@ -6891,7 +6891,25 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 480px;
+  max-width: 520px;
+}
+
+/* Card holding stacked form fields — the base .settings-card is padded for
+   divider-separated rows, which is too tight for labelled inputs. */
+.settings-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+}
+
+.settings-subhead {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
 }
 
 .settings-stack-field {
