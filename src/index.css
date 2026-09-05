@@ -3878,7 +3878,8 @@ a:hover {
 .app-home {
   max-width: 1040px;
   margin: 0 auto;
-  padding: 40px 32px 96px;
+  /* First value is the headroom above the greeting. */
+  padding: 96px 32px 96px;
 }
 
 .app-home-greeting {
