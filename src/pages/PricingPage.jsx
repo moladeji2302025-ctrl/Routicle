@@ -222,7 +222,6 @@ export default function PricingPage() {
                   <span className="pricing-amount">$0</span>
                 ) : (
                   <>
-                    {cadence === 'annual' && <span className="pricing-was">{money(plan.monthly)}</span>}
                     <span className="pricing-amount">{money(price)}</span>
                     <span className="pricing-per">
                       /month

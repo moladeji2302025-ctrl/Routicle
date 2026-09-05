@@ -51,11 +51,11 @@
 [data-theme='dark'] .app-shell {
   --app-bg: #111111;
   --app-bg-elevated: oklch(0.14 0.012 290);
-  --app-sidebar-bg: oklch(0.07 0.01 290);
+  --app-sidebar-bg: #181818;
   --app-border: oklch(1 0 0 / 0.1);
   --app-text: oklch(0.97 0.004 90);
   --app-text-muted: oklch(0.66 0.01 290);
-  --app-hover: oklch(0.2 0.014 290);
+  --app-hover: #333333;
   --app-card-bg: #222222;
   --app-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.6);
 }
@@ -2082,14 +2082,14 @@ a:hover {
 }
 
 .detail-download-btn {
-  width: 100%;
-  padding: 15px;
-  border-radius: 999px;
-  background: var(--brand-violet);
-  color: white;
+  align-self: flex-start;
+  padding: 9px 16px;
+  border: 1px solid white;
+  border-radius: 9px;
+  color: var(--brand-violet);
+  font-size: 13px;
   font-weight: 600;
-  font-size: 14.5px;
-  transition: opacity 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
 .detail-download-btn:hover {
@@ -2520,13 +2520,6 @@ a:hover {
   margin: 22px 0 0;
 }
 
-.pricing-was {
-  font-size: 17px;
-  color: var(--text-muted);
-  text-decoration: line-through;
-  text-decoration-thickness: 1.5px;
-}
-
 .pricing-amount {
   font-size: 40px;
   font-weight: 700;
@@ -2615,11 +2608,15 @@ a:hover {
 /* Feature matrix */
 
 .pricing-matrix {
-  margin-top: 56px;
+  margin-top: 96px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: var(--surface-2);
+  background: #181818;
   overflow: hidden;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1320px, calc(100vw - 80px));
 }
 
 .pricing-matrix-group + .pricing-matrix-group {
