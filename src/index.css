@@ -6327,11 +6327,10 @@ a:hover {
   justify-content: space-between;
   gap: 24px;
   padding: 15px 0;
-  border-bottom: 1px solid var(--app-border);
 }
 
-.settings-row:last-child {
-  border-bottom: none;
+.settings-row + .settings-row {
+  border-top: 1px solid var(--app-border);
 }
 
 .settings-row-stacked {
@@ -6517,11 +6516,12 @@ a:hover {
   flex-direction: column;
   gap: 6px;
   padding: 14px 0;
-  border-bottom: 1px solid var(--app-border);
 }
 
-.settings-field:last-child {
-  border-bottom: none;
+/* Separator goes *between* siblings, not after every one — :last-child can't
+   help when a Feedback message or an actions row follows the final field. */
+.settings-field + .settings-field {
+  border-top: 1px solid var(--app-border);
 }
 
 .settings-field label {
@@ -6607,11 +6607,13 @@ a:hover {
   background: none;
 }
 
+/* Bottom value matters: these sit last inside a card, whose own vertical
+   padding is only 4px, so without it the button hugs the card's edge. */
 .settings-actions {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-top: 14px;
+  padding: 14px 0 18px;
 }
 
 /* Keeps Save reachable on the long Profile form without hunting for it. */
@@ -6700,12 +6702,11 @@ a:hover {
   align-items: center;
   gap: 12px;
   padding: 13px 0;
-  border-bottom: 1px solid var(--app-border);
 }
 
-.settings-list-row:last-child,
-.settings-session-row:last-child {
-  border-bottom: none;
+.settings-list-row + .settings-list-row,
+.settings-session-row + .settings-session-row {
+  border-top: 1px solid var(--app-border);
 }
 
 .settings-list-row .settings-row-text {
@@ -6735,7 +6736,6 @@ a:hover {
   width: 100%;
   padding: 13px 0;
   border: none;
-  border-bottom: 1px solid var(--app-border);
   background: none;
   color: var(--app-text);
   font: inherit;
@@ -6743,8 +6743,8 @@ a:hover {
   cursor: pointer;
 }
 
-.settings-workspace-row:last-child {
-  border-bottom: none;
+.settings-workspace-row + .settings-workspace-row {
+  border-top: 1px solid var(--app-border);
 }
 
 .settings-workspace-row .settings-row-text {
@@ -6759,11 +6759,10 @@ a:hover {
 
 .settings-meter {
   padding: 14px 0;
-  border-bottom: 1px solid var(--app-border);
 }
 
-.settings-meter:last-child {
-  border-bottom: none;
+.settings-meter + .settings-meter {
+  border-top: 1px solid var(--app-border);
 }
 
 .settings-meter-top {
