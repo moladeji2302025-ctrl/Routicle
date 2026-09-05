@@ -3886,14 +3886,14 @@ a:hover {
   font-size: 32px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 0 20px 8px;
+  margin: 0 20px 15px;
   color: var(--app-text);
   text-align: center;
 }
 
 .app-home-sub {
   /* Bottom value is the gap down to the search bar. */
-  margin: 8px 0 80px;
+  margin: 8px 0 60px;
   font-size: 13.5px;
   color: var(--app-text-muted);
   text-align: center;
@@ -3910,6 +3910,8 @@ a:hover {
   border: 1px solid var(--app-border);
   color: var(--app-text-muted);
   margin-bottom: 40px;
+  max-width: 840px;
+  margin: 0 auto 40px;
 }
 
 .app-home-search:focus-within {

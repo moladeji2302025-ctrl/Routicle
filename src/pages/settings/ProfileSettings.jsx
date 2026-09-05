@@ -123,59 +123,68 @@ export default function ProfileSettings() {
 
         <div className="settings-profile-layout">
           <div className="settings-profile-fields">
-            <StackField label="Display name" hint="Shown as the creator credit on anything you upload.">
-              <input
-                type="text"
-                className="settings-input"
-                value={form.name}
-                onChange={(e) => set('name', e.target.value)}
-                required
-              />
-            </StackField>
+            <div className="settings-card settings-card-form">
+              <StackField label="Display name" hint="Shown as the creator credit on anything you upload.">
+                <input
+                  type="text"
+                  className="settings-input"
+                  value={form.name}
+                  onChange={(e) => set('name', e.target.value)}
+                  required
+                />
+              </StackField>
 
-            <StackField label="Email" hint="Used for sign-in, receipts and payout notices. Change it under Sign-in & security.">
-              <input type="email" className="settings-input" value={currentUser.email} readOnly />
-            </StackField>
+              <StackField
+                label="Email"
+                hint="Used for sign-in, receipts and payout notices. Change it under Sign-in & security."
+              >
+                <input type="email" className="settings-input" value={currentUser.email} readOnly />
+              </StackField>
 
-            <StackField label="Bio" hint="A couple of sentences on what you make.">
-              <textarea
-                className="settings-textarea"
-                rows={4}
-                value={form.bio}
-                placeholder="Motion designer working mostly in broadcast and title sequences…"
-                onChange={(e) => set('bio', e.target.value)}
-              />
-            </StackField>
+              <StackField label="Bio" hint="A couple of sentences on what you make.">
+                <textarea
+                  className="settings-textarea"
+                  rows={4}
+                  value={form.bio}
+                  placeholder="Motion designer working mostly in broadcast and title sequences…"
+                  onChange={(e) => set('bio', e.target.value)}
+                />
+              </StackField>
+            </div>
 
-            <StackField label="Website">
-              <input
-                type="url"
-                className="settings-input"
-                value={form.website}
-                placeholder="https://yourwork.com"
-                onChange={(e) => set('website', e.target.value)}
-              />
-            </StackField>
+            <div className="settings-card settings-card-form">
+              <p className="settings-subhead">Links</p>
 
-            <StackField label="Instagram">
-              <input
-                type="text"
-                className="settings-input"
-                value={form.instagram}
-                placeholder="@handle"
-                onChange={(e) => set('instagram', e.target.value)}
-              />
-            </StackField>
+              <StackField label="Website">
+                <input
+                  type="url"
+                  className="settings-input"
+                  value={form.website}
+                  placeholder="https://yourwork.com"
+                  onChange={(e) => set('website', e.target.value)}
+                />
+              </StackField>
 
-            <StackField label="LinkedIn">
-              <input
-                type="text"
-                className="settings-input"
-                value={form.linkedin}
-                placeholder="linkedin.com/in/…"
-                onChange={(e) => set('linkedin', e.target.value)}
-              />
-            </StackField>
+              <StackField label="Instagram">
+                <input
+                  type="text"
+                  className="settings-input"
+                  value={form.instagram}
+                  placeholder="@handle"
+                  onChange={(e) => set('instagram', e.target.value)}
+                />
+              </StackField>
+
+              <StackField label="LinkedIn">
+                <input
+                  type="text"
+                  className="settings-input"
+                  value={form.linkedin}
+                  placeholder="linkedin.com/in/…"
+                  onChange={(e) => set('linkedin', e.target.value)}
+                />
+              </StackField>
+            </div>
           </div>
 
           <div className="settings-profile-picture">
