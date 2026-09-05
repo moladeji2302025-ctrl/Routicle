@@ -625,12 +625,45 @@ export function AppProvider({ children }) {
 
       /** Creates a team (Neon Auth organization), makes it the active workspace, and returns it. */
       async createTeam(name) {
+        const user = stateRef.current.currentUser
         const slug = `${name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}-${Math.random().toString(36).slice(2, 6)}`
         const result = await orgClient.organization.create({ name: name.trim(), slug })
         if (result.error) throw new Error(result.error.message || 'Could not create team')
+
+        // Every new team lands with somewhere to put things. A failure here
+        // must not undo the team itself — the folder can be created later from
+        // the team page, and the partial unique index makes a retry a no-op.
+        if (user) {
+          await api
+            .createFolder({
+              organizationId: result.data.id,
+              name: 'Team folder',
+              createdBy: user.id,
+              isDefault: true,
+            })
+            .catch((err) => console.error('default folder creation failed', err))
+        }
+
         await refreshTeams()
         setActiveTeamId(result.data.id)
         return result.data
+      },
+
+      /**
+       * Deletes a whole workspace. Guarded here as well as in the UI, since the
+       * owner check is the only thing standing between an admin and everyone
+       * else's shared collections, folders and download history.
+       */
+      async deleteTeam(teamId) {
+        const team = teams.find((t) => t.id === teamId)
+        if (!team) throw new Error('Workspace not found')
+        if (team.role !== 'owner') throw new Error('Only the workspace owner can delete it')
+
+        const result = await orgClient.organization.delete({ organizationId: teamId })
+        if (result?.error) throw new Error(result.error.message || 'Could not delete this workspace')
+        if (activeTeamId === teamId) setActiveTeamId(null)
+        await refreshTeams()
+        return true
       },
 
       async inviteTeamMember(email, role = 'member') {

@@ -140,6 +140,45 @@ export function unsaveItemRemote({ userId, organizationId, contentItemId }) {
   return request(`/collections${query}`, { method: 'DELETE' })
 }
 
+/* ---- Team folders ---- */
+
+export function fetchFolders(organizationId) {
+  return request(`/folders?organizationId=${encodeURIComponent(organizationId)}`)
+}
+
+export function createFolder({ organizationId, name, createdBy, isDefault }) {
+  return request('/folders', {
+    method: 'POST',
+    body: JSON.stringify({ organizationId, name, createdBy, isDefault }),
+  })
+}
+
+export function updateFolder({ id, name, isStarred }) {
+  return request('/folders', { method: 'PATCH', body: JSON.stringify({ id, name, isStarred }) })
+}
+
+export function deleteFolder(id) {
+  return request(`/folders?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+export function fetchFolderItems(folderId) {
+  return request(`/folders/items?folderId=${encodeURIComponent(folderId)}`)
+}
+
+export function addFolderItems({ folderId, contentItemIds, addedBy }) {
+  return request('/folders/items', {
+    method: 'POST',
+    body: JSON.stringify({ folderId, contentItemIds, addedBy }),
+  })
+}
+
+export function removeFolderItem({ folderId, contentItemId }) {
+  return request(
+    `/folders/items?folderId=${encodeURIComponent(folderId)}&contentItemId=${encodeURIComponent(contentItemId)}`,
+    { method: 'DELETE' }
+  )
+}
+
 /* ---- Billing (Paystack) ---- */
 
 /** Starts a checkout; returns the hosted Paystack URL to send the buyer to. */

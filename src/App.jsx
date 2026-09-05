@@ -34,6 +34,7 @@ import ProjectsPage from './pages/ProjectsPage'
 import WorkspacesPage from './pages/WorkspacesPage'
 import ResourcesPage from './pages/ResourcesPage'
 import TeamPage from './pages/TeamPage'
+import FolderPage from './pages/FolderPage'
 import BillingCallbackPage from './pages/BillingCallbackPage'
 import AdminModerationPage from './pages/AdminModerationPage'
 import StaticPage from './pages/StaticPage'
@@ -81,6 +82,7 @@ export default function App() {
             <Route path="/workspaces" element={<WorkspacesPage />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/team" element={<TeamPage />} />
+            <Route path="/team/folder/:id" element={<FolderPage />} />
             <Route path="/billing/callback" element={<BillingCallbackPage />} />
             <Route path="/admin" element={<AdminModerationPage />} />
             <Route path="/about" element={<StaticPage slug="about" />} />
