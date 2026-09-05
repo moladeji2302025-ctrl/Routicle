@@ -9,6 +9,8 @@ const STORAGE_KEY = 'routicle_mock_state_v1'
 const PENDING_INTENT_KEY = 'routicle_pending_signup_intent'
 const THEME_KEY = 'routicle_app_theme'
 const ACTIVE_TEAM_KEY = 'routicle_active_team_id'
+const RECENT_KEY = 'routicle_recently_viewed'
+const RECENT_LIMIT = 12
 
 function parseTeamMetadata(raw) {
   try {
@@ -107,6 +109,31 @@ export function AppProvider({ children }) {
   const [teamMembers, setTeamMembers] = useState([])
   // Real, server-side billing state for the active scope (personal or team).
   const [subscription, setSubscription] = useState(null)
+
+  // Design detail pages record themselves here so the dashboard can offer a
+  // genuine "pick up where you left off" rather than a decorative placeholder.
+  const [recentlyViewed, setRecentlyViewed] = useState(() => {
+    try {
+      const raw = localStorage.getItem(RECENT_KEY)
+      return raw ? JSON.parse(raw) : []
+    } catch {
+      return []
+    }
+  })
+
+  const recordView = useCallback((itemId) => {
+    if (itemId == null) return
+    setRecentlyViewed((prev) => {
+      const id = String(itemId)
+      const next = [id, ...prev.filter((x) => x !== id)].slice(0, RECENT_LIMIT)
+      try {
+        localStorage.setItem(RECENT_KEY, JSON.stringify(next))
+      } catch {
+        // storage blocked — history just won't persist across reloads
+      }
+      return next
+    })
+  }, [])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -626,8 +653,23 @@ export function AppProvider({ children }) {
       activeTeam,
       teamMembers,
       subscription,
+      recentlyViewed,
+      recordView,
     }),
-    [state, actions, mergedContentItems, livePendingSubmissions, theme, teams, activeTeamId, activeTeam, teamMembers, subscription]
+    [
+      state,
+      actions,
+      mergedContentItems,
+      livePendingSubmissions,
+      theme,
+      teams,
+      activeTeamId,
+      activeTeam,
+      teamMembers,
+      subscription,
+      recentlyViewed,
+      recordView,
+    ]
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getCreatorByName } from '../data/creators'
@@ -10,11 +10,16 @@ import { requestDownload, triggerFileDownload } from '../lib/api'
 export default function DesignDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { contentItems, currentUser, activeTeam, toggleAppreciate, purchaseDownload } = useApp()
+  const { contentItems, currentUser, activeTeam, toggleAppreciate, purchaseDownload, recordView } = useApp()
   const [copied, setCopied] = useState(false)
   const [justDownloaded, setJustDownloaded] = useState(false)
 
   const item = contentItems.find((it) => String(it.id) === id)
+
+  // Feeds the dashboard's "Pick up where you left off".
+  useEffect(() => {
+    if (item) recordView(item.id)
+  }, [item, recordView])
 
   if (!item) {
     return (
