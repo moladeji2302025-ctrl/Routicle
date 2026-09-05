@@ -11,20 +11,77 @@ import {
   PlusIcon,
   UsersIcon,
   SettingsIcon,
+  GridIcon,
+  ImageIcon,
+  VideoIcon,
+  HeartIcon,
+  CardIcon,
+  HelpIcon,
+  PenIcon,
 } from './icons'
 
-const NAV_ITEMS = [
-  { label: 'Home', to: '/', icon: HomeIcon, match: (p) => p === '/' },
-  { label: 'Explore', to: '/explore', icon: SearchIcon, match: (p) => p.startsWith('/explore') },
-  { label: 'AI Studio', to: '/studio/image', icon: SparkleIcon, match: (p) => p.startsWith('/studio') },
-  { label: 'Collections', to: '/collections', icon: FolderIcon, match: (p) => p.startsWith('/collections') },
-  { label: 'Team', to: '/team', icon: UsersIcon, match: (p) => p.startsWith('/team') },
+/**
+ * Sidebar navigation, grouped by what you're trying to do rather than as one
+ * flat list. `when` hides sections that don't apply to the account — an Upload
+ * link that bounces a non-creator to an application form is worse than no link.
+ */
+const NAV_GROUPS = [
+  {
+    label: 'Browse',
+    items: [
+      { label: 'Home', to: '/', icon: HomeIcon, match: (p) => p === '/' },
+      { label: 'Explore', to: '/explore', icon: SearchIcon },
+      { label: 'Departments', to: '/departments', icon: GridIcon },
+      { label: 'Following', to: '/following', icon: UsersIcon },
+    ],
+  },
+  {
+    label: 'Library',
+    items: [
+      { label: 'Collections', to: '/collections', icon: HeartIcon },
+      { label: 'Downloads', to: '/downloads', icon: FolderIcon },
+    ],
+  },
+  {
+    label: 'Create',
+    items: [
+      { label: 'AI Image', to: '/studio/image', icon: ImageIcon },
+      { label: 'AI Video', to: '/studio/video', icon: VideoIcon },
+      { label: 'Upload', to: '/upload', icon: UploadIcon, when: (u) => u?.isCreator },
+      { label: 'Projects', to: '/projects', icon: PenIcon, when: (u) => u?.isCreator },
+      { label: 'Become a Creator', to: '/become-creator', icon: UploadIcon, when: (u) => !u?.isCreator },
+    ],
+  },
+  {
+    label: 'Workspace',
+    items: [
+      { label: 'Workspaces', to: '/workspaces', icon: UsersIcon },
+      { label: 'Team', to: '/team', icon: UsersIcon },
+      { label: 'Earnings', to: '/dashboard', icon: ChartIcon, when: (u) => u?.isCreator },
+      { label: 'Moderation', to: '/admin', icon: SparkleIcon, when: (u) => u?.isAdmin },
+    ],
+  },
+  {
+    label: 'More',
+    items: [
+      { label: 'Resources', to: '/resources', icon: HelpIcon },
+      { label: 'Pricing', to: '/pricing', icon: CardIcon },
+      { label: 'Settings', to: '/settings', icon: SettingsIcon },
+    ],
+  },
 ]
 
 export default function AppShell() {
   const { currentUser } = useApp()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Default match is prefix-based, so /design/12 doesn't light up Explore but
+  // /settings/plan does light up Settings.
+  function isActive(item) {
+    if (item.match) return item.match(location.pathname)
+    return location.pathname === item.to || location.pathname.startsWith(`${item.to}/`)
+  }
 
   return (
     <div className="app-shell">
@@ -40,49 +97,28 @@ export default function AppShell() {
         </button>
 
         <nav className="app-nav">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon
-            const active = item.match(location.pathname)
+          {NAV_GROUPS.map((group) => {
+            const items = group.items.filter((item) => !item.when || item.when(currentUser))
+            if (items.length === 0) return null
             return (
-              <Link key={item.label} to={item.to} className={active ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}>
-                <Icon size={17} color="currentColor" />
-                {item.label}
-              </Link>
+              <div key={group.label} className="app-nav-group">
+                <p className="app-nav-label">{group.label}</p>
+                {items.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <Link
+                      key={item.label}
+                      to={item.to}
+                      className={isActive(item) ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}
+                    >
+                      <Icon size={16} color="currentColor" />
+                      {item.label}
+                    </Link>
+                  )
+                })}
+              </div>
             )
           })}
-
-          {currentUser?.isCreator ? (
-            <Link
-              to="/dashboard"
-              className={location.pathname.startsWith('/dashboard') ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}
-            >
-              <ChartIcon size={17} color="currentColor" />
-              Dashboard
-            </Link>
-          ) : (
-            <Link
-              to="/become-creator"
-              className={location.pathname.startsWith('/become-creator') ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}
-            >
-              <UploadIcon size={17} color="currentColor" />
-              Become a Creator
-            </Link>
-          )}
-
-          {currentUser?.isAdmin && (
-            <Link to="/admin" className={location.pathname.startsWith('/admin') ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}>
-              <FolderIcon size={17} color="currentColor" />
-              Moderation
-            </Link>
-          )}
-
-          <Link
-            to="/settings"
-            className={location.pathname.startsWith('/settings') ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}
-          >
-            <SettingsIcon size={17} color="currentColor" />
-            Settings
-          </Link>
         </nav>
 
         <div className="app-sidebar-bottom">

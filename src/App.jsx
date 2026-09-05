@@ -28,6 +28,11 @@ import CreatorSettings from './pages/settings/CreatorSettings'
 import PrivacySettings from './pages/settings/PrivacySettings'
 import DeveloperSettings from './pages/settings/DeveloperSettings'
 import CollectionsPage from './pages/CollectionsPage'
+import FollowingPage from './pages/FollowingPage'
+import DownloadsPage from './pages/DownloadsPage'
+import ProjectsPage from './pages/ProjectsPage'
+import WorkspacesPage from './pages/WorkspacesPage'
+import ResourcesPage from './pages/ResourcesPage'
 import TeamPage from './pages/TeamPage'
 import BillingCallbackPage from './pages/BillingCallbackPage'
 import AdminModerationPage from './pages/AdminModerationPage'
@@ -70,6 +75,11 @@ export default function App() {
             {/* The old single-panel account screen these replaced. */}
             <Route path="/account" element={<Navigate to="/settings/profile" replace />} />
             <Route path="/collections" element={<CollectionsPage />} />
+            <Route path="/following" element={<FollowingPage />} />
+            <Route path="/downloads" element={<DownloadsPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/workspaces" element={<WorkspacesPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/billing/callback" element={<BillingCallbackPage />} />
             <Route path="/admin" element={<AdminModerationPage />} />

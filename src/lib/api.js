@@ -112,9 +112,12 @@ export function requestDownload(itemId, userEmail, organizationId) {
   return request('/downloads', { method: 'POST', body: JSON.stringify({ itemId, userEmail, organizationId }) })
 }
 
-/** A team's shared download history. */
-export function fetchTeamDownloads(organizationId) {
-  return request(`/downloads?organizationId=${encodeURIComponent(organizationId)}`)
+/** Download history for the active scope — a team's shared log, or your own. */
+export function fetchDownloads({ userEmail, organizationId }) {
+  const query = organizationId
+    ? `?organizationId=${encodeURIComponent(organizationId)}`
+    : `?userEmail=${encodeURIComponent(userEmail)}`
+  return request(`/downloads${query}`)
 }
 
 /** Personal (organizationId omitted) or team-shared saved items — real, server-side Collections. */

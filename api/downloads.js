@@ -9,22 +9,37 @@ import { presignDownload, SOURCE_BUCKET } from './_lib/s3.js'
  * ran evaluateDownload().
  *
  * GET ?organizationId=  returns a team's shared download history.
+ * GET ?userEmail=       returns that person's own history (rows with no team).
  */
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['GET', 'POST'])) return
 
     if (req.method === 'GET') {
-      const { organizationId } = req.query || {}
-      if (!organizationId) return send(res, 400, { error: 'organizationId is required' })
-      const rows = await sql`
-        SELECT d.content_item_id, d.user_email, d.downloaded_at, c.title
-        FROM downloads d
-        JOIN content_items c ON c.id = d.content_item_id
-        WHERE d.organization_id = ${organizationId}
-        ORDER BY d.downloaded_at DESC
-        LIMIT 100
-      `
+      const { organizationId, userEmail } = req.query || {}
+      if (!organizationId && !userEmail) {
+        return send(res, 400, { error: 'organizationId or userEmail is required' })
+      }
+
+      // Personal history deliberately excludes team rows: those belong to the
+      // workspace and stay visible there, not in someone's private list.
+      const rows = organizationId
+        ? await sql`
+            SELECT d.content_item_id, d.user_email, d.downloaded_at, c.title, c.thumbnail_key, c.department
+            FROM downloads d
+            JOIN content_items c ON c.id = d.content_item_id
+            WHERE d.organization_id = ${organizationId}
+            ORDER BY d.downloaded_at DESC
+            LIMIT 100
+          `
+        : await sql`
+            SELECT d.content_item_id, d.user_email, d.downloaded_at, c.title, c.thumbnail_key, c.department
+            FROM downloads d
+            JOIN content_items c ON c.id = d.content_item_id
+            WHERE d.user_email = ${userEmail.toLowerCase().trim()} AND d.organization_id IS NULL
+            ORDER BY d.downloaded_at DESC
+            LIMIT 100
+          `
       return send(res, 200, { downloads: rows })
     }
 
