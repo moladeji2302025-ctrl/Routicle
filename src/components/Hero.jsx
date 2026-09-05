@@ -4,7 +4,7 @@ export default function Hero() {
   return (
     <section className="hero-behance">
       <div className="hero-behance-bg" aria-hidden="true">
-        <img src="/images/hero-sunset-reeds.jpg" alt="" />
+        <img src="/images/hero-sunset-reeds.svg" alt="" />
       </div>
 
       <div className="hero-behance-text">

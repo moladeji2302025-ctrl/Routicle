@@ -1777,8 +1777,8 @@ a:hover {
   display: block;
   /* Fades in from transparent at the top (blends with the section-before's
      solid color) down into the fully visible image. */
-  mask-image: linear-gradient(to bottom, transparent 0%, black 38%, black 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 38%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 20%, black 55%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 20%, black 55%, black 100%);
 }
 
 .footer-cta-content {
@@ -3774,8 +3774,8 @@ a:hover {
 .app-cta-btn {
   align-self: flex-start;
   padding: 9px 16px;
+  border: 1px solid white;
   border-radius: 9px;
-  background: white;
   color: var(--brand-violet);
   font-size: 13px;
   font-weight: 600;
@@ -3783,8 +3783,8 @@ a:hover {
 }
 
 .app-cta-btn:hover {
-  color: var(--brand-violet);
-  transform: scale(1.05);
+  color: white;
+  transform: scale(1.01);
 }
 
 @media (max-width: 640px) {
@@ -4907,7 +4907,7 @@ a:hover {
      Overview/Works/Intro so every section aligns at wide viewports. */
   grid-template-columns: minmax(0, 426px) minmax(0, 426px);
   justify-content: center;
-  gap: 48px;
+  gap: 200px;
   transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 

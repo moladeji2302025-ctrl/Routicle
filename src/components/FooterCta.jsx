@@ -48,7 +48,7 @@ export default function FooterCta() {
     <section className="footer-cta-pin-wrapper" ref={wrapperRef}>
       <div className="footer-cta">
         <div className="footer-cta-bg" aria-hidden="true">
-          <img src="/images/footer-hillside.jpg" alt="" />
+          <img src="/images/footer-hillside.svg" alt="" />
         </div>
 
         <div className="footer-cta-content">
