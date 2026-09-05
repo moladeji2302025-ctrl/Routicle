@@ -10,7 +10,7 @@ import { requestDownload, triggerFileDownload } from '../lib/api'
 export default function DesignDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { contentItems, currentUser, activeTeam, toggleAppreciate, purchaseDownload, recordView } = useApp()
+  const { contentItems, currentUser, activeTeam, settings, toggleAppreciate, purchaseDownload, recordView } = useApp()
   const [copied, setCopied] = useState(false)
   const [justDownloaded, setJustDownloaded] = useState(false)
 
@@ -65,6 +65,13 @@ export default function DesignDetailPage() {
       return
     }
     if (decision.state === 'pay-per-download') {
+      // Settings > Plan & billing > "Confirm before charging".
+      if (settings.downloads.confirmPurchase) {
+        const ok = window.confirm(
+          `Download “${item.title}” for $${decision.price.toFixed(2)}?\n\nYou can turn this confirmation off in Settings › Plan & billing.`
+        )
+        if (!ok) return
+      }
       purchaseDownload(item.id)
       setJustDownloaded(true)
       await deliverRealFiles()

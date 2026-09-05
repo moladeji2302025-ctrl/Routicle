@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { DEPARTMENTS, departmentLabel } from '../data/departments'
 import { CREATORS, getCreatorByName } from '../data/creators'
+import { applyBrowsingFilters } from '../data/settings'
 import { TIERS } from '../data/pricing'
 import { formatCount } from '../utils/format'
 import {
@@ -20,6 +21,7 @@ import {
   SparkleIcon,
   PlusIcon,
   ChevronRightIcon,
+  SettingsIcon,
 } from '../components/icons'
 
 function greeting() {
@@ -38,6 +40,7 @@ export default function AppHomePage() {
     activeTeam,
     teamMembers,
     recentlyViewed,
+    settings,
     toggleFollow,
   } = useApp()
   const navigate = useNavigate()
@@ -47,9 +50,15 @@ export default function AppHomePage() {
   const [cursor, setCursor] = useState(0)
   const searchRef = useRef(null)
 
+  // Every rail, count and command-bar result on this page comes off `approved`,
+  // so applying the browsing preferences once here covers the whole dashboard.
   const approved = useMemo(
-    () => contentItems.filter((item) => item.moderationStatus === 'approved'),
-    [contentItems]
+    () =>
+      applyBrowsingFilters(
+        contentItems.filter((item) => item.moderationStatus === 'approved'),
+        settings.browsing
+      ),
+    [contentItems, settings.browsing]
   )
 
   /* ---- Command bar: real matches across designs, creators and departments ---- */
@@ -169,6 +178,7 @@ export default function AppHomePage() {
         ]
       : [{ label: 'Pricing', to: '/pricing', icon: StarIcon }]),
     ...(currentUser?.isAdmin ? [{ label: 'Moderation', to: '/admin', icon: SparkleIcon }] : []),
+    { label: 'Settings', to: '/settings', icon: SettingsIcon },
   ]
 
   return (

@@ -10,6 +10,7 @@ import {
   UploadIcon,
   PlusIcon,
   UsersIcon,
+  SettingsIcon,
 } from './icons'
 
 const NAV_ITEMS = [
@@ -74,6 +75,14 @@ export default function AppShell() {
               Moderation
             </Link>
           )}
+
+          <Link
+            to="/settings"
+            className={location.pathname.startsWith('/settings') ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}
+          >
+            <SettingsIcon size={17} color="currentColor" />
+            Settings
+          </Link>
         </nav>
 
         <div className="app-sidebar-bottom">

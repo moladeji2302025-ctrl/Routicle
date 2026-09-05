@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import FeedCard from './FeedCard'
 import Reveal from './Reveal'
+import { useApp } from '../context/AppContext'
 
-function columnCountFor(width) {
-  if (width <= 520) return 1
-  if (width <= 780) return 2
-  if (width <= 1100) return 3
-  return 5
+// Settings > Appearance > Grid density shifts the column count at every
+// breakpoint, so "compact" genuinely fits more work on the same screen.
+const DENSITY_OFFSET = { compact: 1, comfortable: 0, spacious: -1 }
+
+function columnCountFor(width, offset = 0) {
+  let base
+  if (width <= 520) base = 1
+  else if (width <= 780) base = 2
+  else if (width <= 1100) base = 3
+  else base = 5
+  return Math.max(1, base + offset)
 }
 
 /**
@@ -30,7 +37,9 @@ function columnCountFor(width) {
  *      Real completion is tracked from each <img>'s own load/error event.
  */
 export default function FeedGrid({ items }) {
-  const [columnCount, setColumnCount] = useState(() => columnCountFor(window.innerWidth))
+  const { settings } = useApp()
+  const offset = DENSITY_OFFSET[settings.appearance.density] ?? 0
+  const [columnCount, setColumnCount] = useState(() => columnCountFor(window.innerWidth, offset))
   const [heights, setHeights] = useState({})
   const [loadedIds, setLoadedIds] = useState(() => new Set())
   const roRef = useRef(null)
@@ -38,11 +47,12 @@ export default function FeedGrid({ items }) {
 
   useEffect(() => {
     function onResize() {
-      setColumnCount(columnCountFor(window.innerWidth))
+      setColumnCount(columnCountFor(window.innerWidth, offset))
     }
+    onResize() // also re-runs when the density setting changes
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-  }, [])
+  }, [offset])
 
   // One shared observer for every card, rather than one per card recreated
   // on every render — cards' ref callbacks below stay referentially stable

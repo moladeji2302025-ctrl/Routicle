@@ -4,10 +4,10 @@ import { useApp } from '../context/AppContext'
 import { SparkleIcon } from '../components/icons'
 
 export default function AIVideoStudioPage() {
-  const { currentUser, generateVideo } = useApp()
+  const { currentUser, generateVideo, settings } = useApp()
   const navigate = useNavigate()
   const [prompt, setPrompt] = useState('')
-  const [seconds, setSeconds] = useState(5)
+  const [seconds, setSeconds] = useState(settings.studio.defaultVideoSeconds)
 
   if (!currentUser) {
     return (

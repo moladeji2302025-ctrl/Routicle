@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
 import Layout from './components/Layout'
 import IntroReveal from './components/IntroReveal'
@@ -15,7 +15,18 @@ import BecomeCreatorPage from './pages/BecomeCreatorPage'
 import CreatorUploadPage from './pages/CreatorUploadPage'
 import CreatorDashboardPage from './pages/CreatorDashboardPage'
 import CreatorProfilePage from './pages/CreatorProfilePage'
-import AccountPage from './pages/AccountPage'
+import SettingsPage from './pages/SettingsPage'
+import ProfileSettings from './pages/settings/ProfileSettings'
+import SecuritySettings from './pages/settings/SecuritySettings'
+import NotificationSettings from './pages/settings/NotificationSettings'
+import PlanSettings from './pages/settings/PlanSettings'
+import WorkspaceSettings from './pages/settings/WorkspaceSettings'
+import AppearanceSettings from './pages/settings/AppearanceSettings'
+import BrowsingSettings from './pages/settings/BrowsingSettings'
+import StudioSettings from './pages/settings/StudioSettings'
+import CreatorSettings from './pages/settings/CreatorSettings'
+import PrivacySettings from './pages/settings/PrivacySettings'
+import DeveloperSettings from './pages/settings/DeveloperSettings'
 import CollectionsPage from './pages/CollectionsPage'
 import TeamPage from './pages/TeamPage'
 import BillingCallbackPage from './pages/BillingCallbackPage'
@@ -42,7 +53,22 @@ export default function App() {
             <Route path="/upload" element={<CreatorUploadPage />} />
             <Route path="/dashboard" element={<CreatorDashboardPage />} />
             <Route path="/creator/:id" element={<CreatorProfilePage />} />
-            <Route path="/account" element={<AccountPage />} />
+            <Route path="/settings" element={<SettingsPage />}>
+              <Route index element={<Navigate to="/settings/profile" replace />} />
+              <Route path="profile" element={<ProfileSettings />} />
+              <Route path="security" element={<SecuritySettings />} />
+              <Route path="notifications" element={<NotificationSettings />} />
+              <Route path="plan" element={<PlanSettings />} />
+              <Route path="workspace" element={<WorkspaceSettings />} />
+              <Route path="appearance" element={<AppearanceSettings />} />
+              <Route path="browsing" element={<BrowsingSettings />} />
+              <Route path="studio" element={<StudioSettings />} />
+              <Route path="creator" element={<CreatorSettings />} />
+              <Route path="privacy" element={<PrivacySettings />} />
+              <Route path="developer" element={<DeveloperSettings />} />
+            </Route>
+            {/* The old single-panel account screen these replaced. */}
+            <Route path="/account" element={<Navigate to="/settings/profile" replace />} />
             <Route path="/collections" element={<CollectionsPage />} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/billing/callback" element={<BillingCallbackPage />} />

@@ -3885,13 +3885,14 @@ a:hover {
   font-size: 32px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 0;
+  margin: 0 20px 8px;
   color: var(--app-text);
   text-align: center;
 }
 
 .app-home-sub {
-  margin: 8px 0 26px;
+  /* Bottom value is the gap down to the search bar. */
+  margin: 8px 0 80px;
   font-size: 13.5px;
   color: var(--app-text-muted);
   text-align: center;
@@ -6116,5 +6117,899 @@ a:hover {
   .app-home-kbd,
   .app-suggest-sub {
     display: none;
+  }
+}
+
+/* ============================================================
+   Settings
+   ============================================================ */
+
+/* Appearance settings published on <html> by AppContext. Reduce-motion is
+   deliberately blunt â€” a near-zero duration rather than `none`, so anything
+   relying on a transitionend/animationend event still fires. */
+:root[data-reduce-motion] *,
+:root[data-reduce-motion] *::before,
+:root[data-reduce-motion] *::after {
+  animation-duration: 0.001ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+:root[data-density='compact'] .feed-grid,
+:root[data-density='compact'] .feed-grid-column {
+  gap: 12px;
+}
+
+:root[data-density='spacious'] .feed-grid,
+:root[data-density='spacious'] .feed-grid-column {
+  gap: 30px;
+}
+
+.settings-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 40px 32px 96px;
+  color: var(--app-text);
+}
+
+.settings-head {
+  margin-bottom: 30px;
+}
+
+.settings-head h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.settings-head p {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  color: var(--app-text-muted);
+}
+
+.settings-body {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+/* ---- Left rail ---- */
+
+.settings-nav {
+  position: sticky;
+  top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.settings-nav-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--app-border);
+  background: var(--app-card-bg);
+  color: var(--app-text-muted);
+}
+
+.settings-nav-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--app-text);
+}
+
+/* Chrome's default clear button on type=search is unstyleable and clashes here. */
+.settings-nav-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.settings-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-nav-label {
+  margin: 0 0 6px 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  color: var(--app-text-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.settings-nav-item:hover {
+  background: var(--app-hover);
+  color: var(--app-text);
+}
+
+.settings-nav-item-active {
+  background: var(--app-hover);
+  color: var(--app-text);
+  font-weight: 600;
+}
+
+.settings-nav-empty {
+  font-size: 13px;
+  color: var(--app-text-muted);
+}
+
+/* ---- Right column ---- */
+
+.settings-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+/* Only direct children get the gap; nested fragments handle their own spacing. */
+.settings-content > form {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.settings-section {
+  min-width: 0;
+}
+
+.settings-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.settings-section-head h2 {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.settings-section-desc {
+  margin: 5px 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--app-text-muted);
+}
+
+.settings-danger-title {
+  color: #e5484d;
+}
+
+.settings-card {
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  background: var(--app-card-bg);
+  padding: 4px 18px;
+}
+
+.settings-card-danger {
+  border-color: color-mix(in srgb, #e5484d 32%, var(--app-border));
+}
+
+/* ---- Rows ---- */
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row-stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.settings-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.settings-row-title {
+  font-size: 13.5px;
+  font-weight: 550;
+  color: var(--app-text);
+}
+
+.settings-row-desc {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--app-text-muted);
+  max-width: 58ch;
+}
+
+.settings-row-control {
+  flex-shrink: 0;
+}
+
+.settings-row-stacked .settings-row-control {
+  width: 100%;
+}
+
+.settings-static-value {
+  font-size: 13px;
+  color: var(--app-text-muted);
+}
+
+.settings-footnote {
+  margin: -14px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--app-text-muted);
+}
+
+.settings-footnote code {
+  font-size: 11.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--app-hover);
+}
+
+/* ---- Toggle ---- */
+
+.settings-toggle {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.settings-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-toggle-track {
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--app-hover);
+  border: 1px solid var(--app-border);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.settings-toggle-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--app-text-muted);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.settings-toggle input:checked + .settings-toggle-track {
+  background: var(--brand-violet);
+  border-color: var(--brand-violet);
+}
+
+.settings-toggle input:checked + .settings-toggle-track .settings-toggle-thumb {
+  transform: translateX(16px);
+  background: #ffffff;
+}
+
+.settings-toggle input:focus-visible + .settings-toggle-track {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+}
+
+.settings-toggle-disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* ---- Segmented control ---- */
+
+.settings-seg {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--app-hover);
+  border: 1px solid var(--app-border);
+}
+
+.settings-seg-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 6px 13px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 550;
+  color: var(--app-text-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.settings-seg-btn:hover:not(:disabled) {
+  color: var(--app-text);
+}
+
+.settings-seg-btn-active {
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+
+.settings-seg-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ---- Inputs ---- */
+
+.settings-input,
+.settings-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--app-border);
+  background: var(--app-bg);
+  color: var(--app-text);
+  font: inherit;
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.settings-textarea {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.settings-input:focus,
+.settings-textarea:focus {
+  border-color: var(--brand-purple);
+}
+
+.settings-input[readonly] {
+  color: var(--app-text-muted);
+}
+
+.settings-row-control .settings-input {
+  min-width: 260px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.settings-field:last-child {
+  border-bottom: none;
+}
+
+.settings-field label {
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.settings-field-hint {
+  font-size: 12px;
+  color: var(--app-text-muted);
+}
+
+.settings-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.settings-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-hover);
+  color: var(--app-text-muted);
+}
+
+/* ---- Buttons ---- */
+
+.settings-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 15px;
+  border-radius: 9px;
+  border: 1px solid var(--app-border);
+  background: var(--app-bg);
+  color: var(--app-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 550;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.settings-btn:hover:not(:disabled) {
+  transform: scale(1.03);
+}
+
+.settings-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.settings-btn-primary {
+  background: var(--brand-violet);
+  border-color: var(--brand-violet);
+  color: #ffffff;
+}
+
+.settings-btn-ghost {
+  border-color: transparent;
+  background: none;
+  color: var(--app-text-muted);
+}
+
+.settings-btn-ghost:hover:not(:disabled) {
+  color: var(--app-text);
+}
+
+.settings-btn-danger {
+  border-color: color-mix(in srgb, #e5484d 45%, transparent);
+  color: #e5484d;
+  background: none;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 14px;
+}
+
+/* Keeps Save reachable on the long Profile form without hunting for it. */
+.settings-actions-sticky {
+  position: sticky;
+  bottom: 0;
+  padding: 14px 0;
+  background: linear-gradient(to top, var(--app-bg) 62%, transparent);
+}
+
+.settings-inline-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-inline-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+}
+
+.settings-inline-form .settings-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-delete-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-delete-row .settings-input {
+  max-width: 180px;
+}
+
+/* ---- Chips ---- */
+
+.settings-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.settings-chip {
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: none;
+  color: var(--app-text-muted);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.settings-chip:hover {
+  color: var(--app-text);
+}
+
+/* Muted, not selected â€” an active chip here means this department is switched off. */
+.settings-chip-active {
+  background: color-mix(in srgb, #e5484d 14%, transparent);
+  border-color: color-mix(in srgb, #e5484d 40%, transparent);
+  color: #e5484d;
+  text-decoration: line-through;
+}
+
+.settings-pill {
+  flex-shrink: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--app-hover);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--app-text-muted);
+}
+
+/* ---- Lists ---- */
+
+.settings-list-row,
+.settings-session-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.settings-list-row:last-child,
+.settings-session-row:last-child {
+  border-bottom: none;
+}
+
+.settings-list-row .settings-row-text {
+  flex: 1;
+}
+
+.settings-list-thumb {
+  width: 44px;
+  height: 34px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.settings-list-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.settings-workspace-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 0;
+  border: none;
+  border-bottom: 1px solid var(--app-border);
+  background: none;
+  color: var(--app-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.settings-workspace-row:last-child {
+  border-bottom: none;
+}
+
+.settings-workspace-row .settings-row-text {
+  flex: 1;
+}
+
+.settings-workspace-row-active .settings-row-title {
+  color: var(--brand-purple);
+}
+
+/* ---- Meters ---- */
+
+.settings-meter {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.settings-meter:last-child {
+  border-bottom: none;
+}
+
+.settings-meter-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  margin-bottom: 8px;
+}
+
+.settings-meter-top span:first-child {
+  font-weight: 550;
+}
+
+.settings-meter-top span:last-child {
+  color: var(--app-text-muted);
+}
+
+.settings-meter-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--app-hover);
+  overflow: hidden;
+}
+
+.settings-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand-violet);
+}
+
+/* ---- Feedback ---- */
+
+.settings-error,
+.settings-notice {
+  margin: 12px 0 0;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.settings-error {
+  background: color-mix(in srgb, #e5484d 12%, transparent);
+  color: #e5484d;
+}
+
+.settings-notice {
+  background: color-mix(in srgb, var(--brand-violet) 12%, transparent);
+  color: var(--brand-purple);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px) {
+  .settings-page {
+    padding: 28px 18px 72px;
+  }
+
+  .settings-body {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .settings-nav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
+
+  .settings-nav-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .settings-nav-label {
+    width: 100%;
+    margin: 6px 0 0;
+  }
+
+  .settings-nav-search {
+    width: 100%;
+  }
+
+  .settings-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .settings-row-control,
+  .settings-row-control .settings-input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .settings-seg {
+    width: 100%;
+  }
+
+  .settings-seg-btn {
+    flex: 1;
+  }
+}
+
+/* ---- Profile picture editor ---- */
+
+/* The Profile page is a form, not a settings list: fields run down the left,
+   the picture floats to the right of them, and neither sits in a card. */
+.settings-section-head-ruled {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--app-border);
+  margin-bottom: 24px;
+}
+
+.settings-profile-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 56px;
+  align-items: start;
+}
+
+.settings-profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 480px;
+}
+
+.settings-stack-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-stack-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.settings-stack-hint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--app-text-muted);
+}
+
+.settings-profile-picture {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-avatar-hint {
+  max-width: 190px;
+}
+
+.settings-avatar-link-input {
+  max-width: 210px;
+}
+
+.settings-avatar-large-wrap {
+  position: relative;
+  width: 168px;
+  height: 168px;
+}
+
+.settings-avatar-large {
+  display: block;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--app-hover);
+}
+
+/* The pill sits over the lower-left of the circle, as in the reference. */
+.settings-avatar-edit {
+  position: absolute;
+  left: 6px;
+  bottom: 8px;
+}
+
+.settings-avatar-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 10px -2px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s ease;
+}
+
+.settings-avatar-edit-btn:hover {
+  transform: scale(1.05);
+}
+
+.settings-avatar-menu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+  min-width: 178px;
+  padding: 5px;
+  border-radius: 11px;
+  border: 1px solid var(--app-border);
+  background: var(--app-card-bg);
+  box-shadow: var(--app-shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-avatar-menu button {
+  padding: 8px 10px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--app-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.settings-avatar-menu button:hover {
+  background: var(--app-hover);
+}
+
+.settings-avatar-menu-danger {
+  color: #e5484d !important;
+}
+
+@media (max-width: 780px) {
+  .settings-profile-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  /* Picture above the fields once there's no room beside them. */
+  .settings-profile-picture {
+    order: -1;
   }
 }

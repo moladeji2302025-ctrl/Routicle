@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { DEPARTMENTS } from '../data/departments'
+import { applyBrowsingFilters } from '../data/settings'
 import { getCreatorByName } from '../data/creators'
 import FeedGrid from '../components/FeedGrid'
 import { SearchIcon, SlidersIcon, ChevronDownIcon } from '../components/icons'
@@ -13,25 +14,32 @@ const SORTS = [
 ]
 
 export default function ExplorePage() {
-  const { contentItems, currentUser } = useApp()
+  const { contentItems, currentUser, settings } = useApp()
   const [searchParams] = useSearchParams()
   const [department, setDepartment] = useState(searchParams.get('department') || null)
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [peopleOnly, setPeopleOnly] = useState(false)
   const [fileType, setFileType] = useState(searchParams.get('fileType') || null)
   const [followingOnly, setFollowingOnly] = useState(searchParams.get('following') === '1')
-  const [sort, setSort] = useState('recommended')
+  const [sort, setSort] = useState(settings.browsing.defaultSort)
   const [filterOpen, setFilterOpen] = useState(false)
   const [sortOpen, setSortOpen] = useState(false)
 
+  // Muted departments / "hide AI work" are applied before anything on this page's
+  // own toolbar, so the counts and facets below only ever describe visible work.
+  const visibleItems = useMemo(
+    () => applyBrowsingFilters(contentItems, settings.browsing),
+    [contentItems, settings.browsing]
+  )
+
   const fileTypes = useMemo(() => {
     const set = new Set()
-    contentItems.forEach((item) => item.fileTypes.forEach((ft) => set.add(ft)))
+    visibleItems.forEach((item) => item.fileTypes.forEach((ft) => set.add(ft)))
     return Array.from(set)
-  }, [contentItems])
+  }, [visibleItems])
 
   const results = useMemo(() => {
-    let list = contentItems.filter((item) => {
+    let list = visibleItems.filter((item) => {
       if (item.moderationStatus !== 'approved') return false
       if (department && item.department !== department) return false
       if (fileType && !item.fileTypes.includes(fileType)) return false
@@ -51,9 +59,13 @@ export default function ExplorePage() {
     else if (sort === 'recent') list = [...list].sort((a, b) => b.id - a.id)
 
     return list
-  }, [contentItems, department, fileType, peopleOnly, followingOnly, currentUser, query, sort])
+  }, [visibleItems, department, fileType, peopleOnly, followingOnly, currentUser, query, sort])
 
-  const chips = [{ id: null, label: 'All' }, ...DEPARTMENTS]
+  // A muted department shouldn't offer a chip that filters down to nothing.
+  const chips = [
+    { id: null, label: 'All' },
+    ...DEPARTMENTS.filter((d) => visibleItems.some((item) => item.department === d.id)),
+  ]
 
   return (
     <div className="explore-page">

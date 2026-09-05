@@ -1,20 +1,25 @@
 import { useEffect, useState } from 'react'
+import { useApp } from '../context/AppContext'
 
 const OPEN_DELAY = 350
 const OPEN_DURATION = 1100
 const CLEANUP_DELAY = OPEN_DELAY + OPEN_DURATION + 150
 
 export default function IntroReveal() {
+  const { settings } = useApp()
   const [open, setOpen] = useState(false)
   const [done, setDone] = useState(false)
+  const { introAnimation, reduceMotion } = settings.appearance
 
   useEffect(() => {
-    const reducedMotion =
+    const systemReducedMotion =
       typeof window !== 'undefined' &&
       window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    if (reducedMotion) {
+    // Settings > Appearance can switch this off outright; reduce-motion (either
+    // the app's own setting or the OS's) suppresses it too.
+    if (!introAnimation || reduceMotion || systemReducedMotion) {
       setDone(true)
       return undefined
     }
@@ -33,7 +38,7 @@ export default function IntroReveal() {
       clearTimeout(doneTimer)
       document.body.style.overflow = previousOverflow
     }
-  }, [])
+  }, [introAnimation, reduceMotion])
 
   if (done) return null
 

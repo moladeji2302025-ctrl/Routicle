@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { FEED_ITEMS } from '../data/feedItems'
 import { TIERS } from '../data/pricing'
+import { DEFAULT_SETTINGS, mergeSettings } from '../data/settings'
 import * as api from '../lib/api'
 import { authClient } from '../lib/authClient'
 import { orgClient } from '../lib/orgClient'
@@ -8,6 +9,7 @@ import { orgClient } from '../lib/orgClient'
 const STORAGE_KEY = 'routicle_mock_state_v1'
 const PENDING_INTENT_KEY = 'routicle_pending_signup_intent'
 const THEME_KEY = 'routicle_app_theme'
+const SETTINGS_KEY = 'routicle_settings_v1'
 const ACTIVE_TEAM_KEY = 'routicle_active_team_id'
 const RECENT_KEY = 'routicle_recently_viewed'
 const RECENT_LIMIT = 12
@@ -22,18 +24,31 @@ function parseTeamMetadata(raw) {
 
 const AppContext = createContext(null)
 
-function loadInitialTheme() {
-  // Dark mode was removed from the homepage/marketing chrome only (see
-  // index.css — --surface/--text/etc no longer respond to
-  // [data-theme='dark']). The signed-in AppShell keeps its own independent
-  // dark mode, so this still reads/persists a real preference for that.
+function loadInitialSettings() {
+  let stored = null
   try {
-    const stored = localStorage.getItem(THEME_KEY)
-    if (stored === 'light' || stored === 'dark') return stored
+    const raw = localStorage.getItem(SETTINGS_KEY)
+    if (raw) stored = JSON.parse(raw)
   } catch {
-    // ignore
+    // ignore corrupt/blocked storage
   }
-  return 'dark'
+  const merged = mergeSettings(DEFAULT_SETTINGS, stored)
+
+  // One-time migration from the standalone theme key this replaced, so anyone
+  // who already picked light mode doesn't get silently flipped back to dark.
+  if (!stored?.appearance?.themeMode) {
+    try {
+      const legacy = localStorage.getItem(THEME_KEY)
+      if (legacy === 'light' || legacy === 'dark') merged.appearance.themeMode = legacy
+    } catch {
+      // ignore
+    }
+  }
+  return merged
+}
+
+function systemPrefersDark() {
+  return typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-color-scheme: dark)').matches
 }
 
 function loadInitialState() {
@@ -91,7 +106,19 @@ export function AppProvider({ children }) {
   // Real, server-backed data — fetched fresh from Postgres/Object Storage rather than persisted locally.
   const [liveContentItems, setLiveContentItems] = useState([])
   const [livePendingSubmissions, setLivePendingSubmissions] = useState([])
-  const [theme, setTheme] = useState(loadInitialTheme)
+
+  // Every user preference in the app (see data/settings.js). `theme` below is
+  // derived from it rather than being its own state, so 'system' can track the
+  // OS live without a second source of truth to keep in sync.
+  const [settings, setSettings] = useState(loadInitialSettings)
+  const [systemTheme, setSystemTheme] = useState(() => (systemPrefersDark() ? 'dark' : 'light'))
+  const theme = settings.appearance.themeMode === 'system' ? systemTheme : settings.appearance.themeMode
+
+  // Lets stable, dependency-free callbacks (recordView) read current settings
+  // without being recreated — and therefore re-firing consumers' effects —
+  // every time an unrelated preference changes.
+  const settingsRef = useRef(settings)
+  settingsRef.current = settings
 
   // Teams (shared subscriber workspaces) — backed by Neon Auth's built-in
   // organization/member/invitation tables via orgClient, not the local mock
@@ -123,6 +150,9 @@ export function AppProvider({ children }) {
 
   const recordView = useCallback((itemId) => {
     if (itemId == null) return
+    // Privacy setting is honoured at the point of writing, not just on display,
+    // so turning it off genuinely stops the history being collected.
+    if (!settingsRef.current.privacy.saveRecentlyViewed) return
     setRecentlyViewed((prev) => {
       const id = String(itemId)
       const next = [id, ...prev.filter((x) => x !== id)].slice(0, RECENT_LIMIT)
@@ -135,14 +165,33 @@ export function AppProvider({ children }) {
     })
   }, [])
 
+  // Track the OS preference only while it's actually being followed.
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
+    if (settings.appearance.themeMode !== 'system') return undefined
+    const mq = window.matchMedia?.('(prefers-color-scheme: dark)')
+    if (!mq) return undefined
+    const onChange = (e) => setSystemTheme(e.matches ? 'dark' : 'light')
+    setSystemTheme(mq.matches ? 'dark' : 'light')
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [settings.appearance.themeMode])
+
+  // Appearance settings are published as attributes on <html> so plain CSS can
+  // act on them (see index.css: [data-density] and [data-reduce-motion]).
+  useEffect(() => {
+    const root = document.documentElement
+    root.setAttribute('data-theme', theme)
+    root.setAttribute('data-density', settings.appearance.density)
+    root.toggleAttribute('data-reduce-motion', settings.appearance.reduceMotion)
+  }, [theme, settings.appearance.density, settings.appearance.reduceMotion])
+
+  useEffect(() => {
     try {
-      localStorage.setItem(THEME_KEY, theme)
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
     } catch {
-      // ignore
+      // storage blocked — preferences still apply for this session
     }
-  }, [theme])
+  }, [settings])
 
   // Mirrors `state` so stable action callbacks can read the latest currentUser without
   // being recreated every render (actions below intentionally have a narrow dependency list).
@@ -372,8 +421,156 @@ export function AppProvider({ children }) {
         setState((prev) => ({ ...prev, pendingIntentRedirect: null }))
       },
 
+      /* ---- Settings ---- */
+
+      /** Patches one settings group, e.g. updateSettings('appearance', { density: 'compact' }). */
+      updateSettings(group, patch) {
+        setSettings((prev) => (prev[group] ? { ...prev, [group]: { ...prev[group], ...patch } } : prev))
+      },
+
+      /** Restores one group to its defaults, or the whole lot when called with no argument. */
+      resetSettings(group) {
+        setSettings((prev) =>
+          group ? { ...prev, [group]: { ...DEFAULT_SETTINGS[group] } } : { ...DEFAULT_SETTINGS }
+        )
+      },
+
       toggleTheme() {
-        setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
+        setSettings((prev) => ({
+          ...prev,
+          appearance: { ...prev.appearance, themeMode: prev.appearance.themeMode === 'dark' ? 'light' : 'dark' },
+        }))
+      },
+
+      /* ---- Profile & identity ---- */
+
+      /**
+       * Writes name/avatar through to the real Neon Auth record so they survive
+       * a new device, and keeps the app-specific fields (bio, socials) in the
+       * local profile alongside them. A creator's public card is refreshed too.
+       */
+      async updateProfile({ name, image, bio, social }) {
+        const user = stateRef.current.currentUser
+        if (!user) throw new Error('Sign in first')
+
+        const authPatch = {}
+        if (name !== undefined && name !== user.name) authPatch.name = name
+        if (image !== undefined && image !== (user.image || '')) authPatch.image = image || null
+        if (Object.keys(authPatch).length > 0) {
+          const result = await orgClient.updateUser(authPatch)
+          if (result?.error) throw new Error(result.error.message || 'Could not save your profile')
+        }
+
+        updateUser((u) => ({
+          ...u,
+          name: name ?? u.name,
+          image: image === undefined ? u.image : image || null,
+          bio: bio ?? u.bio,
+          social: { ...u.social, ...social },
+        }))
+
+        if (user.isCreator) {
+          await api
+            .upsertCreator({
+              name: name ?? user.name,
+              email: user.email,
+              bio: bio ?? user.bio,
+              social: { ...user.social, ...social },
+            })
+            .catch((err) => console.error('upsertCreator failed', err))
+        }
+      },
+
+      /* ---- Security ---- */
+
+      async changePassword({ currentPassword, newPassword, revokeOtherSessions }) {
+        const result = await orgClient.changePassword({ currentPassword, newPassword, revokeOtherSessions })
+        if (result?.error) throw new Error(result.error.message || 'Could not change your password')
+        return true
+      },
+
+      async listSessions() {
+        const result = await orgClient.listSessions()
+        if (result?.error) throw new Error(result.error.message || 'Could not load your sessions')
+        return result.data || []
+      },
+
+      async revokeOtherSessions() {
+        const result = await orgClient.revokeOtherSessions()
+        if (result?.error) throw new Error(result.error.message || 'Could not sign out your other devices')
+        return true
+      },
+
+      async deleteAccount() {
+        const result = await orgClient.deleteUser({})
+        if (result?.error) throw new Error(result.error.message || 'Could not delete this account')
+        setState((prev) => ({ ...prev, currentUser: null }))
+        setActiveTeamId(null)
+        return true
+      },
+
+      /* ---- Downloads & billing mode ---- */
+
+      /** 'subscription' uses the plan's entitlement; 'payPerDownload' charges per file (see evaluateDownload). */
+      setBillingMode(mode) {
+        updateUser((user) => ({ ...user, billingMode: mode }))
+      },
+
+      setPayoutMethod(payoutMethod) {
+        updateUser((user) => ({ ...user, payoutMethod: payoutMethod || null }))
+      },
+
+      /* ---- Data ---- */
+
+      clearRecentlyViewed() {
+        setRecentlyViewed([])
+        try {
+          localStorage.removeItem(RECENT_KEY)
+        } catch {
+          // ignore
+        }
+      },
+
+      /** kind: 'image' | 'video' | 'all' */
+      clearGenerationHistory(kind = 'all') {
+        updateUser((user) => ({
+          ...user,
+          generationHistory: {
+            image: kind === 'video' ? user.generationHistory.image : [],
+            video: kind === 'image' ? user.generationHistory.video : [],
+          },
+        }))
+      },
+
+      /** Everything this browser holds about the account, as a downloadable JSON snapshot. */
+      exportAccountData() {
+        const user = stateRef.current.currentUser
+        return {
+          exportedAt: new Date().toISOString(),
+          profile: user,
+          settings: settingsRef.current,
+          recentlyViewed: JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'),
+          teams: teams.map((t) => ({ id: t.id, name: t.name, role: t.role, tier: t.tier })),
+          subscription,
+        }
+      },
+
+      /**
+       * Wipes this browser's locally-held app state (profile cache, preferences,
+       * history) without touching the server-side account, subscription, or
+       * uploads. Signing back in re-creates a fresh local profile.
+       */
+      resetLocalData() {
+        for (const key of [STORAGE_KEY, SETTINGS_KEY, RECENT_KEY, ACTIVE_TEAM_KEY, THEME_KEY]) {
+          try {
+            localStorage.removeItem(key)
+          } catch {
+            // ignore
+          }
+        }
+        setSettings({ ...DEFAULT_SETTINGS })
+        setRecentlyViewed([])
+        setActiveTeamId(null)
       },
 
       /**
@@ -540,10 +737,13 @@ export function AppProvider({ children }) {
         updateUser((user) => {
           if (user.credits.image <= 0) return user
           ok = true
+          const credits = { ...user.credits, image: user.credits.image - 1 }
+          // Settings > AI Studio can turn history off; the credit is still spent.
+          if (!settingsRef.current.studio.keepHistory) return { ...user, credits }
           const result = { id: `gen-${Date.now()}`, prompt, createdAt: Date.now(), type: 'image' }
           return {
             ...user,
-            credits: { ...user.credits, image: user.credits.image - 1 },
+            credits,
             generationHistory: { ...user.generationHistory, image: [result, ...user.generationHistory.image] },
           }
         })
@@ -565,10 +765,12 @@ export function AppProvider({ children }) {
         updateUser((user) => {
           if (user.role !== 'express' || user.credits.video < seconds) return user
           ok = true
+          const credits = { ...user.credits, video: user.credits.video - seconds }
+          if (!settingsRef.current.studio.keepHistory) return { ...user, credits }
           const result = { id: `gen-${Date.now()}`, prompt, seconds, createdAt: Date.now(), type: 'video' }
           return {
             ...user,
-            credits: { ...user.credits, video: user.credits.video - seconds },
+            credits,
             generationHistory: { ...user.generationHistory, video: [result, ...user.generationHistory.video] },
           }
         })
@@ -632,6 +834,8 @@ export function AppProvider({ children }) {
     refreshTeams,
     refreshTeamMembers,
     refreshSubscription,
+    teams,
+    subscription,
   ])
 
   const mergedContentItems = useMemo(
@@ -647,6 +851,7 @@ export function AppProvider({ children }) {
       ...actions,
       contentItems: mergedContentItems,
       pendingSubmissions: livePendingSubmissions,
+      settings,
       theme,
       teams,
       activeTeamId,
@@ -661,6 +866,7 @@ export function AppProvider({ children }) {
       actions,
       mergedContentItems,
       livePendingSubmissions,
+      settings,
       theme,
       teams,
       activeTeamId,

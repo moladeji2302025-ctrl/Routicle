@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import { THEME_MODES } from '../data/settings'
 import {
   UserIcon,
   CardIcon,
@@ -16,7 +17,8 @@ import {
 const ROLE_LABEL = { free: 'Free', standard: 'Standard', express: 'Express' }
 
 export default function AccountMenu() {
-  const { currentUser, teams, activeTeam, activeTeamId, theme, toggleTheme, setActiveTeam, signOut } = useApp()
+  const { currentUser, teams, activeTeam, activeTeamId, theme, settings, updateSettings, setActiveTeam, signOut } =
+    useApp()
   const [open, setOpen] = useState(false)
   const rootRef = useRef(null)
   const navigate = useNavigate()
@@ -117,12 +119,12 @@ export default function AccountMenu() {
 
           <div className="account-menu-divider" />
 
-          <button type="button" className="account-menu-item" onClick={() => go(activeTeamId ? '/team' : '/account')}>
+          <button type="button" className="account-menu-item" onClick={() => go('/settings/plan')}>
             <CardIcon size={16} color="currentColor" />
             Plan &amp; billing
             <span className="account-menu-badge">{ROLE_LABEL[activeTeam?.tier || currentUser.role] ?? 'Free'}</span>
           </button>
-          <button type="button" className="account-menu-item" onClick={() => go('/account')}>
+          <button type="button" className="account-menu-item" onClick={() => go('/settings')}>
             <SettingsIcon size={16} color="currentColor" />
             Settings
           </button>
@@ -134,21 +136,19 @@ export default function AccountMenu() {
           <div className="account-menu-row">
             {theme === 'dark' ? <MoonIcon size={16} color="currentColor" /> : <SunIcon size={16} color="currentColor" />}
             <span>Theme</span>
+            {/* Sets the mode explicitly rather than toggling, so picking a side
+                from 'system' lands where you clicked instead of flipping. */}
             <div className="account-menu-segmented">
-              <button
-                type="button"
-                className={theme === 'light' ? 'account-menu-seg-active' : ''}
-                onClick={() => theme !== 'light' && toggleTheme()}
-              >
-                Light
-              </button>
-              <button
-                type="button"
-                className={theme === 'dark' ? 'account-menu-seg-active' : ''}
-                onClick={() => theme !== 'dark' && toggleTheme()}
-              >
-                Dark
-              </button>
+              {THEME_MODES.map((mode) => (
+                <button
+                  key={mode.id}
+                  type="button"
+                  className={settings.appearance.themeMode === mode.id ? 'account-menu-seg-active' : ''}
+                  onClick={() => updateSettings('appearance', { themeMode: mode.id })}
+                >
+                  {mode.label}
+                </button>
+              ))}
             </div>
           </div>
 
