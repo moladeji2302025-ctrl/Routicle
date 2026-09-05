@@ -3,6 +3,10 @@
 async function request(path, options = {}) {
   const res = await fetch(`/api${path}`, {
     ...options,
+    // Admin endpoints verify the Neon Auth session cookie server-side, so it has
+    // to actually be sent. Same-origin defaults to 'same-origin' already, but
+    // being explicit keeps this correct if the API ever moves to a subdomain.
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json', ...options.headers },
   })
   const isJson = res.headers.get('content-type')?.includes('application/json')
@@ -138,6 +142,86 @@ export function unsaveItemRemote({ userId, organizationId, contentItemId }) {
     ? `?userId=${userId}&organizationId=${organizationId}&contentItemId=${contentItemId}`
     : `?userId=${userId}&contentItemId=${contentItemId}`
   return request(`/collections${query}`, { method: 'DELETE' })
+}
+
+/* ---- What's new (public) ---- */
+
+export function fetchUpdates(limit) {
+  return request(`/updates${limit ? `?limit=${limit}` : ''}`)
+}
+
+export function fetchPublicResources() {
+  return request('/public/resources')
+}
+
+/* ---- Admin (session-verified server-side) ---- */
+
+export function fetchAdminSession() {
+  return request('/admin/session')
+}
+
+export function fetchAdminOverview() {
+  return request('/admin/overview')
+}
+
+export function fetchAdminUpdates() {
+  return request('/admin/updates')
+}
+
+export function createUpdate(data) {
+  return request('/admin/updates', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export function patchUpdate(data) {
+  return request('/admin/updates', { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export function deleteUpdate(id) {
+  return request(`/admin/updates?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+export function fetchAdminResources() {
+  return request('/admin/resources')
+}
+
+export function createResource(data) {
+  return request('/admin/resources', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export function patchResource(data) {
+  return request('/admin/resources', { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export function deleteResource(id) {
+  return request(`/admin/resources?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+export function fetchAdminUsers(q) {
+  return request(`/admin/users${q ? `?q=${encodeURIComponent(q)}` : ''}`)
+}
+
+export function grantAdmin(userId) {
+  return request('/admin/users', { method: 'POST', body: JSON.stringify({ userId }) })
+}
+
+export function revokeAdmin(userId) {
+  return request(`/admin/users?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
+}
+
+export function fetchAdminContent({ status, q } = {}) {
+  const params = new URLSearchParams()
+  if (status) params.set('status', status)
+  if (q) params.set('q', q)
+  const query = params.toString()
+  return request(`/admin/content${query ? `?${query}` : ''}`)
+}
+
+export function patchAdminContent(data) {
+  return request('/admin/content', { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export function deleteAdminContent(id) {
+  return request(`/admin/content?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 /* ---- Team folders ---- */

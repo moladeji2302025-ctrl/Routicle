@@ -249,3 +249,12 @@ export function HelpIcon({ size = 18, color = 'currentColor' }) {
     </svg>
   )
 }
+
+export function ShieldIcon({ size = 18, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2.8 4.5 6v5.4c0 4.5 3 8.2 7.5 9.8 4.5-1.6 7.5-5.3 7.5-9.8V6Z" />
+      <path d="m9.2 12 2 2 3.6-3.8" />
+    </svg>
+  )
+}

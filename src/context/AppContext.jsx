@@ -137,6 +137,15 @@ export function AppProvider({ children }) {
   // Real, server-side billing state for the active scope (personal or team).
   const [subscription, setSubscription] = useState(null)
 
+  /**
+   * Whether the server says this session is a platform admin. The local
+   * currentUser.isAdmin flag is a prototype convenience that only changes what
+   * the UI renders — this is the one the admin console gates on, and every
+   * /api/admin/* route re-checks it anyway, so a forged client flag buys
+   * nothing.
+   */
+  const [isPlatformAdmin, setIsPlatformAdmin] = useState(false)
+
   // Design detail pages record themselves here so the dashboard can offer a
   // genuine "pick up where you left off" rather than a decorative placeholder.
   const [recentlyViewed, setRecentlyViewed] = useState(() => {
@@ -209,7 +218,13 @@ export function AppProvider({ children }) {
   }, [state])
 
   const refreshLiveContent = useCallback(() => {
-    api.fetchApprovedContent().then(setLiveContentItems).catch((err) => console.error('fetchApprovedContent failed', err))
+    api
+      .fetchApprovedContent()
+      // Guard the shape: a non-array here makes the merge below throw during
+      // render, which unmounts the whole tree and leaves a blank page. A bad
+      // response should cost the live rows, not the entire app.
+      .then((rows) => setLiveContentItems(Array.isArray(rows) ? rows : []))
+      .catch((err) => console.error('fetchApprovedContent failed', err))
   }, [])
 
   const refreshPending = useCallback(() => {
@@ -309,6 +324,17 @@ export function AppProvider({ children }) {
       setTeamMembers([])
     }
   }, [state.currentUser?.id, refreshTeams])
+
+  useEffect(() => {
+    if (!state.currentUser?.id) {
+      setIsPlatformAdmin(false)
+      return
+    }
+    api
+      .fetchAdminSession()
+      .then(({ isAdmin }) => setIsPlatformAdmin(!!isAdmin))
+      .catch(() => setIsPlatformAdmin(false))
+  }, [state.currentUser?.id])
 
   /**
    * Pulls the subscription actually in force from the server and mirrors its
@@ -891,6 +917,7 @@ export function AppProvider({ children }) {
       activeTeam,
       teamMembers,
       subscription,
+      isPlatformAdmin,
       recentlyViewed,
       recordView,
     }),
@@ -906,6 +933,7 @@ export function AppProvider({ children }) {
       activeTeam,
       teamMembers,
       subscription,
+      isPlatformAdmin,
       recentlyViewed,
       recordView,
     ]

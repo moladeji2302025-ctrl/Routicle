@@ -37,6 +37,13 @@ import TeamPage from './pages/TeamPage'
 import FolderPage from './pages/FolderPage'
 import BillingCallbackPage from './pages/BillingCallbackPage'
 import AdminModerationPage from './pages/AdminModerationPage'
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminOverviewPage from './pages/admin/AdminOverviewPage'
+import AdminUpdatesPage from './pages/admin/AdminUpdatesPage'
+import AdminResourcesPage from './pages/admin/AdminResourcesPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
+import AdminContentPage from './pages/admin/AdminContentPage'
+import UpdatesPage from './pages/UpdatesPage'
 import StaticPage from './pages/StaticPage'
 
 export default function App() {
@@ -84,7 +91,15 @@ export default function App() {
             <Route path="/team" element={<TeamPage />} />
             <Route path="/team/folder/:id" element={<FolderPage />} />
             <Route path="/billing/callback" element={<BillingCallbackPage />} />
-            <Route path="/admin" element={<AdminModerationPage />} />
+            <Route path="/updates" element={<UpdatesPage />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminOverviewPage />} />
+              <Route path="updates" element={<AdminUpdatesPage />} />
+              <Route path="content" element={<AdminContentPage />} />
+              <Route path="moderation" element={<AdminModerationPage />} />
+              <Route path="resources" element={<AdminResourcesPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+            </Route>
             <Route path="/about" element={<StaticPage slug="about" />} />
             <Route path="/careers" element={<StaticPage slug="careers" />} />
             <Route path="/brand" element={<StaticPage slug="brand" />} />

@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import { fetchPublicResources } from '../lib/api'
 import {
   HelpIcon,
   UploadIcon,
@@ -65,6 +67,42 @@ const GROUPS = [
 export default function ResourcesPage() {
   const { currentUser } = useApp()
   const isCreator = !!currentUser?.isCreator
+  const [added, setAdded] = useState([])
+
+  // Admin-added entries are merged into the matching built-in group, or appear
+  // as their own group if an admin used a name that isn't one of these.
+  useEffect(() => {
+    let cancelled = false
+    fetchPublicResources()
+      .then(({ resources }) => !cancelled && setAdded(resources))
+      .catch(() => {
+        // API unreachable — the built-in groups below still render.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const groupNames = GROUPS.map((g) => g.title)
+  const extraGroups = [...new Set(added.map((r) => r.group))].filter((g) => !groupNames.includes(g))
+
+  const merged = [
+    ...GROUPS.map((group) => ({
+      ...group,
+      items: [
+        ...group.items,
+        ...added
+          .filter((r) => r.group === group.title)
+          .map((r) => ({ to: r.url, label: r.title, desc: r.description || '', icon: StarIcon })),
+      ],
+    })),
+    ...extraGroups.map((name) => ({
+      title: name,
+      items: added
+        .filter((r) => r.group === name)
+        .map((r) => ({ to: r.url, label: r.title, desc: r.description || '', icon: StarIcon })),
+    })),
+  ]
 
   return (
     <div className="explore-page">
@@ -74,7 +112,7 @@ export default function ResourcesPage() {
         How Routicle works, what you can do with what you download, and where everything lives.
       </p>
 
-      {GROUPS.map((group) => {
+      {merged.map((group) => {
         const items = group.items.filter(
           (item) => (!item.creatorOnly || isCreator) && (!item.hideWhenCreator || !isCreator)
         )
@@ -85,14 +123,29 @@ export default function ResourcesPage() {
             <div className="resource-grid">
               {items.map((item) => {
                 const Icon = item.icon
-                return (
-                  <Link key={item.to} to={item.to} className="resource-card">
+                // Admin-added links can point off-site; those need a real anchor.
+                const external = /^https?:\/\//i.test(item.to)
+                const inner = (
+                  <>
                     <span className="resource-card-icon">
                       <Icon size={17} color="currentColor" />
                     </span>
                     <span className="resource-card-label">{item.label}</span>
-                    <span className="resource-card-desc">{item.desc}</span>
-                  </Link>
+                    {item.desc && <span className="resource-card-desc">{item.desc}</span>}
+                  </>
+                )
+                return external ? (
+                  <a
+                    key={item.to}
+                    href={item.to}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="resource-card"
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <Link key={item.to} to={item.to} className="resource-card">{inner}</Link>
                 )
               })}
             </div>

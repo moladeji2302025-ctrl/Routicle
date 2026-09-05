@@ -6,6 +6,7 @@ import { CREATORS, getCreatorByName } from '../data/creators'
 import { applyBrowsingFilters } from '../data/settings'
 import { TIERS } from '../data/pricing'
 import { formatCount } from '../utils/format'
+import WhatsNew from '../components/WhatsNew'
 import {
   SearchIcon,
   GridIcon,
@@ -234,6 +235,8 @@ export default function AppHomePage() {
           </div>
         )}
       </form>
+
+      <WhatsNew />
 
       <div className="app-tool-grid">
         {tools.map((tool) => {

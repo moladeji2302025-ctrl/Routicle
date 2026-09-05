@@ -18,6 +18,7 @@ import {
   CardIcon,
   HelpIcon,
   PenIcon,
+  ShieldIcon,
 } from './icons'
 
 /**
@@ -58,23 +59,31 @@ const NAV_GROUPS = [
       { label: 'Workspaces', to: '/workspaces', icon: UsersIcon },
       { label: 'Team', to: '/team', icon: UsersIcon },
       { label: 'Earnings', to: '/dashboard', icon: ChartIcon, when: (u) => u?.isCreator },
-      { label: 'Moderation', to: '/admin', icon: SparkleIcon, when: (u) => u?.isAdmin },
     ],
   },
   {
     label: 'More',
     items: [
+      { label: "What's new", to: '/updates', icon: SparkleIcon },
       { label: 'Resources', to: '/resources', icon: HelpIcon },
       { label: 'Pricing', to: '/pricing', icon: CardIcon },
       { label: 'Settings', to: '/settings', icon: SettingsIcon },
     ],
   },
+  {
+    label: 'Platform',
+    // Gated on the server's answer, not the local prototype flag — and the
+    // console re-checks the session on every request behind it anyway.
+    when: (ctx) => ctx.isPlatformAdmin,
+    items: [{ label: 'Admin console', to: '/admin', icon: ShieldIcon }],
+  },
 ]
 
 export default function AppShell() {
-  const { currentUser } = useApp()
+  const { currentUser, isPlatformAdmin } = useApp()
   const navigate = useNavigate()
   const location = useLocation()
+  const navContext = { ...currentUser, isPlatformAdmin }
 
   // Default match is prefix-based, so /design/12 doesn't light up Explore but
   // /settings/plan does light up Settings.
@@ -98,7 +107,8 @@ export default function AppShell() {
 
         <nav className="app-nav">
           {NAV_GROUPS.map((group) => {
-            const items = group.items.filter((item) => !item.when || item.when(currentUser))
+            if (group.when && !group.when(navContext)) return null
+            const items = group.items.filter((item) => !item.when || item.when(navContext))
             if (items.length === 0) return null
             return (
               <div key={group.label} className="app-nav-group">
