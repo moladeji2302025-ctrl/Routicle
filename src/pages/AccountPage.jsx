@@ -1,10 +1,33 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { TIERS } from '../data/pricing'
 
+const CYCLE_LABEL = { monthly: 'billed monthly', annual: 'billed annually' }
+const STATUS_LABEL = {
+  active: 'Active',
+  canceled: 'Canceled',
+  past_due: 'Payment failed',
+  pending: 'Pending',
+}
+
 export default function AccountPage() {
-  const { currentUser, signOut, devSetUser } = useApp()
+  const { currentUser, subscription, activeTeam, signOut, devSetUser, cancelSubscription } = useApp()
   const navigate = useNavigate()
+  const [canceling, setCanceling] = useState(false)
+  const [billingError, setBillingError] = useState('')
+
+  async function handleCancel() {
+    setBillingError('')
+    setCanceling(true)
+    try {
+      await cancelSubscription()
+    } catch (err) {
+      setBillingError(err.message)
+    } finally {
+      setCanceling(false)
+    }
+  }
 
   if (!currentUser) {
     return (
@@ -22,10 +45,38 @@ export default function AccountPage() {
       <div className="dashboard-grid">
         <div className="dashboard-panel">
           <h3>Plan</h3>
-          <p className="dashboard-note">
-            {TIERS[currentUser.role].label} · {currentUser.billingMode === 'payPerDownload' ? 'Pay-per-download' : `Monthly (${currentUser.billingCadence})`}
-          </p>
-          <button type="button" className="btn-hero-secondary" onClick={() => navigate('/pricing')}>Change plan</button>
+          {subscription ? (
+            <>
+              <p className="dashboard-note">
+                <strong>{TIERS[subscription.tier]?.label || subscription.tier}</strong>
+                {' · '}
+                {CYCLE_LABEL[subscription.billingCycle]}
+                {' · '}
+                {STATUS_LABEL[subscription.status] || subscription.status}
+                {activeTeam ? ` · team plan for ${activeTeam.name}` : ''}
+              </p>
+              {subscription.currentPeriodEnd && (
+                <p className="dashboard-note">
+                  {subscription.status === 'canceled' ? 'Access until' : 'Renews'}{' '}
+                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                  {subscription.status === 'active' && !subscription.isRecurring && ' (one-off payment — renew manually)'}
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="dashboard-note">Free · browsing and free-marked downloads only</p>
+          )}
+          {billingError && <p className="pricing-error">{billingError}</p>}
+          <div className="account-demo-row">
+            <button type="button" className="btn-hero-secondary" onClick={() => navigate('/pricing')}>
+              {subscription ? 'Change plan' : 'See plans'}
+            </button>
+            {subscription?.status === 'active' && (
+              <button type="button" className="btn-hero-secondary" onClick={handleCancel} disabled={canceling}>
+                {canceling ? 'Canceling…' : 'Cancel plan'}
+              </button>
+            )}
+          </div>
 
           <h3 className="dashboard-panel-spacer">AI credits</h3>
           <p className="dashboard-note">{currentUser.credits.image} image · {currentUser.credits.video}s video remaining</p>
@@ -47,15 +98,15 @@ export default function AccountPage() {
           <h3>Demo controls</h3>
           <p className="dashboard-note">This is a prototype — switch roles instantly to preview gated screens.</p>
           <div className="account-demo-row">
-            <button type="button" className="pricing-toggle-btn" onClick={() => devSetUser({ role: 'free', billingMode: 'monthly' })}>Free</button>
-            <button type="button" className="pricing-toggle-btn" onClick={() => devSetUser({ role: 'standard', credits: { image: 50, video: 0 } })}>Standard</button>
-            <button type="button" className="pricing-toggle-btn" onClick={() => devSetUser({ role: 'express', credits: { image: 50, video: 60 } })}>Express</button>
+            <button type="button" className="account-demo-btn" onClick={() => devSetUser({ role: 'free', billingMode: 'monthly' })}>Free</button>
+            <button type="button" className="account-demo-btn" onClick={() => devSetUser({ role: 'standard', credits: { image: 50, video: 0 } })}>Standard</button>
+            <button type="button" className="account-demo-btn" onClick={() => devSetUser({ role: 'express', credits: { image: 50, video: 60 } })}>Express</button>
           </div>
           <div className="account-demo-row">
-            <button type="button" className="pricing-toggle-btn" onClick={() => devSetUser({ isCreator: !currentUser.isCreator })}>
+            <button type="button" className="account-demo-btn" onClick={() => devSetUser({ isCreator: !currentUser.isCreator })}>
               {currentUser.isCreator ? 'Remove creator status' : 'Grant creator status'}
             </button>
-            <button type="button" className="pricing-toggle-btn" onClick={() => devSetUser({ isAdmin: !currentUser.isAdmin })}>
+            <button type="button" className="account-demo-btn" onClick={() => devSetUser({ isAdmin: !currentUser.isAdmin })}>
               {currentUser.isAdmin ? 'Remove admin' : 'Grant admin'}
             </button>
           </div>

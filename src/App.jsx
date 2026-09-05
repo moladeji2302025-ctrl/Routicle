@@ -18,6 +18,7 @@ import CreatorProfilePage from './pages/CreatorProfilePage'
 import AccountPage from './pages/AccountPage'
 import CollectionsPage from './pages/CollectionsPage'
 import TeamPage from './pages/TeamPage'
+import BillingCallbackPage from './pages/BillingCallbackPage'
 import AdminModerationPage from './pages/AdminModerationPage'
 import StaticPage from './pages/StaticPage'
 
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/account" element={<AccountPage />} />
             <Route path="/collections" element={<CollectionsPage />} />
             <Route path="/team" element={<TeamPage />} />
+            <Route path="/billing/callback" element={<BillingCallbackPage />} />
             <Route path="/admin" element={<AdminModerationPage />} />
             <Route path="/about" element={<StaticPage slug="about" />} />
             <Route path="/careers" element={<StaticPage slug="careers" />} />

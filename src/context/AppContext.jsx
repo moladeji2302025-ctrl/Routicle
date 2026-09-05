@@ -105,6 +105,8 @@ export function AppProvider({ children }) {
     }
   })
   const [teamMembers, setTeamMembers] = useState([])
+  // Real, server-side billing state for the active scope (personal or team).
+  const [subscription, setSubscription] = useState(null)
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -232,11 +234,35 @@ export function AppProvider({ children }) {
     }
   }, [state.currentUser?.id, refreshTeams])
 
+  /**
+   * Pulls the subscription actually in force from the server and mirrors its
+   * tier onto currentUser.role, so every existing tier gate (evaluateDownload,
+   * AI Studio credits, etc.) reads real billing state instead of the local
+   * flag the mock subscribe() used to set.
+   */
+  const refreshSubscription = useCallback(async (userId, teamId) => {
+    if (!userId) return
+    try {
+      const { subscription } = await api.fetchSubscription({ userId, organizationId: teamId || undefined })
+      setSubscription(subscription)
+      setState((prev) => {
+        if (!prev.currentUser || prev.currentUser.id !== userId) return prev
+        const role = subscription?.tier || 'free'
+        if (prev.currentUser.role === role) return prev
+        const nextUser = { ...prev.currentUser, role }
+        return { ...prev, currentUser: nextUser, profiles: { ...prev.profiles, [userId]: nextUser } }
+      })
+    } catch (err) {
+      console.error('fetchSubscription failed', err)
+    }
+  }, [])
+
   useEffect(() => {
     if (!state.currentUser?.id) return
     refreshSavedItems(state.currentUser.id, activeTeamId)
     refreshTeamMembers(activeTeamId)
-  }, [state.currentUser?.id, activeTeamId, refreshSavedItems, refreshTeamMembers])
+    refreshSubscription(state.currentUser.id, activeTeamId)
+  }, [state.currentUser?.id, activeTeamId, refreshSavedItems, refreshTeamMembers, refreshSubscription])
 
   /**
    * Pulls the real Neon Auth session and merges it with this browser's locally-persisted
@@ -323,22 +349,54 @@ export function AppProvider({ children }) {
         setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
       },
 
-      subscribe({ tier, billingMode, cadence }) {
-        const plan = TIERS[tier]
-        updateUser((user) => ({
-          ...user,
-          role: tier,
-          billingMode,
-          billingCadence: cadence,
-          credits:
-            billingMode === 'payPerDownload'
-              ? user.credits
-              : { image: plan.imageCredits || 0, video: plan.videoCredits || 0 },
-        }))
+      /**
+       * Starts a real Paystack checkout and hands back the hosted payment URL.
+       * Nothing about the account changes here — the tier only moves once the
+       * payment is verified (see /billing/callback and the webhook), so a
+       * closed tab or a declined card can't leave someone on a plan they
+       * didn't pay for.
+       */
+      async startSubscriptionCheckout({ tier, cadence, returnUrl }) {
+        const user = stateRef.current.currentUser
+        if (!user) throw new Error('Sign in first')
+        const { authorizationUrl } = await api.startCheckout({
+          userId: user.id,
+          email: user.email,
+          tier,
+          billingCycle: cadence,
+          organizationId: activeTeamId || undefined,
+          returnUrl,
+        })
+        return authorizationUrl
       },
 
-      cancelSubscription() {
-        updateUser((user) => ({ ...user, role: 'free', billingMode: 'monthly' }))
+      /** Confirms a payment on return from Paystack, then syncs local state. */
+      async confirmPayment(reference) {
+        const result = await api.verifyPayment(reference)
+        const user = stateRef.current.currentUser
+        if (user) await refreshSubscription(user.id, activeTeamId)
+        return result
+      },
+
+      async cancelSubscription() {
+        const user = stateRef.current.currentUser
+        if (!user) return null
+        const result = await api.cancelSubscriptionRemote({
+          userId: user.id,
+          organizationId: activeTeamId || undefined,
+        })
+        await refreshSubscription(user.id, activeTeamId)
+        return result
+      },
+
+      /** Grants the per-cycle AI credits that come with a paid tier. */
+      applyPlanCredits(tier) {
+        const plan = TIERS[tier]
+        if (!plan) return
+        updateUser((user) => ({
+          ...user,
+          credits: { image: plan.imageCredits || 0, video: plan.videoCredits || 0 },
+        }))
       },
 
       /** Creates a team (Neon Auth organization), makes it the active workspace, and returns it. */
@@ -546,6 +604,7 @@ export function AppProvider({ children }) {
     setActiveTeamId,
     refreshTeams,
     refreshTeamMembers,
+    refreshSubscription,
   ])
 
   const mergedContentItems = useMemo(
@@ -566,8 +625,9 @@ export function AppProvider({ children }) {
       activeTeamId,
       activeTeam,
       teamMembers,
+      subscription,
     }),
-    [state, actions, mergedContentItems, livePendingSubmissions, theme, teams, activeTeamId, activeTeam, teamMembers]
+    [state, actions, mergedContentItems, livePendingSubmissions, theme, teams, activeTeamId, activeTeam, teamMembers, subscription]
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

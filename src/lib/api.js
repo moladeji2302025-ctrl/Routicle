@@ -132,6 +132,30 @@ export function unsaveItemRemote({ userId, organizationId, contentItemId }) {
   return request(`/collections${query}`, { method: 'DELETE' })
 }
 
+/* ---- Billing (Paystack) ---- */
+
+/** Starts a checkout; returns the hosted Paystack URL to send the buyer to. */
+export function startCheckout({ userId, email, tier, billingCycle, organizationId, returnUrl }) {
+  return request('/billing/checkout', {
+    method: 'POST',
+    body: JSON.stringify({ userId, email, tier, billingCycle, organizationId, returnUrl }),
+  })
+}
+
+export function verifyPayment(reference) {
+  return request('/billing/verify', { method: 'POST', body: JSON.stringify({ reference }) })
+}
+
+export function fetchSubscription({ userId, organizationId }) {
+  const query = organizationId ? `?userId=${userId}&organizationId=${organizationId}` : `?userId=${userId}`
+  return request(`/billing/subscription${query}`)
+}
+
+export function cancelSubscriptionRemote({ userId, organizationId }) {
+  const query = organizationId ? `?userId=${userId}&organizationId=${organizationId}` : `?userId=${userId}`
+  return request(`/billing/subscription${query}`, { method: 'DELETE' })
+}
+
 export function triggerFileDownload(url, fileName) {
   const a = document.createElement('a')
   a.href = url
