@@ -25,7 +25,7 @@ const ADMIN_NAV = [
  * convenience, not the security boundary.
  */
 export default function AdminLayout() {
-  const { currentUser, isPlatformAdmin } = useApp()
+  const { currentUser, isPlatformAdmin, adminReason } = useApp()
 
   if (!currentUser) {
     return (
@@ -44,6 +44,7 @@ export default function AdminLayout() {
           This account isn't a platform admin. Ask an existing admin to grant access, or add your
           email to <code>ADMIN_EMAILS</code> if you're setting the first one up.
         </p>
+        {adminReason && <p className="settings-error">{adminReason}</p>}
         <Link to="/" className="btn-hero-primary">Back to Routicle</Link>
       </div>
     )

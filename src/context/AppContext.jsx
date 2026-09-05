@@ -145,6 +145,9 @@ export function AppProvider({ children }) {
    * nothing.
    */
   const [isPlatformAdmin, setIsPlatformAdmin] = useState(false)
+  // Why admin was refused, surfaced in the console's gate so a misconfiguration
+  // is readable without opening devtools.
+  const [adminReason, setAdminReason] = useState('')
 
   // Design detail pages record themselves here so the dashboard can offer a
   // genuine "pick up where you left off" rather than a decorative placeholder.
@@ -332,8 +335,14 @@ export function AppProvider({ children }) {
     }
     api
       .fetchAdminSession()
-      .then(({ isAdmin }) => setIsPlatformAdmin(!!isAdmin))
-      .catch(() => setIsPlatformAdmin(false))
+      .then(({ isAdmin, reason }) => {
+        setIsPlatformAdmin(!!isAdmin)
+        setAdminReason(reason || '')
+      })
+      .catch((err) => {
+        setIsPlatformAdmin(false)
+        setAdminReason(err.message)
+      })
   }, [state.currentUser?.id])
 
   /**
@@ -375,7 +384,17 @@ export function AppProvider({ children }) {
   const hydrateFromSession = useCallback(async (intentOverride) => {
     const result = await authClient.getSession()
     const authUser = result.data?.user
-    if (!authUser) return null
+    if (!authUser) {
+      api.setSessionToken(null)
+      return null
+    }
+
+    // Neon Auth is on its own domain, so its cookie never reaches /api/*.
+    // Hand the token to the API client so authenticated endpoints can verify
+    // it as a bearer credential (see api/_lib/auth.js).
+    const token = result.data?.session?.token
+    if (token) api.setSessionToken(token)
+    else console.warn('No session token in the Neon Auth response — /api/admin/* will reject this session')
 
     const pendingIntent = intentOverride || sessionStorage.getItem(PENDING_INTENT_KEY) || null
     sessionStorage.removeItem(PENDING_INTENT_KEY)
@@ -439,6 +458,7 @@ export function AppProvider({ children }) {
 
       async signOut() {
         await authClient.signOut()
+        api.setSessionToken(null)
         setState((prev) => ({ ...prev, currentUser: null }))
         setActiveTeamId(null)
       },
@@ -918,6 +938,7 @@ export function AppProvider({ children }) {
       teamMembers,
       subscription,
       isPlatformAdmin,
+      adminReason,
       recentlyViewed,
       recordView,
     }),
@@ -934,6 +955,7 @@ export function AppProvider({ children }) {
       teamMembers,
       subscription,
       isPlatformAdmin,
+      adminReason,
       recentlyViewed,
       recordView,
     ]

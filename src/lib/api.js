@@ -1,13 +1,28 @@
 /** Thin client for the real backend (/api/*) — Postgres metadata + Neon Object Storage files. */
 
+/**
+ * The Neon Auth session token, held in memory only.
+ *
+ * Neon Auth runs on its own domain, so its session cookie is scoped there and
+ * never reaches /api/* on this origin. Endpoints that need to know who is
+ * calling get this token as a bearer header instead, and verify it against the
+ * session table server-side. AppContext sets it whenever the session is
+ * hydrated, and clears it on sign-out.
+ */
+let sessionToken = null
+
+export function setSessionToken(token) {
+  sessionToken = token || null
+}
+
 async function request(path, options = {}) {
   const res = await fetch(`/api${path}`, {
     ...options,
-    // Admin endpoints verify the Neon Auth session cookie server-side, so it has
-    // to actually be sent. Same-origin defaults to 'same-origin' already, but
-    // being explicit keeps this correct if the API ever moves to a subdomain.
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
+      ...options.headers,
+    },
   })
   const isJson = res.headers.get('content-type')?.includes('application/json')
   if (!isJson) {

@@ -4,32 +4,43 @@ import { send } from './http.js'
 /**
  * Server-side session verification.
  *
- * Neon Auth is Managed Better Auth, so the session is a signed cookie its own
- * service issued. Rather than re-implement that verification, this forwards the
- * request's cookie header to Better Auth's own /get-session and trusts only
- * what it returns. The browser can lie about a userId in a body; it cannot
- * forge a session cookie.
+ * Neon Auth is hosted on its own domain (…neonauth.…aws.neon.tech), so its
+ * session cookie is scoped there and is *never* sent to this app's origin —
+ * reading req.headers.cookie here always comes up empty. Instead the client
+ * sends the session token it already holds as a bearer header, and this
+ * verifies it against neon_auth.session, which is the same table Neon Auth
+ * itself checks.
+ *
+ * The token is a bearer credential: it only ever travels same-origin over
+ * HTTPS, and is held in memory client-side rather than localStorage.
  *
  * Everything under /api/admin/* goes through requireAdmin(). The rest of the
- * API still trusts caller-supplied ids — that is a known gap, but it is not one
- * that should extend to endpoints which can change the platform for everyone.
+ * API still trusts caller-supplied ids — a known gap, but not one that should
+ * extend to endpoints which can change the platform for everyone.
  */
 
-const AUTH_BASE = process.env.VITE_NEON_AUTH_URL || process.env.NEON_AUTH_URL
+function bearerToken(req) {
+  const header = req.headers?.authorization || req.headers?.Authorization
+  if (!header || !/^Bearer\s+/i.test(header)) return null
+  const token = header.replace(/^Bearer\s+/i, '').trim()
+  return token || null
+}
 
 export async function getSession(req) {
-  if (!AUTH_BASE) throw new Error('VITE_NEON_AUTH_URL is not set — session checks cannot run')
-  const cookie = req.headers?.cookie
-  if (!cookie) return null
+  const token = bearerToken(req)
+  if (!token) return null
 
-  const res = await fetch(`${AUTH_BASE.replace(/\/$/, '')}/get-session`, {
-    headers: { cookie, accept: 'application/json' },
-  })
-  if (!res.ok) return null
+  const rows = await sql`
+    SELECT u.id, u.email, u.name, u.image, s."expiresAt"
+    FROM neon_auth.session s
+    JOIN neon_auth."user" u ON u.id = s."userId"
+    WHERE s.token = ${token} AND s."expiresAt" > now()
+    LIMIT 1
+  `
+  if (rows.length === 0) return null
 
-  const data = await res.json().catch(() => null)
-  // Better Auth answers 200 with an empty body when there is no live session.
-  return data?.user ? { user: data.user, session: data.session } : null
+  const r = rows[0]
+  return { user: { id: r.id, email: r.email, name: r.name, image: r.image } }
 }
 
 /**
