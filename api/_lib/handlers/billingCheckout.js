@@ -1,8 +1,8 @@
 import crypto from 'crypto'
-import { sql } from '../_lib/db.js'
-import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
-import { initializeTransaction } from '../_lib/paystack.js'
-import { priceFor, planCodeFor, TIERS, CYCLES } from '../_lib/plans.js'
+import { sql } from '../db.js'
+import { send, methodGuard, withErrorHandling } from '../http.js'
+import { initializeTransaction } from '../paystack.js'
+import { priceFor, planCodeFor, TIERS, CYCLES } from '../plans.js'
 
 /**
  * Starts a subscription checkout.

@@ -1,6 +1,6 @@
-import { sql } from '../_lib/db.js'
-import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
-import { publicPreviewUrl } from '../_lib/s3.js'
+import { sql } from '../db.js'
+import { send, methodGuard, withErrorHandling } from '../http.js'
+import { publicPreviewUrl } from '../s3.js'
 
 function toFeedShape(row) {
   return {

@@ -1,5 +1,5 @@
-import { getSession, isAdminUser } from '../_lib/auth.js'
-import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
+import { getSession, isAdminUser } from '../auth.js'
+import { send, methodGuard, withErrorHandling } from '../http.js'
 
 /**
  * "Is whoever is holding this cookie an admin?" — the client asks once on load

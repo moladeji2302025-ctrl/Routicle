@@ -104,7 +104,7 @@ export async function submitRealUpload({
 }
 
 export function moderateSubmission(id, action, note) {
-  return request('/moderation', { method: 'POST', body: JSON.stringify({ id, action, note }) })
+  return request('/admin/moderation', { method: 'POST', body: JSON.stringify({ id, action, note }) })
 }
 
 export function markItemFreeRemote(id, isFree) {
@@ -147,7 +147,7 @@ export function unsaveItemRemote({ userId, organizationId, contentItemId }) {
 /* ---- What's new (public) ---- */
 
 export function fetchUpdates(limit) {
-  return request(`/updates${limit ? `?limit=${limit}` : ''}`)
+  return request(`/public/updates${limit ? `?limit=${limit}` : ''}`)
 }
 
 export function fetchPublicResources() {

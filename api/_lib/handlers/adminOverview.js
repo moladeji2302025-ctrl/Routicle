@@ -1,6 +1,6 @@
-import { sql } from '../_lib/db.js'
-import { requireAdmin } from '../_lib/auth.js'
-import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
+import { sql } from '../db.js'
+import { requireAdmin } from '../auth.js'
+import { send, methodGuard, withErrorHandling } from '../http.js'
 
 /** Platform-wide numbers for the admin dashboard — real counts, one round trip each. */
 export default async function handler(req, res) {

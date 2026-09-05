@@ -1,7 +1,7 @@
-import { sql } from '../_lib/db.js'
-import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
-import { verifyTransaction } from '../_lib/paystack.js'
-import { activateFromTransaction, serializeSubscription } from '../_lib/billing.js'
+import { sql } from '../db.js'
+import { send, methodGuard, withErrorHandling } from '../http.js'
+import { verifyTransaction } from '../paystack.js'
+import { activateFromTransaction, serializeSubscription } from '../billing.js'
 
 /**
  * Confirms a checkout after the buyer returns from Paystack.

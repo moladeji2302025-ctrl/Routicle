@@ -1,5 +1,5 @@
-import { sql } from '../_lib/db.js'
-import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
+import { sql } from '../db.js'
+import { send, methodGuard, withErrorHandling } from '../http.js'
 
 /**
  * Published admin-added resources, for the client's Resources page to merge in
