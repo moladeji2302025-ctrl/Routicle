@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import PinnedSection, { stage } from './PinnedSection'
+import PinnedSection, { reveal } from './PinnedSection'
 import { departmentLabel } from '../data/departments'
 
 const INTERVAL_MS = 6000
@@ -39,7 +39,7 @@ export default function LiveShowcase() {
 
   return (
     <PinnedSection className="showcase-deck">
-      {(p) => (
+      {(shown) => (
         <>
           <div className="showcase-deck-text">
             <div>
@@ -47,22 +47,22 @@ export default function LiveShowcase() {
               <div className="deck-accent" aria-hidden="true" />
             </div>
 
-            <span className="showcase-deck-num" style={stage(p, 0.08, 0.42)}>
+            <span {...reveal(shown, 0, 'showcase-deck-num')}>
               {String(index + 1).padStart(2, '0')}
               <span className="showcase-deck-num-total"> / {String(slides.length).padStart(2, '0')}</span>
             </span>
 
-            <p className="showcase-deck-desc" style={stage(p, 0.18, 0.55)}>
+            <p {...reveal(shown, 2, 'showcase-deck-desc')}>
               A rotating look at real, finished work from the library — sign in to view any project
               in full and download the source files behind it.
             </p>
 
-            <div className="showcase-deck-cta-row" style={stage(p, 0.34, 0.7)}>
+            <div {...reveal(shown, 3, 'showcase-deck-cta-row')}>
               <Link to="/explore" className="hero-deck-btn-secondary">Explore the library</Link>
             </div>
           </div>
 
-          <div className="showcase-grid-reveal" style={stage(p, 0.12, 0.55, 32)}>
+          <div {...reveal(shown, 1, 'showcase-grid-reveal')}>
             {/* Keyed on the slide index so only this inner track replays the
                 glide-in animation on rotation — the wrapper above keeps whatever
                 scroll-staged transform it currently has. */}

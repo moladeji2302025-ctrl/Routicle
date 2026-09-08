@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useApp } from '../context/AppContext'
 import { DEPARTMENTS, departmentLabel } from '../data/departments'
 import { useTimeline, easeOutCubic } from '../hooks/useTimeline'
-import PinnedSection, { stage } from './PinnedSection'
+import PinnedSection, { reveal } from './PinnedSection'
 
 const DONUT_COLORS = ['var(--brand-violet)', 'var(--brand-purple)', 'var(--brand-lavender)', 'oklch(0.5 0.02 290)', 'oklch(0.35 0.02 290)']
 
@@ -44,7 +44,7 @@ export default function PlatformStats() {
 
   return (
     <PinnedSection className="stats-deck" pinLength="180vh">
-      {(p) => <StatsBody p={p} still={still} breakdown={breakdown} />}
+      {(shown) => <StatsBody shown={shown} still={still} breakdown={breakdown} />}
     </PinnedSection>
   )
 }
@@ -54,9 +54,11 @@ export default function PlatformStats() {
  * scroll position rather than a viewport intersection, so the numbers don't
  * finish counting behind an element that hasn't faded in yet.
  */
-function StatsBody({ p, still, breakdown }) {
-  const donutClock = useTimeline(p > 0.1, still ? 0 : DONUT_MS)
-  const barsClock = useTimeline(p > 0.3, still ? 0 : BARS_MS)
+function StatsBody({ shown, still, breakdown }) {
+  // Both clocks start from the same trigger as the fades, so the numbers count
+  // up while their block arrives rather than finishing behind an invisible one.
+  const donutClock = useTimeline(shown, still ? 0 : DONUT_MS)
+  const barsClock = useTimeline(shown, still ? 0 : BARS_MS)
 
   // The ring is drawn as a single continuous sweep: every segment's share sums
   // to 1, so eased clock time maps straight onto arc length travelled, and each
@@ -74,7 +76,7 @@ function StatsBody({ p, still, breakdown }) {
           <p className="stats-deck-intro">Approved uploads across the library, by department.</p>
         </div>
 
-        <div className="donut-wrap" style={stage(p, 0.06, 0.4, 28)}>
+        <div {...reveal(shown, 0, 'donut-wrap')}>
           <svg viewBox="0 0 180 180" className="donut-chart" aria-hidden="true">
             <circle cx="90" cy="90" r={RADIUS} fill="none" stroke="var(--border)" strokeWidth="20" />
             {breakdown.map((d, i) => {
@@ -124,7 +126,7 @@ function StatsBody({ p, still, breakdown }) {
             const rowT = easeOutCubic(clamp01((barsClock - i * ROW_STAGGER) / ROW_SPAN))
             const filled = row.pct * rowT
             return (
-              <div key={row.label} className="progress-row" style={stage(p, 0.24 + i * 0.1, 0.58 + i * 0.1)}>
+              <div key={row.label} {...reveal(shown, i + 1, 'progress-row')}>
                 <span className="progress-label">{row.label}</span>
                 <div className="progress-track">
                   <div

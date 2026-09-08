@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import PinnedSection, { stage } from './PinnedSection'
+import PinnedSection, { reveal } from './PinnedSection'
 
 const ITEMS = [
   { n: '01', label: 'Browse the Library', to: '/explore', desc: 'Real, finished design and video work from real creators.' },
@@ -11,10 +11,10 @@ const ITEMS = [
 export default function SiteOverview() {
   return (
     <PinnedSection className="overview-deck">
-      {(p) => (
+      {(shown) => (
         <>
           {/* The heading is already in place when the section arrives — only
-              what follows it stages in. */}
+              what follows it cascades in. */}
           <div className="overview-deck-head">
             <h2 className="deck-heading">What's Inside</h2>
             <div className="deck-accent" aria-hidden="true" />
@@ -22,7 +22,7 @@ export default function SiteOverview() {
 
           <div className="overview-deck-grid">
             {ITEMS.map((item, i) => (
-              <div key={item.n} className="overview-deck-row" style={stage(p, i * 0.13, i * 0.13 + 0.34)}>
+              <div key={item.n} {...reveal(shown, i, 'overview-deck-row')}>
                 <span className="overview-deck-num">{item.n}</span>
                 <div className="overview-deck-text">
                   <Link to={item.to} className="overview-deck-label">{item.label}</Link>

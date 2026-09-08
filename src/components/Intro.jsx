@@ -1,11 +1,11 @@
-import PinnedSection, { stage } from './PinnedSection'
+import PinnedSection, { reveal } from './PinnedSection'
 
 export default function Intro() {
   return (
     <PinnedSection className="intro-deck">
-      {(p) => (
+      {(shown) => (
         <>
-          <div className="intro-deck-media" style={stage(p, 0.04, 0.44, 32)}>
+          <div {...reveal(shown, 0, 'intro-deck-media')}>
             <img src="/images/t9.jpg" alt="" />
           </div>
 
@@ -15,12 +15,12 @@ export default function Intro() {
               <div className="deck-accent" aria-hidden="true" />
             </div>
 
-            <p className="intro-deck-lead" style={stage(p, 0.12, 0.5)}>
+            <p {...reveal(shown, 1, 'intro-deck-lead')}>
               Most finished creative work only ever gets used once — then it sits on a drive,
               earning nothing.
             </p>
 
-            <p className="intro-deck-body" style={stage(p, 0.3, 0.72)}>
+            <p {...reveal(shown, 2, 'intro-deck-body')}>
               Routicle is a subscriber-share marketplace: creators upload real, finished design and
               video files they never got to reuse. Subscribers pay to download the source files
               behind them — not stock, not a flattened export, the real editable project. Half of

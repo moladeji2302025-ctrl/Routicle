@@ -8494,12 +8494,12 @@ a.admin-stat:hover {
    Pinned full-screen homepage sections
    ============================================================ */
 
-/* The wrapper is taller than the viewport; the extra height is the scroll
-   distance the sticky stage stays pinned for, which is what drives the
-   staged reveals inside it. */
+/* The wrapper is taller than the viewport; the extra height is how long the
+   sticky stage holds on screen after it arrives — just enough for the section
+   to settle and introduce itself, not a scroll-scrub track. */
 .pinned-wrapper {
   position: relative;
-  height: calc(100vh + var(--pin-length, 150vh));
+  height: calc(100vh + var(--pin-length, 60vh));
 }
 
 .pinned-stage {
@@ -8535,25 +8535,28 @@ a.admin-stat:hover {
   padding-bottom: 56px;
 }
 
-/* Elements are positioned by inline transforms driven from scroll, so the
-   staged children must not also carry a scroll-reveal transition. */
-.pinned-stage .overview-deck-row,
-.pinned-stage .works-deck-row,
-.pinned-stage .progress-row {
+/* One element in a section's cascade. Every item in a section is switched on
+   by the same trigger; transition-delay alone spaces them out, so the sequence
+   runs on its own clock instead of being scrubbed by the scrollbar. */
+.stage-item {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.72s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.72s cubic-bezier(0.22, 0.61, 0.36, 1);
   will-change: transform, opacity;
 }
 
-/* Reduced motion, and viewports too small to hold a screen of content still:
-   drop the pin and let the sections flow normally. PinnedSection reports
-   progress 1 in both cases, so everything is simply visible. */
-.pinned-wrapper-static {
-  height: auto;
+.stage-item-in {
+  opacity: 1;
+  transform: none;
 }
 
-.pinned-wrapper-static .pinned-stage {
-  position: static;
-  height: auto;
-  overflow: visible;
+/* Reduced motion: land everything in place rather than sliding it in. The
+   global reduce-motion rule already collapses the duration, but the item would
+   still start at opacity 0 and wait on the observer. */
+:root[data-reduce-motion] .stage-item {
+  opacity: 1;
+  transform: none;
 }
 
 @media (max-width: 900px), (max-height: 640px) {

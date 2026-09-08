@@ -1,4 +1,4 @@
-import PinnedSection, { stage } from './PinnedSection'
+import PinnedSection, { reveal } from './PinnedSection'
 import { UploadIcon, SparkleIcon, HeartIcon } from './icons'
 
 const STEPS = [
@@ -22,7 +22,7 @@ const STEPS = [
 export default function HowItWorks() {
   return (
     <PinnedSection className="works-deck">
-      {(p) => (
+      {(shown) => (
         <>
           <div className="works-deck-head">
             <h2 className="deck-heading">How It Works</h2>
@@ -33,7 +33,7 @@ export default function HowItWorks() {
             {STEPS.map((step, i) => {
               const Icon = step.icon
               return (
-                <div key={step.label} className="works-deck-row" style={stage(p, i * 0.18, i * 0.18 + 0.4)}>
+                <div key={step.label} {...reveal(shown, i, 'works-deck-row')}>
                   <span className="works-deck-icon">
                     <Icon size={20} color="currentColor" />
                   </span>

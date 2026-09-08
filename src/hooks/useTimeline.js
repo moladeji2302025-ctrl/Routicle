@@ -19,7 +19,12 @@ export function useTimeline(active, duration = 1500) {
   const frameRef = useRef(0)
 
   useEffect(() => {
-    if (!active) return undefined
+    // Rewind when the trigger drops, so re-entering a section replays the
+    // count rather than showing the finished figures the moment it reappears.
+    if (!active) {
+      setProgress(0)
+      return undefined
+    }
     if (duration <= 0) {
       setProgress(1)
       return undefined
