@@ -8489,3 +8489,90 @@ a.admin-stat:hover {
     gap: 12px;
   }
 }
+
+/* ============================================================
+   Pinned full-screen homepage sections
+   ============================================================ */
+
+/* The wrapper is taller than the viewport; the extra height is the scroll
+   distance the sticky stage stays pinned for, which is what drives the
+   staged reveals inside it. */
+.pinned-wrapper {
+  position: relative;
+  height: calc(100vh + var(--pin-length, 150vh));
+}
+
+.pinned-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Deliberately no `display` here — each section keeps its own grid or block
+   layout, and only gains vertical centring inside the now-taller stage. */
+.pinned-stage.overview-deck,
+.pinned-stage.works-deck {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pinned-stage.intro-deck,
+.pinned-stage.showcase-deck,
+.pinned-stage.stats-deck {
+  align-content: center;
+}
+
+/* 100px top and bottom was sized for a section that grew to fit its content;
+   inside a fixed 100vh stage it just squeezes the content. */
+.pinned-stage.overview-deck,
+.pinned-stage.intro-deck,
+.pinned-stage.showcase-deck,
+.pinned-stage.works-deck,
+.pinned-stage.stats-deck {
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+
+/* Elements are positioned by inline transforms driven from scroll, so the
+   staged children must not also carry a scroll-reveal transition. */
+.pinned-stage .overview-deck-row,
+.pinned-stage .works-deck-row,
+.pinned-stage .progress-row {
+  will-change: transform, opacity;
+}
+
+/* Reduced motion, and viewports too small to hold a screen of content still:
+   drop the pin and let the sections flow normally. PinnedSection reports
+   progress 1 in both cases, so everything is simply visible. */
+.pinned-wrapper-static {
+  height: auto;
+}
+
+.pinned-wrapper-static .pinned-stage {
+  position: static;
+  height: auto;
+  overflow: visible;
+}
+
+@media (max-width: 900px), (max-height: 640px) {
+  .pinned-wrapper {
+    height: auto;
+  }
+
+  .pinned-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+
+  .pinned-stage.overview-deck,
+  .pinned-stage.intro-deck,
+  .pinned-stage.showcase-deck,
+  .pinned-stage.works-deck,
+  .pinned-stage.stats-deck {
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+}

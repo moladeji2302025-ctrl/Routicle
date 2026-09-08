@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import Reveal from './Reveal'
+import PinnedSection, { stage } from './PinnedSection'
 import { departmentLabel } from '../data/departments'
 
 const INTERVAL_MS = 6000
@@ -38,55 +38,57 @@ export default function LiveShowcase() {
   }
 
   return (
-    <section className="showcase-deck">
-      <div className="showcase-deck-text">
-        <Reveal>
-          <h2 className="deck-heading">Showcase</h2>
-          <div className="deck-accent" aria-hidden="true" />
-        </Reveal>
+    <PinnedSection className="showcase-deck">
+      {(p) => (
+        <>
+          <div className="showcase-deck-text">
+            <div>
+              <h2 className="deck-heading">Showcase</h2>
+              <div className="deck-accent" aria-hidden="true" />
+            </div>
 
-        <Reveal delay={80} className="showcase-deck-num">
-          {String(index + 1).padStart(2, '0')}
-          <span className="showcase-deck-num-total"> / {String(slides.length).padStart(2, '0')}</span>
-        </Reveal>
+            <span className="showcase-deck-num" style={stage(p, 0.08, 0.42)}>
+              {String(index + 1).padStart(2, '0')}
+              <span className="showcase-deck-num-total"> / {String(slides.length).padStart(2, '0')}</span>
+            </span>
 
-        <Reveal delay={120}>
-          <p className="showcase-deck-desc">
-            A rotating look at real, finished work from the library — sign in to view any project
-            in full and download the source files behind it.
-          </p>
-        </Reveal>
+            <p className="showcase-deck-desc" style={stage(p, 0.18, 0.55)}>
+              A rotating look at real, finished work from the library — sign in to view any project
+              in full and download the source files behind it.
+            </p>
 
-        <Reveal delay={160} className="showcase-deck-cta-row">
-          <Link to="/explore" className="hero-deck-btn-secondary">Explore the library</Link>
-        </Reveal>
-      </div>
+            <div className="showcase-deck-cta-row" style={stage(p, 0.34, 0.7)}>
+              <Link to="/explore" className="hero-deck-btn-secondary">Explore the library</Link>
+            </div>
+          </div>
 
-      <Reveal delay={100} className="showcase-grid-reveal">
-        {/* Keyed on the slide index so only this inner track replays the
-            glide-in animation on rotation — the outer Reveal above stays
-            mounted once, so its own scroll-reveal never resets. */}
-        <div className="showcase-grid" key={index}>
-          {slide.map((item, i) => (
-            <button
-              type="button"
-              key={item.id}
-              className={`showcase-grid-tile showcase-grid-tile-${i}`}
-              onClick={() => openProject(item)}
-            >
-              <img src={item.image} alt={item.title} />
-              <span className="showcase-grid-dept">{departmentLabel(item.department)}</span>
-              <span className="showcase-grid-credit">
-                <img src={item.avatar} alt="" className="showcase-grid-avatar" />
-                <span>
-                  <span className="showcase-grid-title">{item.title}</span>
-                  <span className="showcase-grid-creator">by {item.creator}</span>
-                </span>
-              </span>
-            </button>
-          ))}
-        </div>
-      </Reveal>
-    </section>
+          <div className="showcase-grid-reveal" style={stage(p, 0.12, 0.55, 32)}>
+            {/* Keyed on the slide index so only this inner track replays the
+                glide-in animation on rotation — the wrapper above keeps whatever
+                scroll-staged transform it currently has. */}
+            <div className="showcase-grid" key={index}>
+              {slide.map((item, i) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  className={`showcase-grid-tile showcase-grid-tile-${i}`}
+                  onClick={() => openProject(item)}
+                >
+                  <img src={item.image} alt={item.title} />
+                  <span className="showcase-grid-dept">{departmentLabel(item.department)}</span>
+                  <span className="showcase-grid-credit">
+                    <img src={item.avatar} alt="" className="showcase-grid-avatar" />
+                    <span>
+                      <span className="showcase-grid-title">{item.title}</span>
+                      <span className="showcase-grid-creator">by {item.creator}</span>
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </PinnedSection>
   )
 }

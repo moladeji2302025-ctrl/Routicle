@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import Reveal from './Reveal'
+import PinnedSection, { stage } from './PinnedSection'
 
 const ITEMS = [
   { n: '01', label: 'Browse the Library', to: '/explore', desc: 'Real, finished design and video work from real creators.' },
@@ -10,23 +10,29 @@ const ITEMS = [
 
 export default function SiteOverview() {
   return (
-    <section className="overview-deck">
-      <Reveal className="overview-deck-head">
-        <h2 className="deck-heading">What's Inside</h2>
-        <div className="deck-accent" aria-hidden="true" />
-      </Reveal>
+    <PinnedSection className="overview-deck">
+      {(p) => (
+        <>
+          {/* The heading is already in place when the section arrives — only
+              what follows it stages in. */}
+          <div className="overview-deck-head">
+            <h2 className="deck-heading">What's Inside</h2>
+            <div className="deck-accent" aria-hidden="true" />
+          </div>
 
-      <div className="overview-deck-grid">
-        {ITEMS.map((item, i) => (
-          <Reveal key={item.n} delay={i * 70} className="overview-deck-row">
-            <span className="overview-deck-num">{item.n}</span>
-            <div className="overview-deck-text">
-              <Link to={item.to} className="overview-deck-label">{item.label}</Link>
-              <p className="overview-deck-desc">{item.desc}</p>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </section>
+          <div className="overview-deck-grid">
+            {ITEMS.map((item, i) => (
+              <div key={item.n} className="overview-deck-row" style={stage(p, i * 0.13, i * 0.13 + 0.34)}>
+                <span className="overview-deck-num">{item.n}</span>
+                <div className="overview-deck-text">
+                  <Link to={item.to} className="overview-deck-label">{item.label}</Link>
+                  <p className="overview-deck-desc">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </PinnedSection>
   )
 }

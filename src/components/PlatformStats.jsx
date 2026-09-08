@@ -1,9 +1,8 @@
 import { useMemo } from 'react'
 import { useApp } from '../context/AppContext'
 import { DEPARTMENTS, departmentLabel } from '../data/departments'
-import { useInView } from '../hooks/useInView'
 import { useTimeline, easeOutCubic } from '../hooks/useTimeline'
-import Reveal from './Reveal'
+import PinnedSection, { stage } from './PinnedSection'
 
 const DONUT_COLORS = ['var(--brand-violet)', 'var(--brand-purple)', 'var(--brand-lavender)', 'oklch(0.5 0.02 290)', 'oklch(0.35 0.02 290)']
 
@@ -32,13 +31,6 @@ export default function PlatformStats() {
   const { contentItems, settings } = useApp()
   const still = settings.appearance.reduceMotion || systemReducedMotion()
 
-  // Each column starts its own clock when it scrolls in, so the one you're
-  // actually looking at animates rather than both firing off-screen together.
-  const [donutRef, donutInView] = useInView({ threshold: 0.4 })
-  const [barsRef, barsInView] = useInView({ threshold: 0.3 })
-  const donutClock = useTimeline(donutInView, still ? 0 : DONUT_MS)
-  const barsClock = useTimeline(barsInView, still ? 0 : BARS_MS)
-
   const breakdown = useMemo(() => {
     const approved = contentItems.filter((item) => item.moderationStatus === 'approved')
     const total = approved.length || 1
@@ -50,6 +42,22 @@ export default function PlatformStats() {
     })).filter((d) => d.count > 0)
   }, [contentItems])
 
+  return (
+    <PinnedSection className="stats-deck" pinLength="180vh">
+      {(p) => <StatsBody p={p} still={still} breakdown={breakdown} />}
+    </PinnedSection>
+  )
+}
+
+/**
+ * Split out so the clocks can be hooks: they start from the section's own
+ * scroll position rather than a viewport intersection, so the numbers don't
+ * finish counting behind an element that hasn't faded in yet.
+ */
+function StatsBody({ p, still, breakdown }) {
+  const donutClock = useTimeline(p > 0.1, still ? 0 : DONUT_MS)
+  const barsClock = useTimeline(p > 0.3, still ? 0 : BARS_MS)
+
   // The ring is drawn as a single continuous sweep: every segment's share sums
   // to 1, so eased clock time maps straight onto arc length travelled, and each
   // segment simply draws whatever part of that sweep falls inside its own span.
@@ -58,16 +66,16 @@ export default function PlatformStats() {
   let cursor = 0
 
   return (
-    <section className="stats-deck">
+    <>
       <div className="stats-deck-col">
-        <Reveal>
+        <div>
           <h2 className="deck-heading">Library Mix</h2>
           <div className="deck-accent" aria-hidden="true" />
           <p className="stats-deck-intro">Approved uploads across the library, by department.</p>
-        </Reveal>
+        </div>
 
-        <Reveal delay={100} className="donut-wrap">
-          <svg ref={donutRef} viewBox="0 0 180 180" className="donut-chart" aria-hidden="true">
+        <div className="donut-wrap" style={stage(p, 0.06, 0.4, 28)}>
+          <svg viewBox="0 0 180 180" className="donut-chart" aria-hidden="true">
             <circle cx="90" cy="90" r={RADIUS} fill="none" stroke="var(--border)" strokeWidth="20" />
             {breakdown.map((d, i) => {
               const dash = d.pct * CIRCUMFERENCE
@@ -100,24 +108,24 @@ export default function PlatformStats() {
               </div>
             ))}
           </div>
-        </Reveal>
+        </div>
       </div>
 
       <div className="stats-deck-col">
-        <Reveal>
+        <div>
           <h2 className="deck-heading">Where We Are</h2>
           <div className="deck-accent" aria-hidden="true" />
-        </Reveal>
+        </div>
 
-        <div className="progress-list" ref={barsRef}>
-          {PROGRESS.map((p, i) => {
+        <div className="progress-list">
+          {PROGRESS.map((row, i) => {
             // Offset this row's window out of the shared clock *before* easing —
             // easing first and shifting after would flatten the curve's tail.
             const rowT = easeOutCubic(clamp01((barsClock - i * ROW_STAGGER) / ROW_SPAN))
-            const filled = p.pct * rowT
+            const filled = row.pct * rowT
             return (
-              <Reveal key={p.label} delay={i * 90} className="progress-row">
-                <span className="progress-label">{p.label}</span>
+              <div key={row.label} className="progress-row" style={stage(p, 0.24 + i * 0.1, 0.58 + i * 0.1)}>
+                <span className="progress-label">{row.label}</span>
                 <div className="progress-track">
                   <div
                     className={rowT > 0 && rowT < 1 ? 'progress-fill progress-fill-active' : 'progress-fill'}
@@ -125,11 +133,11 @@ export default function PlatformStats() {
                   />
                 </div>
                 <span className="progress-pct">{Math.round(filled)}%</span>
-              </Reveal>
+              </div>
             )
           })}
         </div>
       </div>
-    </section>
+    </>
   )
 }
