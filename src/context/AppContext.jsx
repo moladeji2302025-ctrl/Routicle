@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState, useCal
 import { FEED_ITEMS } from '../data/feedItems'
 import { TIERS } from '../data/pricing'
 import { DEFAULT_SETTINGS, mergeSettings } from '../data/settings'
+import { DEPARTMENTS } from '../data/departments'
 import * as api from '../lib/api'
 import { authClient } from '../lib/authClient'
 import { orgClient } from '../lib/orgClient'
@@ -13,6 +14,7 @@ const SETTINGS_KEY = 'routicle_settings_v1'
 const ACTIVE_TEAM_KEY = 'routicle_active_team_id'
 const RECENT_KEY = 'routicle_recently_viewed'
 const RECENT_LIMIT = 12
+const DEPARTMENT_IDS = DEPARTMENTS.map((d) => d.id)
 
 function parseTeamMetadata(raw) {
   try {
@@ -409,6 +411,9 @@ export function AppProvider({ children }) {
         name: authUser.name || base.name,
         email: authUser.email || base.email,
         image: authUser.image || base.image || null,
+        // Only ever set on a profile created right now. Anyone already in
+        // storage predates onboarding and shouldn't be sent through it.
+        needsOnboarding: existing ? base.needsOnboarding === true : true,
       }
       return {
         ...prev,
@@ -546,7 +551,18 @@ export function AppProvider({ children }) {
 
       async deleteAccount() {
         const result = await orgClient.deleteUser({})
-        if (result?.error) throw new Error(result.error.message || 'Could not delete this account')
+        if (result?.error) {
+          // Better Auth ships account deletion switched *off*; a host that has
+          // not enabled it answers with a status and no message, which used to
+          // surface as a bare "could not delete" with nothing to act on.
+          const err = result.error
+          const detail = err.message || err.statusText || (err.status ? `HTTP ${err.status}` : '')
+          throw new Error(
+            detail
+              ? `Could not delete this account: ${detail}`
+              : "Account deletion isn't enabled on this project's auth service, so the request was refused."
+          )
+        }
         setState((prev) => ({ ...prev, currentUser: null }))
         setActiveTeamId(null)
         return true
@@ -654,6 +670,39 @@ export function AppProvider({ children }) {
         })
         await refreshSubscription(user.id, activeTeamId)
         return result
+      },
+
+      /**
+       * Stores what the welcome flow collected and takes the account out of it.
+       *
+       * Two of these answers are real settings rather than survey data: the
+       * departments picked become the browsing filter, and the path decides
+       * whether the creator route is offered next.
+       */
+      async completeOnboarding({ path, name, website, role, goals, departments, heard, tier }) {
+        const allDepartments = DEPARTMENT_IDS
+        const muted = allDepartments.filter((id) => !departments.includes(id))
+
+        updateUser((user) => ({
+          ...user,
+          name: name?.trim() || user.name,
+          signupIntent: path || user.signupIntent,
+          social: { ...user.social, website: website?.trim() || user.social.website },
+          onboarding: { role, goals, heard, path, tier, completedAt: Date.now() },
+          needsOnboarding: false,
+        }))
+
+        // Turning every department off would leave an empty library, so an
+        // all-off answer is treated as no preference rather than a total mute.
+        setSettings((prev) => ({
+          ...prev,
+          browsing: { ...prev.browsing, mutedDepartments: muted.length === allDepartments.length ? [] : muted },
+        }))
+
+        const user = stateRef.current.currentUser
+        if (user && name?.trim() && name.trim() !== user.name) {
+          await orgClient.updateUser({ name: name.trim() }).catch((err) => console.error('name sync failed', err))
+        }
       },
 
       /** Grants the per-cycle AI credits that come with a paid tier. */

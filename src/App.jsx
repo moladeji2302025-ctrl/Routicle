@@ -44,6 +44,7 @@ import AdminResourcesPage from './pages/admin/AdminResourcesPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminContentPage from './pages/admin/AdminContentPage'
 import UpdatesPage from './pages/UpdatesPage'
+import OnboardingPage from './pages/OnboardingPage'
 import StaticPage from './pages/StaticPage'
 
 export default function App() {
@@ -52,6 +53,9 @@ export default function App() {
       <BrowserRouter>
         <IntroReveal />
         <Routes>
+          {/* Outside Layout on purpose: the welcome flow owns the whole screen,
+              with no sidebar or marketing chrome around it. */}
+          <Route path="/welcome" element={<OnboardingPage />} />
           <Route element={<Layout />}>
             <Route path="/" element={<HomeRouter />} />
             <Route path="/design/:id" element={<DesignDetailPage />} />

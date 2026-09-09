@@ -8579,3 +8579,562 @@ a.admin-stat:hover {
     padding-bottom: 80px;
   }
 }
+
+/* ============================================================
+   Onboarding
+   ============================================================ */
+
+.onb {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--bg-base);
+  color: var(--text);
+  overflow: hidden;
+}
+
+.onb-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 32px;
+}
+
+.onb-mark {
+  width: 26px;
+  height: 26px;
+}
+
+.onb-skip {
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.onb-skip:hover {
+  color: var(--text);
+}
+
+.onb-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 0 32px;
+  /* The stage is absolutely centred so an exiting step can't shove the
+     incoming one around while both are briefly in flight. */
+  position: relative;
+}
+
+.onb-stage {
+  width: 100%;
+  max-width: 880px;
+  text-align: center;
+}
+
+.onb-title {
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.onb-sub {
+  margin: 10px auto 0;
+  max-width: 52ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* ---- Step transitions ----
+   Every child carries --i, its place in the queue. The entrance is staggered
+   by that index; the exit deliberately is not, so leaving reads as one quick
+   sweep rather than a second slow cascade. */
+
+.onb-item {
+  animation-duration: 0.62s;
+  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+.onb-stage[data-phase='in'] .onb-item {
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+.onb-stage[data-phase='in'][data-dir='1'] .onb-item {
+  animation-name: onb-in-right;
+}
+
+.onb-stage[data-phase='in'][data-dir='-1'] .onb-item {
+  animation-name: onb-in-left;
+}
+
+.onb-stage[data-phase='out'] .onb-item {
+  animation-duration: 0.26s;
+  animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  animation-delay: 0ms;
+}
+
+.onb-stage[data-phase='out'][data-dir='1'] .onb-item {
+  animation-name: onb-out-left;
+}
+
+.onb-stage[data-phase='out'][data-dir='-1'] .onb-item {
+  animation-name: onb-out-right;
+}
+
+@keyframes onb-in-right {
+  from {
+    opacity: 0;
+    transform: translate3d(46px, 0, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes onb-in-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-46px, 0, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes onb-out-left {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(-34px, 0, 0) scale(0.99);
+  }
+}
+
+@keyframes onb-out-right {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(34px, 0, 0) scale(0.99);
+  }
+}
+
+/* ---- Path cards ---- */
+
+.onb-path-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 36px;
+  text-align: left;
+}
+
+.onb-path {
+  position: relative;
+  display: block;
+  padding: 24px 24px 20px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.onb-path:hover {
+  transform: translateY(-2px);
+}
+
+.onb-path-on {
+  border-color: var(--brand-violet);
+  box-shadow: 0 0 0 1px var(--brand-violet);
+}
+
+.onb-radio {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* The filled centre is an inset ring, so there is no extra element to animate. */
+.onb-path-on .onb-radio {
+  border-color: var(--brand-violet);
+  box-shadow: inset 0 0 0 5px var(--brand-violet);
+}
+
+.onb-path-label {
+  display: block;
+  padding-right: 34px;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.onb-path-blurb {
+  display: block;
+  margin-top: 7px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.onb-path-points {
+  margin: 18px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--border);
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.onb-path-points li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.onb-path-points li::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-purple);
+}
+
+/* ---- Form step ---- */
+
+.onb-form {
+  margin: 36px auto 0;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: left;
+}
+
+.onb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.onb-field > span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.onb-field em {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.onb-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.onb-chip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.onb-chip:hover {
+  color: var(--text);
+}
+
+.onb-chip-on {
+  border-color: var(--brand-violet);
+  background: color-mix(in srgb, var(--brand-violet) 12%, transparent);
+  color: var(--brand-violet);
+}
+
+/* ---- Choice grids ---- */
+
+.onb-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 36px;
+}
+
+.onb-grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+}
+
+.onb-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.onb-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 116px;
+  padding: 20px 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.onb-card:hover {
+  transform: translateY(-2px);
+}
+
+.onb-card-on {
+  border-color: var(--brand-violet);
+  box-shadow: 0 0 0 1px var(--brand-violet);
+}
+
+.onb-card-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  color: var(--text-muted);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.onb-card-on .onb-card-icon {
+  background: color-mix(in srgb, var(--brand-violet) 14%, transparent);
+  color: var(--brand-violet);
+}
+
+.onb-card-label {
+  font-size: 13px;
+  font-weight: 550;
+  text-align: center;
+}
+
+.onb-card-wide {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 0;
+  padding: 16px 18px;
+  text-align: left;
+}
+
+.onb-check {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  position: relative;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.onb-card-on .onb-check {
+  background: var(--brand-violet);
+  border-color: var(--brand-violet);
+}
+
+.onb-card-on .onb-check::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* ---- Plans ---- */
+
+.onb-plan-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 36px;
+  text-align: left;
+}
+
+.onb-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.onb-plan:hover {
+  transform: translateY(-2px);
+}
+
+.onb-plan-on {
+  border-color: var(--brand-violet);
+  box-shadow: 0 0 0 1px var(--brand-violet);
+}
+
+.onb-plan-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.onb-plan-price {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.onb-plan-price em {
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.onb-plan-desc {
+  margin-top: 4px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* ---- Footer ---- */
+
+.onb-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  padding: 26px 32px 34px;
+}
+
+.onb-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.onb-back {
+  padding: 11px 20px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.onb-back:hover {
+  color: var(--text);
+}
+
+.onb-next {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand-violet);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.onb-next:hover:not(:disabled) {
+  transform: scale(1.03);
+}
+
+.onb-next:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.onb-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.onb-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border);
+  transition: width 0.32s cubic-bezier(0.22, 0.61, 0.36, 1), background 0.32s ease;
+}
+
+.onb-dot-on {
+  width: 26px;
+  background: var(--text);
+}
+
+@media (max-width: 700px) {
+  .onb-top,
+  .onb-main {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .onb-foot {
+    padding: 20px 18px 26px;
+  }
+
+  .onb-main {
+    align-items: flex-start;
+    overflow-y: auto;
+    padding-top: 12px;
+  }
+}

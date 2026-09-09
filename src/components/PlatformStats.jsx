@@ -43,7 +43,7 @@ export default function PlatformStats() {
   }, [contentItems])
 
   return (
-    <PinnedSection className="stats-deck" pinLength="180vh">
+    <PinnedSection className="stats-deck">
       {(shown) => <StatsBody shown={shown} still={still} breakdown={breakdown} />}
     </PinnedSection>
   )
