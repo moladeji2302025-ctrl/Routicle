@@ -173,6 +173,15 @@ export function fetchPublicResources() {
 
 /* ---- Admin (session-verified server-side) ---- */
 
+/* ---- Account ---- */
+
+/** Irreversible. The server re-checks `confirmEmail` against the session's own address. */
+export function deleteAccountRemote(confirmEmail) {
+  return request('/account/delete', { method: 'POST', body: JSON.stringify({ confirmEmail }) })
+}
+
+/* ---- Admin (session-verified server-side) ---- */
+
 export function fetchAdminSession() {
   return request('/admin/session')
 }

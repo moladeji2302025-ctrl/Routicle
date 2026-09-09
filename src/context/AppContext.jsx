@@ -549,21 +549,26 @@ export function AppProvider({ children }) {
         return true
       },
 
-      async deleteAccount() {
-        const result = await orgClient.deleteUser({})
-        if (result?.error) {
-          // Better Auth ships account deletion switched *off*; a host that has
-          // not enabled it answers with a status and no message, which used to
-          // surface as a bare "could not delete" with nothing to act on.
-          const err = result.error
-          const detail = err.message || err.statusText || (err.status ? `HTTP ${err.status}` : '')
-          throw new Error(
-            detail
-              ? `Could not delete this account: ${detail}`
-              : "Account deletion isn't enabled on this project's auth service, so the request was refused."
-          )
+      /**
+       * Deletes the account for real, via our own API rather than Better Auth's
+       * deleteUser — Neon Auth ships that endpoint switched off, so it only ever
+       * answered with a bare refusal.
+       *
+       * The server disables any live subscription at Paystack before touching a
+       * row, and refuses outright while this account still owns a workspace that
+       * other people are in.
+       */
+      async deleteAccount(confirmEmail) {
+        await api.deleteAccountRemote(confirmEmail)
+        api.clearAuthToken()
+        // Drop the locally cached profile too, or signing in as someone else on
+        // this browser would inherit the deleted account's saved items.
+        try {
+          localStorage.removeItem(STORAGE_KEY)
+        } catch {
+          // storage blocked — the in-memory reset below still applies
         }
-        setState((prev) => ({ ...prev, currentUser: null }))
+        setState((prev) => ({ ...prev, currentUser: null, profiles: {} }))
         setActiveTeamId(null)
         return true
       },

@@ -78,7 +78,7 @@ export default function SecuritySettings() {
     setDeleteError('')
     setDeleting(true)
     try {
-      await deleteAccount()
+      await deleteAccount(confirmDelete.trim())
       navigate('/')
     } catch (err) {
       setDeleteError(err.message)
@@ -195,25 +195,30 @@ export default function SecuritySettings() {
 
       <DangerZone
         title="Delete account"
-        description="Removes your account, profile and team memberships. Work you've published stays credited unless you take it down first."
+        description="Removes your account, profile, saved items, team memberships and any workspace only you are in. Any live subscription is cancelled first. Work you've published stays credited in the library unless you take it down yourself."
       >
         <Row
           title="This can't be undone"
-          description="Type DELETE to confirm."
+          description={`Type ${currentUser.email} to confirm.`}
           stacked
         >
           <div className="settings-delete-row">
             <input
-              type="text"
+              type="email"
               className="settings-input"
               value={confirmDelete}
-              placeholder="DELETE"
+              placeholder={currentUser.email}
+              autoComplete="off"
               onChange={(e) => setConfirmDelete(e.target.value)}
             />
             <button
               type="button"
               className="settings-btn settings-btn-danger"
-              disabled={confirmDelete !== 'DELETE' || deleting}
+              // The server checks this again against the session's own address;
+              // matching here only saves a pointless round trip.
+              disabled={
+                confirmDelete.trim().toLowerCase() !== currentUser.email.toLowerCase() || deleting
+              }
               onClick={handleDelete}
             >
               {deleting ? 'Deleting…' : 'Delete my account'}
