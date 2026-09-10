@@ -1,7 +1,7 @@
 import { sql } from '../_lib/db.js'
 import { requireUser } from '../_lib/auth.js'
 import { disableSubscription } from '../_lib/paystack.js'
-import { sendMail, inviteEmail, mailerConfigured, explainSmtpError } from '../_lib/mailer.js'
+import { sendMail, inviteEmail, mailerConfigured, explainMailError } from '../_lib/mailer.js'
 import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
 
 const INVITE_DAYS = 7
@@ -121,7 +121,8 @@ async function inviteMember(req, res) {
   // recording an invitation nobody will ever be told about.
   if (!mailerConfigured()) {
     return send(res, 503, {
-      error: 'Email is not set up on the server yet, so the invite was not sent. Set SMTP_USER and SMTP_PASS.',
+      error:
+        'Email is not set up on the server yet, so the invite was not sent. Set RESEND_API_KEY (or SMTP_USER and SMTP_PASS).',
     })
   }
 
@@ -163,12 +164,20 @@ async function inviteMember(req, res) {
   const { text, html } = inviteEmail({ teamName, inviterName: user.name, acceptUrl, role: inviteRole })
 
   try {
-    await sendMail({ to: invitee, subject: `${user.name || 'A teammate'} invited you to ${teamName} on Routicle`, text, html })
+    await sendMail({
+      to: invitee,
+      subject: `${user.name || 'A teammate'} invited you to ${teamName} on Routicle`,
+      text,
+      html,
+      // Everything sends from one shared address, so replies would otherwise
+      // land nowhere useful instead of with the person who invited them.
+      replyTo: user.email,
+    })
   } catch (err) {
     console.error('invite email failed', err)
     // Don't leave a live invitation behind for a mail that never went out.
     await sql`UPDATE neon_auth.invitation SET status = 'canceled' WHERE id = ${invitationId}`
-    return send(res, 502, { error: `The invite could not be emailed. ${explainSmtpError(err)}` })
+    return send(res, 502, { error: `The invite could not be emailed. ${explainMailError(err)}` })
   }
 
   send(res, 201, { ok: true, invitationId, email: invitee })

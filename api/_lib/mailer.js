@@ -1,36 +1,62 @@
 import nodemailer from 'nodemailer'
 
 /**
- * Outbound email over SMTP.
+ * Outbound email.
  *
- * Defaults to Gmail, which needs an **App Password**, not the account password:
- * Google account → Security → 2-Step Verification → App passwords. A normal
- * password is rejected outright.
+ * Prefers Resend's HTTP API, and falls back to SMTP when only SMTP_USER/PASS
+ * are set. HTTP is a better fit for serverless than SMTP: one short request
+ * rather than a multi-round-trip TLS handshake and AUTH exchange held open for
+ * the life of the invocation.
  *
- * SMTP_HOST/PORT are overridable so this can point at a transactional provider
- * later without touching callers — Gmail caps at roughly 500 recipients a day
- * and sends from a consumer address, so it is fine for a founding team and not
- * for launch volume.
+ * Resend will only deliver to arbitrary addresses once a sending domain is
+ * verified. Until then its shared `onboarding@resend.dev` sender is restricted
+ * to the account owner's own address — see explainMailError, which reports that
+ * case rather than letting it read as a generic failure.
  */
-let transport = null
+
+const RESEND_ENDPOINT = 'https://api.resend.com/emails'
+
+function resendKey() {
+  return (process.env.RESEND_API_KEY || '').trim()
+}
 
 /**
  * Google shows an App Password as four space-separated groups
- * ("abcd efgh ijkl mnop"), and its SMTP AUTH rejects the spaces — a copy-paste
- * straight from that dialog fails with 535-5.7.8, which reads like a wrong
- * password rather than a formatting problem. Strip whitespace from both, and
- * any stray newline a dashboard paste can pick up.
+ * ("abcd efgh ijkl mnop") and Gmail's SMTP AUTH rejects the spaces, failing as
+ * 535-5.7.8 — which reads like a wrong password rather than a formatting
+ * problem. Strip whitespace from both, plus any newline a paste picks up.
  */
-function credentials() {
-  const user = (process.env.SMTP_USER || '').trim()
-  const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '')
-  return { user, pass }
+function smtpCredentials() {
+  return {
+    user: (process.env.SMTP_USER || '').trim(),
+    pass: (process.env.SMTP_PASS || '').replace(/\s+/g, ''),
+  }
 }
 
-function getTransport() {
-  const { user, pass } = credentials()
-  if (!user || !pass) return null
+export function mailerConfigured() {
+  if (resendKey()) return true
+  const { user, pass } = smtpCredentials()
+  return Boolean(user && pass)
+}
 
+/** Which transport is actually in play — quoted in errors so they're diagnosable. */
+export function mailerName() {
+  return resendKey() ? 'Resend' : 'SMTP'
+}
+
+function defaultFrom() {
+  if (process.env.MAIL_FROM) return process.env.MAIL_FROM
+  // Resend's shared sender works with no DNS setup at all, so invites can be
+  // tested before a domain exists.
+  if (resendKey()) return 'Routicle <onboarding@resend.dev>'
+  return `Routicle <${smtpCredentials().user}>`
+}
+
+let transport = null
+
+function getSmtpTransport() {
+  const { user, pass } = smtpCredentials()
+  if (!user || !pass) return null
   if (!transport) {
     const port = Number(process.env.SMTP_PORT) || 465
     transport = nodemailer.createTransport({
@@ -44,41 +70,77 @@ function getTransport() {
   return transport
 }
 
-export function mailerConfigured() {
-  const { user, pass } = credentials()
-  return Boolean(user && pass)
+export async function sendMail({ to, subject, text, html, replyTo }) {
+  const key = resendKey()
+
+  if (key) {
+    const res = await fetch(RESEND_ENDPOINT, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        from: defaultFrom(),
+        to: [to],
+        subject,
+        text,
+        html,
+        ...(replyTo ? { reply_to: replyTo } : {}),
+      }),
+    })
+
+    const body = await res.json().catch(() => null)
+    if (!res.ok) {
+      // Carry Resend's own wording through; explainMailError turns the common
+      // ones into something actionable.
+      const err = new Error(body?.message || body?.error || `Resend returned ${res.status}`)
+      err.status = res.status
+      throw err
+    }
+    return body
+  }
+
+  const tx = getSmtpTransport()
+  if (!tx) throw new Error('Email is not configured on the server (RESEND_API_KEY, or SMTP_USER / SMTP_PASS).')
+
+  return tx.sendMail({ from: defaultFrom(), to, subject, text, html, ...(replyTo ? { replyTo } : {}) })
 }
 
-/** Turns SMTP's terse codes into something the person clicking Invite can act on. */
-export function explainSmtpError(err) {
+/** Turns a provider's terse failure into something the person clicking Invite can act on. */
+export function explainMailError(err) {
   const raw = err?.message || String(err)
-  if (/535|BadCredentials|Username and Password not accepted/i.test(raw)) {
-    const { pass } = credentials()
-    const hint =
-      pass.length === 16
-        ? 'The password is 16 characters, so it looks like an App Password — check SMTP_USER is the exact Gmail address that generated it, and that the App Password has not been revoked.'
-        : `SMTP_PASS is ${pass.length} characters, but a Gmail App Password is 16. This looks like a normal account password, which Gmail always refuses for SMTP — generate one at myaccount.google.com/apppasswords.`
-    return `Gmail rejected the sign-in. ${hint}`
+
+  /* ---- Resend ---- */
+  if (/only send testing emails to your own|verify a domain|not verified/i.test(raw)) {
+    return (
+      'Resend will only deliver to your own address until a sending domain is verified. ' +
+      'Verify one at resend.com/domains and set MAIL_FROM to an address on it, or invite your own email to test.'
+    )
   }
-  if (/534|5\.7\.9/.test(raw)) {
-    return 'Gmail wants an App Password for this account (myaccount.google.com/apppasswords), not the normal password.'
+  if (err?.status === 401 || /API key is invalid|Unauthorized/i.test(raw)) {
+    return 'Resend rejected the API key. Check RESEND_API_KEY at resend.com/api-keys.'
+  }
+  if (err?.status === 422 || /validation_error/i.test(raw)) {
+    return `Resend refused the message: ${raw}`
+  }
+  if (err?.status === 429) {
+    return 'Resend is rate limiting this account. Wait a moment and try again.'
+  }
+
+  /* ---- SMTP ---- */
+  if (/535|BadCredentials|Username and Password not accepted/i.test(raw)) {
+    const { pass } = smtpCredentials()
+    return pass.length === 16
+      ? 'Gmail rejected the sign-in. Check SMTP_USER is the exact address that generated the App Password, and that it has not been revoked.'
+      : `Gmail rejected the sign-in. SMTP_PASS is ${pass.length} characters, but a Gmail App Password is 16 — generate one at myaccount.google.com/apppasswords.`
   }
   if (/ETIMEDOUT|ECONNREFUSED|ENOTFOUND/i.test(raw)) {
     return `Could not reach the mail server (${process.env.SMTP_HOST || 'smtp.gmail.com'}). Check SMTP_HOST and SMTP_PORT.`
   }
+
   return raw
 }
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
-}
-
-export async function sendMail({ to, subject, text, html }) {
-  const tx = getTransport()
-  if (!tx) throw new Error('Email is not configured on the server (SMTP_USER / SMTP_PASS).')
-
-  const from = process.env.MAIL_FROM || `Routicle <${credentials().user}>`
-  return tx.sendMail({ from, to, subject, text, html })
 }
 
 /**
