@@ -175,6 +175,15 @@ export function fetchPublicResources() {
 
 /* ---- Account ---- */
 
+/** This account's workspaces, each with the caller's real role in it. */
+export function fetchMyTeams() {
+  return request('/account/teams')
+}
+
+export function fetchTeamMembers(organizationId) {
+  return request(`/account/members?organizationId=${encodeURIComponent(organizationId)}`)
+}
+
 /** Irreversible. The server re-checks `confirmEmail` against the session's own address. */
 export function deleteAccountRemote(confirmEmail) {
   return request('/account/delete', { method: 'POST', body: JSON.stringify({ confirmEmail }) })

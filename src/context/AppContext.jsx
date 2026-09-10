@@ -271,12 +271,16 @@ export function AppProvider({ children }) {
 
   const refreshTeams = useCallback(async () => {
     try {
-      const result = await orgClient.organization.list()
-      const list = (result.data || []).map((org) => ({
+      // Our own endpoint, not orgClient.organization.list(): that returns
+      // organizations without a members array, so `role` was undefined for
+      // every team — which quietly hid invite, remove and delete from owners.
+      const { teams: rows } = await api.fetchMyTeams()
+      const list = rows.map((org) => ({
         id: org.id,
         name: org.name,
         slug: org.slug,
-        role: org.members?.[0]?.role,
+        role: org.role,
+        memberCount: org.memberCount,
         ...parseTeamMetadata(org.metadata),
       }))
       setTeams(list)
@@ -295,8 +299,10 @@ export function AppProvider({ children }) {
       return
     }
     try {
-      const result = await orgClient.organization.listMembers({ query: { organizationId: teamId } })
-      setTeamMembers(result.data?.members || [])
+      // Same reason as refreshTeams: read the membership from our own database
+      // rather than trusting an assumed response shape from the auth client.
+      const { members } = await api.fetchTeamMembers(teamId)
+      setTeamMembers(members)
     } catch (err) {
       console.error('refreshTeamMembers failed', err)
       setTeamMembers([])
@@ -755,6 +761,19 @@ export function AppProvider({ children }) {
         const team = teams.find((t) => t.id === teamId)
         if (!team) throw new Error('Workspace not found')
         if (team.role !== 'owner') throw new Error('Only the workspace owner can delete it')
+
+        // Cancel the shared plan first. The subscription row cascades away with
+        // the organization, and once it's gone there's nothing left to cancel
+        // with — Paystack would keep charging for a workspace that no longer
+        // exists. A "no active subscription" answer is the normal case, not a
+        // failure, so only a real gateway problem should stop the delete.
+        try {
+          await api.cancelSubscriptionRemote({ userId: stateRef.current.currentUser?.id, organizationId: teamId })
+        } catch (err) {
+          if (!/no active subscription/i.test(err.message)) {
+            throw new Error(`${err.message} The workspace was not deleted.`)
+          }
+        }
 
         const result = await orgClient.organization.delete({ organizationId: teamId })
         if (result?.error) throw new Error(result.error.message || 'Could not delete this workspace')
