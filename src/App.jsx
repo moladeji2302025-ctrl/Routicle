@@ -44,6 +44,7 @@ import AdminResourcesPage from './pages/admin/AdminResourcesPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminContentPage from './pages/admin/AdminContentPage'
 import UpdatesPage from './pages/UpdatesPage'
+import InvitePage from './pages/InvitePage'
 import OnboardingPage from './pages/OnboardingPage'
 import StaticPage from './pages/StaticPage'
 
@@ -96,6 +97,7 @@ export default function App() {
             <Route path="/team/folder/:id" element={<FolderPage />} />
             <Route path="/billing/callback" element={<BillingCallbackPage />} />
             <Route path="/updates" element={<UpdatesPage />} />
+            <Route path="/invite/:id" element={<InvitePage />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminOverviewPage />} />
               <Route path="updates" element={<AdminUpdatesPage />} />

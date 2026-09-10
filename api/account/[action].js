@@ -1,7 +1,10 @@
 import { sql } from '../_lib/db.js'
 import { requireUser } from '../_lib/auth.js'
 import { disableSubscription } from '../_lib/paystack.js'
+import { sendMail, inviteEmail, mailerConfigured } from '../_lib/mailer.js'
 import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
+
+const INVITE_DAYS = 7
 
 /**
  * Authenticated self-service account actions.
@@ -18,6 +21,7 @@ export default async function handler(req, res) {
     const action = req.query?.action
     if (action === 'teams') return listTeams(req, res)
     if (action === 'members') return listMembers(req, res)
+    if (action === 'invite') return inviteMember(req, res)
     if (action === 'delete') return deleteAccount(req, res)
     return send(res, 404, { error: `Unknown account route: ${action}` })
   })
@@ -88,6 +92,86 @@ async function listTeams(req, res) {
       memberCount: r.member_count,
     })),
   })
+}
+
+/**
+ * Creates the invitation row and emails the link.
+ *
+ * The row is written here rather than through the auth client's inviteMember so
+ * we hold the invitation id and can put it in the email — and because the
+ * schema is known, unlike that client's response shape. Acceptance still goes
+ * through Better Auth's own accept-invitation, which reads this same table.
+ */
+async function inviteMember(req, res) {
+  if (!methodGuard(req, res, ['POST'])) return
+  const user = await requireUser(req, res)
+  if (!user) return
+
+  const { organizationId, email, role } = req.body || {}
+  const invitee = (email || '').trim().toLowerCase()
+  if (!organizationId || !invitee) {
+    return send(res, 400, { error: 'organizationId and email are required' })
+  }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(invitee)) {
+    return send(res, 400, { error: 'That does not look like an email address.' })
+  }
+  const inviteRole = ['member', 'admin'].includes(role) ? role : 'member'
+
+  // Fail before sending anything if the server has no mailer, rather than
+  // recording an invitation nobody will ever be told about.
+  if (!mailerConfigured()) {
+    return send(res, 503, {
+      error: 'Email is not set up on the server yet, so the invite was not sent. Set SMTP_USER and SMTP_PASS.',
+    })
+  }
+
+  const caller = await sql`
+    SELECT m.role, o.name FROM neon_auth.member m
+    JOIN neon_auth.organization o ON o.id = m."organizationId"
+    WHERE m."organizationId" = ${organizationId} AND m."userId" = ${user.id}
+  `
+  if (caller.length === 0) return send(res, 403, { error: 'You are not a member of this workspace' })
+  if (!['owner', 'admin'].includes(caller[0].role)) {
+    return send(res, 403, { error: 'Only a workspace owner or admin can invite people' })
+  }
+  const teamName = caller[0].name
+
+  const already = await sql`
+    SELECT 1 FROM neon_auth.member m
+    JOIN neon_auth."user" u ON u.id = m."userId"
+    WHERE m."organizationId" = ${organizationId} AND lower(u.email) = ${invitee} LIMIT 1
+  `
+  if (already.length > 0) return send(res, 409, { error: 'They are already in this workspace.' })
+
+  // Supersede any earlier pending invite for the same address, so a resend
+  // leaves exactly one live link rather than several that all still work.
+  await sql`
+    UPDATE neon_auth.invitation SET status = 'canceled'
+    WHERE "organizationId" = ${organizationId} AND lower(email) = ${invitee} AND status = 'pending'
+  `
+
+  const expiresAt = new Date(Date.now() + INVITE_DAYS * 24 * 60 * 60 * 1000).toISOString()
+  const rows = await sql`
+    INSERT INTO neon_auth.invitation ("organizationId", email, role, status, "expiresAt", "inviterId")
+    VALUES (${organizationId}, ${invitee}, ${inviteRole}, 'pending', ${expiresAt}, ${user.id})
+    RETURNING id
+  `
+  const invitationId = rows[0].id
+
+  const base = (process.env.APP_URL || `https://${req.headers['x-forwarded-host'] || req.headers.host}`).replace(/\/$/, '')
+  const acceptUrl = `${base}/invite/${invitationId}`
+  const { text, html } = inviteEmail({ teamName, inviterName: user.name, acceptUrl, role: inviteRole })
+
+  try {
+    await sendMail({ to: invitee, subject: `${user.name || 'A teammate'} invited you to ${teamName} on Routicle`, text, html })
+  } catch (err) {
+    console.error('invite email failed', err)
+    // Don't leave a live invitation behind for a mail that never went out.
+    await sql`UPDATE neon_auth.invitation SET status = 'canceled' WHERE id = ${invitationId}`
+    return send(res, 502, { error: `The invite could not be emailed: ${err.message}` })
+  }
+
+  send(res, 201, { ok: true, invitationId, email: invitee })
 }
 
 async function deleteAccount(req, res) {

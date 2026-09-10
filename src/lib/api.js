@@ -125,7 +125,7 @@ export function moderateSubmission(id, action, note) {
 }
 
 export function markItemFreeRemote(id, isFree) {
-  return request(`/content/${id}`, { method: 'PATCH', body: JSON.stringify({ isFree }) })
+  return request(`/content?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ isFree }) })
 }
 
 /** Returns presigned, time-limited download URLs for a live item's real source files. */
@@ -171,8 +171,6 @@ export function fetchPublicResources() {
   return request('/public/resources')
 }
 
-/* ---- Admin (session-verified server-side) ---- */
-
 /* ---- Account ---- */
 
 /** This account's workspaces, each with the caller's real role in it. */
@@ -182,6 +180,11 @@ export function fetchMyTeams() {
 
 export function fetchTeamMembers(organizationId) {
   return request(`/account/members?organizationId=${encodeURIComponent(organizationId)}`)
+}
+
+/** Sends a real invitation email. Owner/admin only, enforced server-side. */
+export function inviteMemberRemote({ organizationId, email, role }) {
+  return request('/account/invite', { method: 'POST', body: JSON.stringify({ organizationId, email, role }) })
 }
 
 /** Irreversible. The server re-checks `confirmEmail` against the session's own address. */
@@ -281,11 +284,11 @@ export function deleteFolder(id) {
 }
 
 export function fetchFolderItems(folderId) {
-  return request(`/folders/items?folderId=${encodeURIComponent(folderId)}`)
+  return request(`/folders?scope=items&folderId=${encodeURIComponent(folderId)}`)
 }
 
 export function addFolderItems({ folderId, contentItemIds, addedBy }) {
-  return request('/folders/items', {
+  return request('/folders?scope=items', {
     method: 'POST',
     body: JSON.stringify({ folderId, contentItemIds, addedBy }),
   })
@@ -293,7 +296,7 @@ export function addFolderItems({ folderId, contentItemIds, addedBy }) {
 
 export function removeFolderItem({ folderId, contentItemId }) {
   return request(
-    `/folders/items?folderId=${encodeURIComponent(folderId)}&contentItemId=${encodeURIComponent(contentItemId)}`,
+    `/folders?scope=items&folderId=${encodeURIComponent(folderId)}&contentItemId=${encodeURIComponent(contentItemId)}`,
     { method: 'DELETE' }
   )
 }

@@ -782,11 +782,10 @@ export function AppProvider({ children }) {
         return true
       },
 
+      /** Records the invitation and emails the link; owner/admin only, enforced server-side. */
       async inviteTeamMember(email, role = 'member') {
         if (!activeTeamId) throw new Error('No active team')
-        const result = await orgClient.organization.inviteMember({ organizationId: activeTeamId, email: email.trim(), role })
-        if (result.error) throw new Error(result.error.message || 'Could not send invite')
-        return result.data
+        return api.inviteMemberRemote({ organizationId: activeTeamId, email: email.trim(), role })
       },
 
       async removeTeamMember(memberIdOrEmail) {
