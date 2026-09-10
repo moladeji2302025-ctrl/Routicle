@@ -14,9 +14,21 @@ import nodemailer from 'nodemailer'
  */
 let transport = null
 
+/**
+ * Google shows an App Password as four space-separated groups
+ * ("abcd efgh ijkl mnop"), and its SMTP AUTH rejects the spaces — a copy-paste
+ * straight from that dialog fails with 535-5.7.8, which reads like a wrong
+ * password rather than a formatting problem. Strip whitespace from both, and
+ * any stray newline a dashboard paste can pick up.
+ */
+function credentials() {
+  const user = (process.env.SMTP_USER || '').trim()
+  const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '')
+  return { user, pass }
+}
+
 function getTransport() {
-  const user = process.env.SMTP_USER
-  const pass = process.env.SMTP_PASS
+  const { user, pass } = credentials()
   if (!user || !pass) return null
 
   if (!transport) {
@@ -33,7 +45,28 @@ function getTransport() {
 }
 
 export function mailerConfigured() {
-  return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS)
+  const { user, pass } = credentials()
+  return Boolean(user && pass)
+}
+
+/** Turns SMTP's terse codes into something the person clicking Invite can act on. */
+export function explainSmtpError(err) {
+  const raw = err?.message || String(err)
+  if (/535|BadCredentials|Username and Password not accepted/i.test(raw)) {
+    const { pass } = credentials()
+    const hint =
+      pass.length === 16
+        ? 'The password is 16 characters, so it looks like an App Password — check SMTP_USER is the exact Gmail address that generated it, and that the App Password has not been revoked.'
+        : `SMTP_PASS is ${pass.length} characters, but a Gmail App Password is 16. This looks like a normal account password, which Gmail always refuses for SMTP — generate one at myaccount.google.com/apppasswords.`
+    return `Gmail rejected the sign-in. ${hint}`
+  }
+  if (/534|5\.7\.9/.test(raw)) {
+    return 'Gmail wants an App Password for this account (myaccount.google.com/apppasswords), not the normal password.'
+  }
+  if (/ETIMEDOUT|ECONNREFUSED|ENOTFOUND/i.test(raw)) {
+    return `Could not reach the mail server (${process.env.SMTP_HOST || 'smtp.gmail.com'}). Check SMTP_HOST and SMTP_PORT.`
+  }
+  return raw
 }
 
 function escapeHtml(s) {
@@ -44,7 +77,7 @@ export async function sendMail({ to, subject, text, html }) {
   const tx = getTransport()
   if (!tx) throw new Error('Email is not configured on the server (SMTP_USER / SMTP_PASS).')
 
-  const from = process.env.MAIL_FROM || `Routicle <${process.env.SMTP_USER}>`
+  const from = process.env.MAIL_FROM || `Routicle <${credentials().user}>`
   return tx.sendMail({ from, to, subject, text, html })
 }
 

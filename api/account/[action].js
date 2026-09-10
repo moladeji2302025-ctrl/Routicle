@@ -1,7 +1,7 @@
 import { sql } from '../_lib/db.js'
 import { requireUser } from '../_lib/auth.js'
 import { disableSubscription } from '../_lib/paystack.js'
-import { sendMail, inviteEmail, mailerConfigured } from '../_lib/mailer.js'
+import { sendMail, inviteEmail, mailerConfigured, explainSmtpError } from '../_lib/mailer.js'
 import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
 
 const INVITE_DAYS = 7
@@ -168,7 +168,7 @@ async function inviteMember(req, res) {
     console.error('invite email failed', err)
     // Don't leave a live invitation behind for a mail that never went out.
     await sql`UPDATE neon_auth.invitation SET status = 'canceled' WHERE id = ${invitationId}`
-    return send(res, 502, { error: `The invite could not be emailed: ${err.message}` })
+    return send(res, 502, { error: `The invite could not be emailed. ${explainSmtpError(err)}` })
   }
 
   send(res, 201, { ok: true, invitationId, email: invitee })
