@@ -61,7 +61,7 @@ export function fetchPendingSubmissions() {
 async function presignUpload({ creatorEmail, file, kind }) {
   const { uploadUrl, objectKey, publicUrl } = await request('/uploads/presign', {
     method: 'POST',
-    body: JSON.stringify({ creatorEmail, fileName: file.name, contentType: file.type, kind }),
+    body: JSON.stringify({ creatorEmail, fileName: file.name, contentType: file.type, kind, size: file.size }),
   })
   const putRes = await fetch(uploadUrl, {
     method: 'PUT',

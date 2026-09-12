@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { randomUUID } from 'node:crypto'
 
@@ -36,10 +36,44 @@ export function buildObjectKey({ creatorId, fileName, kind }) {
   return `${kind}/${creatorId}/${randomUUID()}-${sanitizeFileName(fileName)}`
 }
 
-/** Presigned PUT URL the browser can upload directly to, bypassing our server. */
-export async function presignUpload({ bucket, key, contentType, expiresIn = 300 }) {
-  const command = new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType })
-  return getSignedUrl(getClient(), command, { expiresIn })
+/**
+ * Presigned PUT URL the browser uploads straight to, bypassing our server.
+ *
+ * When `contentLength` is given it is baked into the signature, so the upload
+ * must be exactly that many bytes or S3 rejects it. Without that a presigned
+ * PUT is an unbounded write: the URL would accept a file of any size, and the
+ * first sign of a 40GB upload would be the storage bill.
+ */
+export async function presignUpload({ bucket, key, contentType, contentLength, expiresIn = 300 }) {
+  const command = new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ContentType: contentType,
+    ...(contentLength ? { ContentLength: contentLength } : {}),
+  })
+  return getSignedUrl(getClient(), command, {
+    expiresIn,
+    ...(contentLength ? { signableHeaders: new Set(['host', 'content-length']) } : {}),
+  })
+}
+
+/** Actual stored size, so accounting uses what landed rather than what was claimed. */
+export async function headObjectSize({ bucket, key }) {
+  try {
+    const res = await getClient().send(new HeadObjectCommand({ Bucket: bucket, Key: key }))
+    return Number(res.ContentLength) || 0
+  } catch {
+    // Missing or unreadable: count as zero rather than failing the submission.
+    return 0
+  }
+}
+
+export async function deleteObject({ bucket, key }) {
+  try {
+    await getClient().send(new DeleteObjectCommand({ Bucket: bucket, Key: key }))
+  } catch (err) {
+    console.error('object delete failed', key, err.message)
+  }
 }
 
 /** Presigned GET URL for a private-bucket object (source files gated behind entitlement checks). */

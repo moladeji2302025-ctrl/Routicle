@@ -21,6 +21,8 @@ export default async function handler(req, res) {
       folders,
       updates,
       resources,
+      storage,
+      topCreators,
       recentDownloads,
       recentSubmissions,
     ] = await Promise.all([
@@ -34,6 +36,8 @@ export default async function handler(req, res) {
       sql`SELECT COUNT(*)::int AS n FROM team_folders`,
       sql`SELECT COUNT(*) FILTER (WHERE is_published)::int AS published, COUNT(*) FILTER (WHERE NOT is_published)::int AS drafts FROM app_updates`,
       sql`SELECT COUNT(*)::int AS n FROM app_resources`,
+      sql`SELECT COALESCE(SUM(total_bytes),0)::bigint AS bytes, COALESCE(MAX(total_bytes),0)::bigint AS largest FROM content_items`,
+      sql`SELECT name, storage_bytes::bigint AS bytes FROM creators WHERE storage_bytes > 0 ORDER BY storage_bytes DESC LIMIT 5`,
       sql`SELECT d.downloaded_at, d.user_email, c.title FROM downloads d JOIN content_items c ON c.id = d.content_item_id ORDER BY d.downloaded_at DESC LIMIT 8`,
       sql`SELECT c.id, c.title, c.created_at, cr.name AS creator_name FROM content_items c JOIN creators cr ON cr.id = c.creator_id WHERE c.moderation_status = 'pending' ORDER BY c.created_at DESC LIMIT 8`,
     ])
@@ -50,6 +54,13 @@ export default async function handler(req, res) {
         publishedUpdates: updates[0].published,
         draftUpdates: updates[0].drafts,
         resources: resources[0].n,
+      },
+      storage: {
+        // Object storage, not Postgres — the files themselves, which is the
+        // line that actually scales with the library.
+        totalBytes: Number(storage[0].bytes),
+        largestItemBytes: Number(storage[0].largest),
+        topCreators: topCreators.map((c) => ({ name: c.name, bytes: Number(c.bytes) })),
       },
       subscriptionsByTier: subs.map((r) => ({ tier: r.tier, count: r.n })),
       recentDownloads: recentDownloads.map((r) => ({
