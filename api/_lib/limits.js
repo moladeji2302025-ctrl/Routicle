@@ -17,9 +17,13 @@ function envBytes(name, fallback) {
   return Number.isFinite(n) && n > 0 ? n : fallback
 }
 
-/** Largest single file. Comfortably clears a packaged After Effects project. */
+/**
+ * Largest single file. Capped just under R2's 4.995 GiB single-PUT ceiling —
+ * a larger value would pass this check and then be refused by storage itself,
+ * which reads as a random upload failure. Going above it needs multipart.
+ */
 export function maxFileBytes() {
-  return envBytes('MAX_UPLOAD_BYTES', 5 * GB)
+  return envBytes('MAX_UPLOAD_BYTES', Math.floor(4.9 * GB))
 }
 
 /** Largest total for one submission across all its source files. */

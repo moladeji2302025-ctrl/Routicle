@@ -2,8 +2,13 @@ import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand, Delete
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { randomUUID } from 'node:crypto'
 
-export const SOURCE_BUCKET = 'routicle-sources'
-export const PREVIEW_BUCKET = 'routicle-previews'
+/**
+ * Bucket names are overridable so the same code runs against Neon Object
+ * Storage or Cloudflare R2 — both speak the S3 API, and which one is in use is
+ * decided entirely by AWS_ENDPOINT_URL_S3 and the credentials beside it.
+ */
+export const SOURCE_BUCKET = process.env.SOURCE_BUCKET_NAME || 'routicle-sources'
+export const PREVIEW_BUCKET = process.env.PREVIEW_BUCKET_NAME || 'routicle-previews'
 
 let client = null
 
@@ -88,8 +93,17 @@ export async function presignDownload({ bucket, key, expiresIn = 300, downloadFi
   return getSignedUrl(getClient(), command, { expiresIn })
 }
 
-/** Public URL for an object in the public_read previews bucket — no signing needed. */
+/**
+ * Public URL for an object in the previews bucket — no signing needed.
+ *
+ * R2 does not serve public objects from its S3 endpoint: a public bucket is
+ * reached through an r2.dev subdomain or a bound custom domain, and the bucket
+ * name is not part of that path. PUBLIC_PREVIEW_BASE_URL covers that; without
+ * it this falls back to the path-style URL Neon Object Storage uses.
+ */
 export function publicPreviewUrl(key) {
-  const endpoint = process.env.AWS_ENDPOINT_URL_S3 || ''
+  const base = process.env.PUBLIC_PREVIEW_BASE_URL
+  if (base) return `${base.replace(/\/$/, '')}/${key}`
+  const endpoint = (process.env.AWS_ENDPOINT_URL_S3 || '').replace(/\/$/, '')
   return `${endpoint}/${PREVIEW_BUCKET}/${key}`
 }
