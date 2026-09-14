@@ -68,7 +68,7 @@ const PLAN_BLURB = {
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
-  const { currentUser, settings, completeOnboarding } = useApp()
+  const { currentUser, settings, theme, completeOnboarding } = useApp()
 
   const [step, setStep] = useState(0)
   const [dir, setDir] = useState(1)
@@ -174,7 +174,11 @@ export default function OnboardingPage() {
   return (
     <div className="onb">
       <header className="onb-top">
-        <img src="/brand/routicle-mark-black.svg" alt="" className="onb-mark" />
+        <img
+          src={theme === 'dark' ? '/brand/routicle-mark-white.svg' : '/brand/routicle-mark-black.svg'}
+          alt=""
+          className="onb-mark"
+        />
         <button type="button" className="onb-skip" onClick={() => finish('')} disabled={saving}>
           Skip for now
         </button>

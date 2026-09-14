@@ -31,7 +31,11 @@ export default function BecomeCreatorPage() {
     setSubmitting(true)
     try {
       await applyAsCreator({ bio, payoutMethod, social: {} })
-      navigate('/upload')
+      // Land on the creator dashboard, not the upload form. Applying and
+      // uploading are separate decisions — being dropped straight into a file
+      // picker reads as "you cannot finish signing up without work to hand",
+      // which is exactly the wall this page promises there isn't.
+      navigate('/dashboard')
     } catch (err) {
       console.error('applyAsCreator failed', err)
       setSubmitting(false)
@@ -95,7 +99,7 @@ export default function BecomeCreatorPage() {
           confidential material I'm not cleared to redistribute.
         </label>
         <button type="submit" className="btn-hero-primary auth-submit" disabled={!rightsConfirmed || submitting}>
-          {submitting ? 'Applying…' : 'Apply and start uploading'}
+          {submitting ? 'Applying…' : 'Finish signing up'}
         </button>
       </form>
     </div>
