@@ -69,6 +69,7 @@ const serializeProject = (r) => ({
   startDate: r.start_date,
   endDate: r.end_date,
   currency: r.currency,
+  figures: r.figures || { packages: [], lines: [] },
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 })
@@ -252,6 +253,7 @@ async function oneProject(req, res, user, id) {
       start_date = COALESCE(${b.startDate ?? null}, start_date),
       end_date = COALESCE(${b.endDate ?? null}, end_date),
       currency = COALESCE(${b.currency ?? null}, currency),
+      figures = COALESCE(${b.figures ? JSON.stringify(b.figures) : null}::jsonb, figures),
       updated_at = now()
     WHERE id = ${id}
     RETURNING *

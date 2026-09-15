@@ -1,0 +1,292 @@
+import { useRef, useState } from 'react'
+import { vectorize } from '../../lib/vectorize'
+import { buildLogoPack, svgToRaster, downloadBlob, PALETTE_PRESETS, isDark } from '../../lib/logoPack'
+import { PenIcon, UploadIcon } from '../../components/icons'
+
+const FONTS = [
+  { id: 'satoshi', label: 'Satoshi' },
+  { id: 'grotesk', label: 'Grotesk' },
+  { id: 'serif', label: 'Serif' },
+  { id: 'mono', label: 'Mono' },
+]
+
+const FORMATS = [
+  { ext: 'svg', label: 'SVG', type: null },
+  { ext: 'png', label: 'PNG', type: 'image/png' },
+  { ext: 'jpg', label: 'JPEG', type: 'image/jpeg' },
+]
+
+const slug = (s) => (s || 'brand').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+
+export default function CreativeSuitePage() {
+  const fileRef = useRef(null)
+  const [preview, setPreview] = useState('')
+  const [trace, setTrace] = useState(null)
+  const [tracing, setTracing] = useState(false)
+  const [error, setError] = useState('')
+
+  const [threshold, setThreshold] = useState(null) // null = choose automatically
+  const [invert, setInvert] = useState(false)
+  const [detail, setDetail] = useState(1.2)
+
+  const [name, setName] = useState('')
+  const [tagline, setTagline] = useState('')
+  const [palette, setPalette] = useState(PALETTE_PRESETS[0].colors)
+  const [font, setFont] = useState('satoshi')
+  const [lastFile, setLastFile] = useState(null)
+
+  async function run(file, opts = {}) {
+    setTracing(true)
+    setError('')
+    try {
+      const result = await vectorize(file, {
+        threshold: opts.threshold !== undefined ? opts.threshold : threshold,
+        invert: opts.invert !== undefined ? opts.invert : invert,
+        detail: opts.detail !== undefined ? opts.detail : detail,
+      })
+      if (!result.pathData) {
+        setError('Nothing traced. Try inverting, or nudge the threshold — the image may be too low contrast.')
+        setTrace(null)
+      } else {
+        setTrace(result)
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setTracing(false)
+    }
+  }
+
+  async function onFile(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setError('Pick an image file — a photo of a sketch, a PNG, or a JPEG.')
+      return
+    }
+    setLastFile(file)
+    setPreview(URL.createObjectURL(file))
+    if (!name) setName(file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' '))
+    await run(file)
+  }
+
+  // Re-tracing uses the original file, so adjustments never compound on an
+  // already-thresholded result.
+  const retrace = (opts) => lastFile && run(lastFile, opts)
+
+  const pack = trace ? buildLogoPack({ trace, name, tagline, palette, font }) : []
+
+  async function download(asset, format) {
+    try {
+      if (format.ext === 'svg') {
+        downloadBlob(new Blob([asset.svg], { type: 'image/svg+xml' }), `${slug(name)}-${asset.id}.svg`)
+        return
+      }
+      const blob = await svgToRaster(asset.svg, {
+        type: format.type,
+        scale: 3,
+        background: format.type === 'image/jpeg' ? palette[palette.length - 1] : null,
+      })
+      downloadBlob(blob, `${slug(name)}-${asset.id}.${format.ext}`)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  return (
+    <>
+      <div className="suite-section-head">
+        <div>
+          <h2>Creative Suite</h2>
+          <p className="settings-section-desc">
+            Upload a sketch or a flat raster logo. It gets vectorised, then turned into a full pack —
+            primary, secondary and tertiary lockups, the mark, the wordmark and the palette.
+          </p>
+        </div>
+      </div>
+
+      {error && <p className="settings-error">{error}</p>}
+
+      <div className="cs-grid">
+        {/* ------------------------------------------------ input column */}
+        <div className="cs-panel">
+          <h3>1. Your mark</h3>
+          <button type="button" className="cs-drop" onClick={() => fileRef.current?.click()}>
+            {preview ? (
+              <img src={preview} alt="" className="cs-preview" />
+            ) : (
+              <>
+                <UploadIcon size={22} color="currentColor" />
+                <strong>Upload a logo or sketch</strong>
+                <span>A photo of a drawing, or a PSD export. High contrast traces best.</span>
+              </>
+            )}
+          </button>
+          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onFile} />
+
+          {lastFile && (
+            <div className="cs-controls">
+              <label className="settings-stack-field">
+                <span className="settings-stack-label">
+                  Threshold {threshold == null ? '(automatic)' : threshold}
+                </span>
+                <input
+                  type="range"
+                  min="20"
+                  max="235"
+                  value={threshold ?? trace?.threshold ?? 128}
+                  onChange={(e) => {
+                    const v = Number(e.target.value)
+                    setThreshold(v)
+                    retrace({ threshold: v })
+                  }}
+                />
+              </label>
+              <label className="settings-stack-field">
+                <span className="settings-stack-label">Detail {detail.toFixed(1)}</span>
+                <input
+                  type="range"
+                  min="0.4"
+                  max="4"
+                  step="0.2"
+                  value={detail}
+                  onChange={(e) => {
+                    const v = Number(e.target.value)
+                    setDetail(v)
+                    retrace({ detail: v })
+                  }}
+                />
+              </label>
+              <div className="settings-inline-actions">
+                <button
+                  type="button"
+                  className="settings-btn"
+                  onClick={() => {
+                    setInvert((v) => !v)
+                    retrace({ invert: !invert })
+                  }}
+                >
+                  {invert ? 'Trace dark shapes' : 'Invert'}
+                </button>
+                <button
+                  type="button"
+                  className="settings-btn settings-btn-ghost"
+                  onClick={() => {
+                    setThreshold(null)
+                    retrace({ threshold: null })
+                  }}
+                >
+                  Auto threshold
+                </button>
+              </div>
+              {trace && (
+                <p className="settings-stack-hint">
+                  {trace.contourCount} shape{trace.contourCount === 1 ? '' : 's'} traced at {trace.width}×{trace.height}.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ----------------------------------------------- brand column */}
+        <div className="cs-panel">
+          <h3>2. Brand details</h3>
+          <label className="settings-stack-field">
+            <span className="settings-stack-label">Brand name</span>
+            <input className="settings-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your Brand" />
+          </label>
+          <label className="settings-stack-field">
+            <span className="settings-stack-label">Tagline (optional)</span>
+            <input className="settings-input" value={tagline} onChange={(e) => setTagline(e.target.value)} />
+          </label>
+          <label className="settings-stack-field">
+            <span className="settings-stack-label">Typeface</span>
+            <div className="settings-seg">
+              {FONTS.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  className={font === f.id ? 'settings-seg-btn settings-seg-btn-active' : 'settings-seg-btn'}
+                  onClick={() => setFont(f.id)}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </label>
+
+          <span className="settings-stack-label" style={{ marginTop: 6 }}>Palette</span>
+          <div className="cs-palettes">
+            {PALETTE_PRESETS.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className={palette === p.colors ? 'cs-palette cs-palette-on' : 'cs-palette'}
+                onClick={() => setPalette(p.colors)}
+                title={p.label}
+              >
+                {p.colors.map((c) => (
+                  <span key={c} style={{ background: c }} />
+                ))}
+              </button>
+            ))}
+          </div>
+          <div className="cs-swatches">
+            {palette.map((c, i) => (
+              <label key={i} className="cs-swatch" style={{ background: c, color: isDark(c) ? '#fff' : '#16161a' }}>
+                {c.toUpperCase()}
+                <input
+                  type="color"
+                  value={c}
+                  onChange={(e) => setPalette(palette.map((x, xi) => (xi === i ? e.target.value : x)))}
+                />
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ----------------------------------------------------- the pack */}
+      <div className="suite-section-head" style={{ marginTop: 10 }}>
+        <div>
+          <h2>3. Your pack</h2>
+          <p className="settings-section-desc">Every asset downloads as SVG, PNG or JPEG.</p>
+        </div>
+      </div>
+
+      {tracing ? (
+        <p className="explore-empty">Tracing…</p>
+      ) : !trace ? (
+        <div className="page-empty-state">
+          <PenIcon size={26} color="currentColor" />
+          <h2>Nothing to show yet</h2>
+          <p>Upload a mark above and the full pack appears here, generated from it.</p>
+        </div>
+      ) : (
+        <div className="cs-pack">
+          {pack.map((asset) => (
+            <figure key={asset.id} className="cs-asset">
+              <div
+                className="cs-asset-art"
+                style={{ background: asset.id === 'tertiary' ? palette[palette.length - 1] : 'transparent' }}
+                dangerouslySetInnerHTML={{ __html: asset.svg }}
+              />
+              <figcaption>
+                <strong>{asset.label}</strong>
+                <span>{asset.blurb}</span>
+                <div className="cs-formats">
+                  {FORMATS.map((f) => (
+                    <button key={f.ext} type="button" className="settings-btn" onClick={() => download(asset, f)}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
+    </>
+  )
+}

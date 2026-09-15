@@ -46,6 +46,7 @@ import AdminContentPage from './pages/admin/AdminContentPage'
 import UpdatesPage from './pages/UpdatesPage'
 import SuiteLayout from './pages/suite/SuiteLayout'
 import BusinessSuitePage from './pages/suite/BusinessSuitePage'
+import CreativeSuitePage from './pages/suite/CreativeSuitePage'
 import StudioProfilePage from './pages/suite/StudioProfilePage'
 import ProjectPage from './pages/suite/ProjectPage'
 import DocumentPage from './pages/suite/DocumentPage'
@@ -110,6 +111,7 @@ export default function App() {
               <Route path="business/studio" element={<StudioProfilePage />} />
               <Route path="business/:id" element={<ProjectPage />} />
               <Route path="business/:id/doc/:docId" element={<DocumentPage />} />
+              <Route path="creative" element={<CreativeSuitePage />} />
             </Route>
             <Route path="/invite/:id" element={<InvitePage />} />
             <Route path="/admin" element={<AdminLayout />}>

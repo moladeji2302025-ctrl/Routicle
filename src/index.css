@@ -9863,3 +9863,344 @@ a.admin-stat:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   Creative Suite
+   ============================================================ */
+
+.cs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.cs-panel {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cs-panel h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cs-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 190px;
+  padding: 20px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.cs-drop:hover {
+  border-color: var(--brand-violet);
+}
+
+.cs-drop strong {
+  font-size: 13.5px;
+  color: var(--text);
+}
+
+.cs-drop span {
+  font-size: 12px;
+  text-align: center;
+  max-width: 34ch;
+  line-height: 1.5;
+}
+
+.cs-preview {
+  max-width: 100%;
+  max-height: 210px;
+  object-fit: contain;
+}
+
+.cs-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-controls input[type='range'] {
+  width: 100%;
+  accent-color: var(--brand-violet);
+}
+
+/* ---- palette picking ---- */
+
+.cs-palettes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cs-palette {
+  display: flex;
+  overflow: hidden;
+  width: 92px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  background: none;
+}
+
+.cs-palette span {
+  flex: 1;
+}
+
+.cs-palette-on {
+  border-color: var(--brand-violet);
+  box-shadow: 0 0 0 1px var(--brand-violet);
+}
+
+.cs-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+/* The whole swatch is the trigger; the native colour input sits invisibly on
+   top so the hit area is the block itself rather than a tiny square. */
+.cs-swatch {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  height: 66px;
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.cs-swatch input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ---- generated pack ---- */
+
+.cs-pack {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.cs-asset {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-asset-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 170px;
+  padding: 22px;
+  border-bottom: 1px solid var(--border);
+  /* A light checkerboard, so transparent exports read as transparent rather
+     than as whatever the theme happens to be behind them. */
+  background-image:
+    linear-gradient(45deg, rgba(128, 128, 128, 0.12) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(128, 128, 128, 0.12) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(128, 128, 128, 0.12) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(128, 128, 128, 0.12) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.cs-asset-art svg {
+  max-width: 100%;
+  max-height: 130px;
+  height: auto;
+}
+
+.cs-asset figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px 16px;
+}
+
+.cs-asset figcaption strong {
+  font-size: 13.5px;
+}
+
+.cs-asset figcaption span {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.cs-formats {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cs-formats .settings-btn {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+/* ============================================================
+   Packages & invoice lines
+   ============================================================ */
+
+.suite-packages {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.suite-packages h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.suite-package {
+  padding: 18px;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.suite-line {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.suite-line .settings-input:first-child {
+  flex: 1;
+}
+
+.suite-line-total {
+  margin: 14px 0 0;
+  text-align: right;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.suite-line-total strong {
+  font-size: 16px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Printing a document
+   ============================================================ */
+
+/* Print rather than rasterise: the browser's own PDF writer keeps text
+   selectable, searchable and vector-sharp, which html2canvas cannot. Everything
+   that is app chrome is dropped, and the editable fields are flattened so a
+   client receives a document rather than a screenshot of a form. */
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  .app-sidebar,
+  .suite-tabs,
+  .suite-subtabs,
+  .suite-crumbs,
+  .settings-actions,
+  .settings-inline-actions,
+  .app-nav,
+  .suite-head p {
+    display: none !important;
+  }
+
+  .app-shell,
+  .app-main,
+  .suite-shell,
+  .suite-body {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .doc-sheet {
+    border: none !important;
+    padding: 0 !important;
+    max-width: none !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Inputs and textareas print their value, but keep their widget chrome —
+     stripping it is what makes the output read as a document. */
+  .doc-text,
+  .doc-input,
+  .suite-doc-title {
+    border: none !important;
+    background: none !important;
+    color: #000 !important;
+    padding: 0 !important;
+    resize: none !important;
+    overflow: hidden !important;
+  }
+
+  .doc-section {
+    break-inside: avoid;
+  }
+
+  .doc-section + .doc-section {
+    border-top: none !important;
+    padding-top: 18px !important;
+  }
+
+  .doc-table th,
+  .doc-table td {
+    border-color: #ddd !important;
+  }
+
+  .doc-signatures {
+    break-inside: avoid;
+  }
+
+  a[href]::after {
+    content: '';
+  }
+}

@@ -3,11 +3,13 @@ import { Link, useParams } from 'react-router-dom'
 import * as api from '../../lib/api'
 import { QUESTION_GROUPS, findQuestion, STARTER_QUESTION_IDS } from '../../data/discoveryQuestions'
 import { buildDocument, answersByMeaning, DOCUMENT_KINDS } from '../../data/documentTemplates'
+import PackagesEditor from './PackagesEditor'
 import { ChevronRightIcon, PlusIcon } from '../../components/icons'
 
 const TABS = [
   { id: 'form', label: 'Discovery form' },
   { id: 'responses', label: 'Responses' },
+  { id: 'figures', label: 'Figures' },
   { id: 'documents', label: 'Documents' },
   { id: 'schedule', label: 'Schedule' },
 ]
@@ -93,7 +95,15 @@ export default function ProjectPage() {
     }
     const latest = data.submissions[0]
     const a = latest ? answersByMeaning(latest.answers, data.form?.questions || []) : {}
-    const content = buildDocument(kind, { studio: profile, project: data.project, a })
+    const figures = data.project.figures || { packages: [], lines: [] }
+    const content = buildDocument(kind, {
+      studio: profile,
+      project: data.project,
+      a,
+      packages: figures.packages || [],
+      lines: figures.lines || [],
+      invoiceNumber: String(data.documents.filter((d) => d.kind === 'invoice').length + 1).padStart(4, '0'),
+    })
     await run(`gen-${kind}`, () => api.saveDocument({ projectId: id, kind, title: content.title, content }), `${kind} generated.`)
   }
 
@@ -256,6 +266,16 @@ export default function ProjectPage() {
             </section>
           ))
         )
+      )}
+
+      {tab === 'figures' && (
+        <PackagesEditor
+          packages={project.figures?.packages || []}
+          lines={project.figures?.lines || []}
+          currency={project.currency}
+          saving={busy === 'figures'}
+          onChange={(figures) => run('figures', () => api.patchProject(id, { figures }), 'Figures saved.')}
+        />
       )}
 
       {/* ----------------------------------------------------- documents */}
