@@ -1,6 +1,6 @@
-import { sql } from './_lib/db.js'
-import { send, methodGuard, withErrorHandling } from './_lib/http.js'
-import { presignDownload, SOURCE_BUCKET } from './_lib/s3.js'
+import { sql } from '../db.js'
+import { send, methodGuard, withErrorHandling } from '../http.js'
+import { presignDownload, SOURCE_BUCKET } from '../s3.js'
 
 /**
  * POST issues short-lived presigned GET URLs for a content item's real source

@@ -46,6 +46,7 @@ const NAV_GROUPS = [
   {
     label: 'Create',
     items: [
+      { label: 'AI Suite', to: '/suite', icon: SparkleIcon },
       { label: 'AI Image', to: '/studio/image', icon: ImageIcon },
       { label: 'AI Video', to: '/studio/video', icon: VideoIcon },
       { label: 'Upload', to: '/upload', icon: UploadIcon, when: (u) => u?.isCreator },

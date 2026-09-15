@@ -46,7 +46,7 @@ async function request(path, options = {}) {
 }
 
 export function upsertCreator(data) {
-  return request('/creators', { method: 'POST', body: JSON.stringify(data) })
+  return request('/creator/profile', { method: 'POST', body: JSON.stringify(data) })
 }
 
 export function fetchApprovedContent(department) {
@@ -55,11 +55,11 @@ export function fetchApprovedContent(department) {
 }
 
 export function fetchPendingSubmissions() {
-  return request('/submissions?status=pending')
+  return request('/creator/submissions?status=pending')
 }
 
 async function presignUpload({ creatorEmail, file, kind }) {
-  const { uploadUrl, objectKey, publicUrl } = await request('/uploads/presign', {
+  const { uploadUrl, objectKey, publicUrl } = await request('/creator/presign', {
     method: 'POST',
     body: JSON.stringify({ creatorEmail, fileName: file.name, contentType: file.type, kind, size: file.size }),
   })
@@ -102,7 +102,7 @@ export async function submitRealUpload({
     sourceObjectKeys.push({ label, key: uploaded.objectKey })
   }
 
-  return request('/submissions', {
+  return request('/creator/submissions', {
     method: 'POST',
     body: JSON.stringify({
       creatorEmail,
@@ -130,7 +130,7 @@ export function markItemFreeRemote(id, isFree) {
 
 /** Returns presigned, time-limited download URLs for a live item's real source files. */
 export function requestDownload(itemId, userEmail, organizationId) {
-  return request('/downloads', { method: 'POST', body: JSON.stringify({ itemId, userEmail, organizationId }) })
+  return request('/library/downloads', { method: 'POST', body: JSON.stringify({ itemId, userEmail, organizationId }) })
 }
 
 /** Download history for the active scope — a team's shared log, or your own. */
@@ -138,17 +138,17 @@ export function fetchDownloads({ userEmail, organizationId }) {
   const query = organizationId
     ? `?organizationId=${encodeURIComponent(organizationId)}`
     : `?userEmail=${encodeURIComponent(userEmail)}`
-  return request(`/downloads${query}`)
+  return request(`/library/downloads${query}`)
 }
 
 /** Personal (organizationId omitted) or team-shared saved items — real, server-side Collections. */
 export function fetchSavedItems({ userId, organizationId }) {
   const query = organizationId ? `?userId=${userId}&organizationId=${organizationId}` : `?userId=${userId}`
-  return request(`/collections${query}`)
+  return request(`/library/collections${query}`)
 }
 
 export function saveItemRemote({ userId, organizationId, contentItemId, savedByUserId }) {
-  return request('/collections', {
+  return request('/library/collections', {
     method: 'POST',
     body: JSON.stringify({ userId, organizationId, contentItemId, savedByUserId }),
   })
@@ -158,7 +158,7 @@ export function unsaveItemRemote({ userId, organizationId, contentItemId }) {
   const query = organizationId
     ? `?userId=${userId}&organizationId=${organizationId}&contentItemId=${contentItemId}`
     : `?userId=${userId}&contentItemId=${contentItemId}`
-  return request(`/collections${query}`, { method: 'DELETE' })
+  return request(`/library/collections${query}`, { method: 'DELETE' })
 }
 
 /* ---- What's new (public) ---- */
@@ -169,6 +169,65 @@ export function fetchUpdates(limit) {
 
 export function fetchPublicResources() {
   return request('/public/resources')
+}
+
+/* ---- AI Suite: Business ---- */
+
+export function fetchStudioProfile() {
+  return request('/suite/profile')
+}
+
+export function saveStudioProfile(profile) {
+  return request('/suite/profile', { method: 'PUT', body: JSON.stringify(profile) })
+}
+
+export function fetchProjects() {
+  return request('/suite/projects')
+}
+
+export function createProject(data) {
+  return request('/suite/projects', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export function fetchProject(id) {
+  return request(`/suite/projects/${encodeURIComponent(id)}`)
+}
+
+export function patchProject(id, data) {
+  return request(`/suite/projects/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export function deleteProject(id) {
+  return request(`/suite/projects/${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+export function saveProjectForm(projectId, data) {
+  return request(`/suite/forms/${encodeURIComponent(projectId)}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export function saveDocument(data) {
+  return request('/suite/documents', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export function patchDocument(id, data) {
+  return request(`/suite/documents/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export function deleteDocument(id) {
+  return request(`/suite/documents/${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+export function saveSchedule(projectId, data) {
+  return request(`/suite/schedule/${encodeURIComponent(projectId)}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+/** Public, unauthenticated — the link the client actually opens. */
+export function fetchPublicForm(slug) {
+  return request(`/suite/public/${encodeURIComponent(slug)}`)
+}
+
+export function submitPublicForm(slug, data) {
+  return request(`/suite/public/${encodeURIComponent(slug)}`, { method: 'POST', body: JSON.stringify(data) })
 }
 
 /* ---- Account ---- */

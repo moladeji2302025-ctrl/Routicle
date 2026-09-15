@@ -1,7 +1,7 @@
-import { sql } from '../_lib/db.js'
-import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
-import { buildObjectKey, presignUpload, SOURCE_BUCKET, PREVIEW_BUCKET, publicPreviewUrl } from '../_lib/s3.js'
-import { maxFileBytes, maxCreatorBytes, maxLibraryBytes, formatBytes } from '../_lib/limits.js'
+import { sql } from '../db.js'
+import { send, methodGuard, withErrorHandling } from '../http.js'
+import { buildObjectKey, presignUpload, SOURCE_BUCKET, PREVIEW_BUCKET, publicPreviewUrl } from '../s3.js'
+import { maxFileBytes, maxCreatorBytes, maxLibraryBytes, formatBytes } from '../limits.js'
 
 /** Returns a presigned PUT URL the browser uploads directly to — file bytes never touch our server. */
 export default async function handler(req, res) {

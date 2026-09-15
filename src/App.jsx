@@ -44,6 +44,12 @@ import AdminResourcesPage from './pages/admin/AdminResourcesPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminContentPage from './pages/admin/AdminContentPage'
 import UpdatesPage from './pages/UpdatesPage'
+import SuiteLayout from './pages/suite/SuiteLayout'
+import BusinessSuitePage from './pages/suite/BusinessSuitePage'
+import StudioProfilePage from './pages/suite/StudioProfilePage'
+import ProjectPage from './pages/suite/ProjectPage'
+import DocumentPage from './pages/suite/DocumentPage'
+import ClientFormPage from './pages/ClientFormPage'
 import InvitePage from './pages/InvitePage'
 import OnboardingPage from './pages/OnboardingPage'
 import StaticPage from './pages/StaticPage'
@@ -57,6 +63,7 @@ export default function App() {
           {/* Outside Layout on purpose: the welcome flow owns the whole screen,
               with no sidebar or marketing chrome around it. */}
           <Route path="/welcome" element={<OnboardingPage />} />
+          <Route path="/f/:slug" element={<ClientFormPage />} />
           <Route element={<Layout />}>
             <Route path="/" element={<HomeRouter />} />
             <Route path="/design/:id" element={<DesignDetailPage />} />
@@ -97,6 +104,13 @@ export default function App() {
             <Route path="/team/folder/:id" element={<FolderPage />} />
             <Route path="/billing/callback" element={<BillingCallbackPage />} />
             <Route path="/updates" element={<UpdatesPage />} />
+            <Route path="/suite" element={<SuiteLayout />}>
+              <Route index element={<Navigate to="/suite/business" replace />} />
+              <Route path="business" element={<BusinessSuitePage />} />
+              <Route path="business/studio" element={<StudioProfilePage />} />
+              <Route path="business/:id" element={<ProjectPage />} />
+              <Route path="business/:id/doc/:docId" element={<DocumentPage />} />
+            </Route>
             <Route path="/invite/:id" element={<InvitePage />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminOverviewPage />} />

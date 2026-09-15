@@ -1,6 +1,6 @@
-import { sql } from './_lib/db.js'
-import { headObjectSize, SOURCE_BUCKET, PREVIEW_BUCKET } from './_lib/s3.js'
-import { send, methodGuard, withErrorHandling } from './_lib/http.js'
+import { sql } from '../db.js'
+import { headObjectSize, SOURCE_BUCKET, PREVIEW_BUCKET } from '../s3.js'
+import { send, methodGuard, withErrorHandling } from '../http.js'
 
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
