@@ -10206,3 +10206,38 @@ a.admin-stat:hover {
     content: '';
   }
 }
+
+/* ---- Plan features, inside the card ---- */
+
+/* The comparison grid used to live below the cards, which meant reading a plan
+   and checking what it included were two separate jobs in two places. Each
+   card now carries its own list. */
+.pricing-features {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.pricing-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+/* Excluded lines stay visible so the gap between tiers is legible, but recede
+   so the list still reads as what you get. */
+.pricing-feature-off {
+  opacity: 0.4;
+}
+
+.pricing-features .pricing-mark {
+  flex-shrink: 0;
+  margin-top: 1px;
+}

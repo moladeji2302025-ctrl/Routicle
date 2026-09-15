@@ -93,6 +93,19 @@ function Mark({ on }) {
   )
 }
 
+/**
+ * Flattens the tier matrix into one plan's list.
+ *
+ * Kept derived rather than hand-written per plan: the matrix stays the single
+ * source of truth, so a feature can't end up ticked in the table and missing
+ * from the card.
+ */
+function featuresFor(tier) {
+  return FEATURE_GROUPS.flatMap((group) =>
+    group.rows.map((row) => ({ label: row.label, included: !!row[tier], group: group.title }))
+  )
+}
+
 export default function PricingPage() {
   const { currentUser, subscription, activeTeam, activeTeamId, startSubscriptionCheckout, cancelSubscription } = useApp()
   const navigate = useNavigate()
@@ -257,30 +270,18 @@ export default function PricingPage() {
               >
                 {busyTier === plan.id ? 'Starting…' : isCurrent ? 'Current plan' : plan.cta}
               </button>
+
+              <ul className="pricing-features">
+                {featuresFor(plan.id).map((f) => (
+                  <li key={f.label} className={f.included ? 'pricing-feature' : 'pricing-feature pricing-feature-off'}>
+                    <Mark on={f.included} />
+                    {f.label}
+                  </li>
+                ))}
+              </ul>
             </section>
           )
         })}
-      </div>
-
-      <div className="pricing-matrix">
-        {FEATURE_GROUPS.map((group) => (
-          <div key={group.title} className="pricing-matrix-group">
-            <div className="pricing-matrix-head">
-              <h3>{group.title}</h3>
-              <span>Free</span>
-              <span>Standard</span>
-              <span>Express</span>
-            </div>
-            {group.rows.map((row) => (
-              <div key={row.label} className="pricing-matrix-row">
-                <span className="pricing-matrix-label">{row.label}</span>
-                <Mark on={row.free} />
-                <Mark on={row.standard} />
-                <Mark on={row.express} />
-              </div>
-            ))}
-          </div>
-        ))}
       </div>
 
       <p className="pricing-foot">
