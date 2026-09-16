@@ -190,19 +190,19 @@ export function createProject(data) {
 }
 
 export function fetchProject(id) {
-  return request(`/suite/projects/${encodeURIComponent(id)}`)
+  return request(`/suite/projects?id=${encodeURIComponent(id)}`)
 }
 
 export function patchProject(id, data) {
-  return request(`/suite/projects/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) })
+  return request(`/suite/projects?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) })
 }
 
 export function deleteProject(id) {
-  return request(`/suite/projects/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  return request(`/suite/projects?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 export function saveProjectForm(projectId, data) {
-  return request(`/suite/forms/${encodeURIComponent(projectId)}`, { method: 'PUT', body: JSON.stringify(data) })
+  return request(`/suite/forms?id=${encodeURIComponent(projectId)}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
 export function saveDocument(data) {
@@ -210,24 +210,24 @@ export function saveDocument(data) {
 }
 
 export function patchDocument(id, data) {
-  return request(`/suite/documents/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) })
+  return request(`/suite/documents?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) })
 }
 
 export function deleteDocument(id) {
-  return request(`/suite/documents/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  return request(`/suite/documents?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 export function saveSchedule(projectId, data) {
-  return request(`/suite/schedule/${encodeURIComponent(projectId)}`, { method: 'PUT', body: JSON.stringify(data) })
+  return request(`/suite/schedule?id=${encodeURIComponent(projectId)}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
 /** Public, unauthenticated — the link the client actually opens. */
 export function fetchPublicForm(slug) {
-  return request(`/suite/public/${encodeURIComponent(slug)}`)
+  return request(`/suite/public?id=${encodeURIComponent(slug)}`)
 }
 
 export function submitPublicForm(slug, data) {
-  return request(`/suite/public/${encodeURIComponent(slug)}`, { method: 'POST', body: JSON.stringify(data) })
+  return request(`/suite/public?id=${encodeURIComponent(slug)}`, { method: 'POST', body: JSON.stringify(data) })
 }
 
 /* ---- Account ---- */

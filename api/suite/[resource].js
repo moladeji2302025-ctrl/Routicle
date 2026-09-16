@@ -5,23 +5,26 @@ import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
 /**
  * The Business Suite API, behind one Vercel function.
  *
- *   GET/PUT   /api/suite/profile                studio profile
- *   GET/POST  /api/suite/projects               list / create
- *   GET/PATCH/DELETE /api/suite/projects/:id    one project (+ its form, docs, schedule)
- *   GET/PUT   /api/suite/forms/:projectId       the project's discovery form
- *   POST      /api/suite/documents              save a generated document
- *   PATCH/DELETE /api/suite/documents/:id       edit / remove
- *   PUT       /api/suite/schedule/:projectId    recurring month plan
- *   GET       /api/suite/public/:slug           public form (no auth)
- *   POST      /api/suite/public/:slug           client submits (no auth)
+ *   GET/PUT   /api/suite/profile                 studio profile
+ *   GET/POST  /api/suite/projects                list / create
+ *   GET/PATCH/DELETE /api/suite/projects?id=     one project (+ form, docs, schedule)
+ *   GET/PUT   /api/suite/forms?id=<projectId>    the project's discovery form
+ *   POST      /api/suite/documents               save a generated document
+ *   PATCH/DELETE /api/suite/documents?id=        edit / remove
+ *   PUT       /api/suite/schedule?id=<projectId> recurring month plan
+ *   GET/POST  /api/suite/public?id=<slug>        public form (no auth)
  *
- * Everything except the two public routes is scoped to the signed-in owner.
+ * One dynamic segment plus an `id` query param, NOT an optional catch-all:
+ * Vercel's plain /api directory does not route these the way Next.js does, so
+ * [[...path]].js resolved with no segments at all and every call 404'd. The
+ * same mistake already cost us api/folders and api/content.
+ *
+ * Everything except the public route is scoped to the signed-in owner.
  */
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
-    const segments = req.query?.path
-    const parts = Array.isArray(segments) ? segments : segments ? [segments] : []
-    const [resource, id] = parts
+    const resource = req.query?.resource
+    const id = req.query?.id
 
     // The client-facing form must work for someone with no Routicle account —
     // that is the whole point of a shareable link.
