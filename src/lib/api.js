@@ -54,6 +54,11 @@ export function fetchApprovedContent(category) {
   return request(`/content${query}`)
 }
 
+/** The signed-in creator's own uploads, in every moderation state. */
+export function fetchMySubmissions() {
+  return request('/creator/submissions?mine=1')
+}
+
 export function fetchPendingSubmissions() {
   return request('/creator/submissions?status=pending')
 }

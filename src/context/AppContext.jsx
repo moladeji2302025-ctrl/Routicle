@@ -292,7 +292,7 @@ export function AppProvider({ children }) {
             submittedAt: new Date(row.created_at).getTime(),
             status: row.moderation_status,
             title: row.title,
-            category: row.category,
+            category: row.department,
             fileTypes: row.file_types || [],
             behindTheDesign: row.behind_the_design || '',
             thumbnail: row.thumbnail_key,

@@ -1,5 +1,5 @@
 import { sql } from '../db.js'
-import { headObjectSize, SOURCE_BUCKET, PREVIEW_BUCKET } from '../s3.js'
+import { headObjectSize, publicPreviewUrl, SOURCE_BUCKET, PREVIEW_BUCKET } from '../s3.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { requireUser, requireAdmin } from '../auth.js'
 import { requireCreator } from '../guard.js'
@@ -8,9 +8,48 @@ const STATUSES = ['pending', 'approved', 'rejected', 'changes-requested']
 
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
+    if (req.method === 'GET' && req.query.mine) {
+      // A creator's own work, in every state. Scoped to the session's creator
+      // record, so it can only ever return the caller's rows. Separate from the
+      // moderation queue below, which is admin only: when creators read their
+      // pending work from that queue, locking it down hid it from them too.
+      const user = await requireUser(req, res)
+      if (!user) return
+      const creator = await requireCreator(res, user)
+      if (!creator) return
+
+      const rows = await sql`
+        SELECT id, title, department, file_types, description, is_free, moderation_status,
+               moderation_note, thumbnail_key, preview_video_key, appreciation_count,
+               download_count, created_at, updated_at
+        FROM content_items
+        WHERE creator_id = ${creator.id}
+        ORDER BY created_at DESC
+        LIMIT 500
+      `
+      return send(res, 200, {
+        items: rows.map((r) => ({
+          id: r.id,
+          title: r.title,
+          // The column is still `department`; the wire format says category.
+          category: r.department,
+          fileTypes: r.file_types || [],
+          description: r.description || '',
+          free: r.is_free,
+          status: r.moderation_status,
+          note: r.moderation_note || '',
+          image: r.thumbnail_key ? publicPreviewUrl(r.thumbnail_key) : null,
+          hasVideo: Boolean(r.preview_video_key),
+          appreciations: r.appreciation_count,
+          downloads: r.download_count,
+          submittedAt: r.created_at,
+          updatedAt: r.updated_at,
+        })),
+      })
+    }
+
     if (req.method === 'GET') {
-      // The moderation queue, including creator email addresses. Admin only —
-      // it was readable by anyone.
+      // The moderation queue, including creator email addresses. Admin only.
       const admin = await requireAdmin(req, res)
       if (!admin) return
 

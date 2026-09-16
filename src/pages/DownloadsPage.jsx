@@ -81,7 +81,7 @@ export default function DownloadsPage() {
                 <div className="download-info">
                   <span className="download-title">{item?.title || row.title}</span>
                   <span className="download-meta">
-                    {categoryLabel(item?.category || row.category)}
+                    {categoryLabel(item?.category || row.department)}
                     {activeTeam ? ` · ${row.user_email}` : ''}
                   </span>
                 </div>
