@@ -544,9 +544,36 @@ export function AppProvider({ children }) {
 
       /* ---- Security ---- */
 
-      async changePassword({ currentPassword, newPassword, revokeOtherSessions }) {
-        const result = await orgClient.changePassword({ currentPassword, newPassword, revokeOtherSessions })
-        if (result?.error) throw new Error(result.error.message || 'Could not change your password')
+      /**
+        * Starts a password change by emailing a single-use link.
+        *
+        * There is deliberately no "type your current password and a new one"
+        * path any more. A form like that turns a borrowed session — an unlocked
+        * laptop, a shared machine someone stayed signed in on — into a full
+        * account takeover, because the attacker is already authenticated and
+        * only needs to type a new password twice. Requiring the mailbox means
+        * taking the account needs the mailbox too.
+        *
+        * The response is intentionally the same whether or not the address has
+        * a password account, so this can't be used to test who has one.
+        */
+      async requestPasswordReset() {
+        const email = state.currentUser?.email
+        if (!email) throw new Error('Sign in first')
+        const result = await orgClient.forgetPassword({
+          email,
+          redirectTo: `${window.location.origin}/reset-password`,
+        })
+        if (result?.error) throw new Error(result.error.message || 'Could not send the reset email')
+        return true
+      },
+
+      /** Completes the change, using the token from that email as the proof. */
+      async resetPasswordWithToken({ token, newPassword }) {
+        const result = await orgClient.resetPassword({ token, newPassword })
+        if (result?.error) throw new Error(result.error.message || 'That link has expired — ask for a new one')
+        // Anything still signed in with the old password should not stay signed in.
+        await orgClient.revokeOtherSessions().catch(() => {})
         return true
       },
 

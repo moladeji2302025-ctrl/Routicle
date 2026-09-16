@@ -11711,3 +11711,49 @@ html {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* A disclosure for settings that should not sit open on the page — password
+   changes, and anything else where the cost of a stray click is high. */
+.settings-reveal {
+  margin-top: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-bg);
+  animation: settings-reveal-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes settings-reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-reveal {
+    animation: none;
+  }
+}
+
+.reset-page {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+}
+
+.reset-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 26px;
+  padding: 24px;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  background: var(--app-card-bg);
+}

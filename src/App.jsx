@@ -9,6 +9,7 @@ import DepartmentsPage from './pages/DepartmentsPage'
 import PricingPage from './pages/PricingPage'
 import SignUpPage from './pages/SignUpPage'
 import SignInPage from './pages/SignInPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import AIImageStudioPage from './pages/AIImageStudioPage'
 import AIVideoStudioPage from './pages/AIVideoStudioPage'
 import BecomeCreatorPage from './pages/BecomeCreatorPage'
@@ -73,6 +74,7 @@ export default function App() {
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/signin" element={<SignInPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/studio/image" element={<AIImageStudioPage />} />
             <Route path="/studio/video" element={<AIVideoStudioPage />} />
             <Route path="/become-creator" element={<BecomeCreatorPage />} />

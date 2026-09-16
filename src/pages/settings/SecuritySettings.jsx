@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
-import { Section, Row, Field, Feedback, DangerZone } from '../../components/settings/SettingsControls'
+import { Section, Row, Feedback, DangerZone } from '../../components/settings/SettingsControls'
 
 function formatWhen(value) {
   if (!value) return 'unknown'
@@ -10,10 +10,10 @@ function formatWhen(value) {
 }
 
 export default function SecuritySettings() {
-  const { currentUser, changePassword, listSessions, revokeOtherSessions, deleteAccount, signOut } = useApp()
+  const { currentUser, requestPasswordReset, listSessions, revokeOtherSessions, deleteAccount, signOut } = useApp()
   const navigate = useNavigate()
 
-  const [pw, setPw] = useState({ current: '', next: '', confirm: '' })
+  const [pwOpen, setPwOpen] = useState(false)
   const [pwBusy, setPwBusy] = useState(false)
   const [pwError, setPwError] = useState('')
   const [pwNotice, setPwNotice] = useState('')
@@ -36,23 +36,15 @@ export default function SecuritySettings() {
     }
   }, [listSessions])
 
-  async function handlePassword(e) {
-    e.preventDefault()
+  async function handlePassword() {
     setPwError('')
     setPwNotice('')
-    if (pw.next.length < 8) {
-      setPwError('Use at least 8 characters.')
-      return
-    }
-    if (pw.next !== pw.confirm) {
-      setPwError("Those two passwords don't match.")
-      return
-    }
     setPwBusy(true)
     try {
-      await changePassword({ currentPassword: pw.current, newPassword: pw.next, revokeOtherSessions: true })
-      setPw({ current: '', next: '', confirm: '' })
-      setPwNotice('Password changed. Other devices have been signed out.')
+      await requestPasswordReset()
+      setPwNotice(
+        `If ${currentUser?.email} has a password sign-in, a single-use link is on its way. It expires shortly.`
+      )
     } catch (err) {
       setPwError(err.message)
     } finally {
@@ -109,57 +101,54 @@ export default function SecuritySettings() {
         </Row>
       </Section>
 
+      {/* Changing a password is rare and dangerous, so it is folded away rather
+          than sitting open on the page. An open form turns a borrowed session
+          into an account takeover: whoever is already signed in only has to
+          type a new password twice. Behind the fold there is no password field
+          at all — the change happens through a link sent to the address on the
+          account, so it takes the mailbox, not just the screen. */}
       <Section
         title="Password"
-        description="Only applies to email/password accounts — if you signed in with Google, manage it there instead."
+        description="Changed by email only. Applies to email/password accounts — if you signed in with Google, manage it there."
       >
-        <form onSubmit={handlePassword}>
-          <Field label="Current password">
-            {(id) => (
-              <input
-                id={id}
-                type="password"
-                className="settings-input"
-                autoComplete="current-password"
-                value={pw.current}
-                onChange={(e) => setPw((p) => ({ ...p, current: e.target.value }))}
-                required
-              />
-            )}
-          </Field>
-          <Field label="New password" hint="At least 8 characters.">
-            {(id) => (
-              <input
-                id={id}
-                type="password"
-                className="settings-input"
-                autoComplete="new-password"
-                value={pw.next}
-                onChange={(e) => setPw((p) => ({ ...p, next: e.target.value }))}
-                required
-              />
-            )}
-          </Field>
-          <Field label="Confirm new password">
-            {(id) => (
-              <input
-                id={id}
-                type="password"
-                className="settings-input"
-                autoComplete="new-password"
-                value={pw.confirm}
-                onChange={(e) => setPw((p) => ({ ...p, confirm: e.target.value }))}
-                required
-              />
-            )}
-          </Field>
-          <Feedback error={pwError} notice={pwNotice} />
-          <div className="settings-actions">
-            <button type="submit" className="settings-btn settings-btn-primary" disabled={pwBusy}>
-              {pwBusy ? 'Updating…' : 'Update password'}
-            </button>
+        <Row
+          title="Change your password"
+          description="We email a single-use link to the address on this account. Nothing changes until you follow it."
+        >
+          <button
+            type="button"
+            className="settings-btn"
+            aria-expanded={pwOpen}
+            onClick={() => {
+              setPwOpen((v) => !v)
+              setPwError('')
+              setPwNotice('')
+            }}
+          >
+            {pwOpen ? 'Cancel' : 'Change password'}
+          </button>
+        </Row>
+
+        {pwOpen && (
+          <div className="settings-reveal">
+            <p className="settings-row-desc">
+              A link goes to <strong>{currentUser?.email}</strong>. Following it lets you set a new
+              password and signs out every other device. If you don't recognise this request, ignore
+              the email and nothing happens.
+            </p>
+            <Feedback error={pwError} notice={pwNotice} />
+            <div className="settings-actions">
+              <button
+                type="button"
+                className="settings-btn settings-btn-primary"
+                onClick={handlePassword}
+                disabled={pwBusy}
+              >
+                {pwBusy ? 'Sending…' : 'Email me a reset link'}
+              </button>
+            </div>
           </div>
-        </form>
+        )}
       </Section>
 
       <Section title="Active sessions" description="Every device currently signed in to this account.">
