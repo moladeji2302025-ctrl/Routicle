@@ -17,7 +17,7 @@ function slugify(name) {
 const seen = new Map()
 FEED_ITEMS.forEach((item) => {
   if (!seen.has(item.creator)) {
-    const specialty = SPECIALTIES[item.department] || 'Creative'
+    const specialty = SPECIALTIES[item.category] || 'Creative'
     seen.set(item.creator, {
       id: slugify(item.creator),
       name: item.creator,

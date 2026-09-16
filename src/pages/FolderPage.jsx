@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { DEPARTMENTS, departmentLabel } from '../data/departments'
+import { CATEGORIES, categoryLabel } from '../data/categories'
 import { formatCount } from '../utils/format'
 import * as api from '../lib/api'
 import {
@@ -29,7 +29,7 @@ export default function FolderPage() {
   const [rows, setRows] = useState(null) // null = loading
   const [view, setView] = useState('grid')
   const [sort, setSort] = useState('added')
-  const [department, setDepartment] = useState('')
+  const [category, setCategory] = useState('')
   const [sortOpen, setSortOpen] = useState(false)
   const [picking, setPicking] = useState(false)
   const [error, setError] = useState('')
@@ -67,11 +67,11 @@ export default function FolderPage() {
   }, [rows, contentItems])
 
   const visible = useMemo(() => {
-    let list = department ? resolved.filter((i) => i.department === department) : resolved
+    let list = category ? resolved.filter((i) => i.category === category) : resolved
     if (sort === 'title') list = [...list].sort((a, b) => a.title.localeCompare(b.title))
     else if (sort === 'appreciated') list = [...list].sort((a, b) => b.appreciations - a.appreciations)
     return list
-  }, [resolved, department, sort])
+  }, [resolved, category, sort])
 
   const inFolder = useMemo(() => new Set(resolved.map((i) => String(i.id))), [resolved])
   const addable = useMemo(
@@ -82,7 +82,7 @@ export default function FolderPage() {
     [contentItems, inFolder]
   )
 
-  const departmentsPresent = DEPARTMENTS.filter((d) => resolved.some((i) => i.department === d.id))
+  const categoriesPresent = CATEGORIES.filter((d) => resolved.some((i) => i.category === d.id))
 
   if (!currentUser) {
     return (
@@ -192,21 +192,21 @@ export default function FolderPage() {
         </div>
       </header>
 
-      {departmentsPresent.length > 1 && (
+      {categoriesPresent.length > 1 && (
         <div className="explore-chip-row" style={{ padding: 0, margin: '18px 0 0' }}>
           <button
             type="button"
-            className={department === '' ? 'explore-chip explore-chip-active' : 'explore-chip'}
-            onClick={() => setDepartment('')}
+            className={category === '' ? 'explore-chip explore-chip-active' : 'explore-chip'}
+            onClick={() => setCategory('')}
           >
             All types
           </button>
-          {departmentsPresent.map((d) => (
+          {categoriesPresent.map((d) => (
             <button
               key={d.id}
               type="button"
-              className={department === d.id ? 'explore-chip explore-chip-active' : 'explore-chip'}
-              onClick={() => setDepartment(d.id)}
+              className={category === d.id ? 'explore-chip explore-chip-active' : 'explore-chip'}
+              onClick={() => setCategory(d.id)}
             >
               {d.label}
             </button>
@@ -261,7 +261,7 @@ export default function FolderPage() {
               <div className="folder-item-foot">
                 <Link to={`/design/${item.id}`} className="folder-item-title">{item.title}</Link>
                 <span className="folder-item-meta">
-                  {departmentLabel(item.department)} · added by {memberName(item.addedBy)}
+                  {categoryLabel(item.category)} · added by {memberName(item.addedBy)}
                 </span>
               </div>
               <button type="button" className="folder-item-remove" onClick={() => remove(item.id)}>
@@ -278,7 +278,7 @@ export default function FolderPage() {
               <div className="download-info">
                 <span className="download-title">{item.title}</span>
                 <span className="download-meta">
-                  {departmentLabel(item.department)} · {item.creator} · added by {memberName(item.addedBy)}
+                  {categoryLabel(item.category)} · {item.creator} · added by {memberName(item.addedBy)}
                 </span>
               </div>
               <span className="project-stat">

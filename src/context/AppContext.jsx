@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState, useCal
 import { FEED_ITEMS } from '../data/feedItems'
 import { TIERS } from '../data/pricing'
 import { DEFAULT_SETTINGS, mergeSettings } from '../data/settings'
-import { DEPARTMENTS } from '../data/departments'
+import { CATEGORIES } from '../data/categories'
 import * as api from '../lib/api'
 import { authClient } from '../lib/authClient'
 import { orgClient } from '../lib/orgClient'
@@ -14,7 +14,7 @@ const SETTINGS_KEY = 'routicle_settings_v1'
 const ACTIVE_TEAM_KEY = 'routicle_active_team_id'
 const RECENT_KEY = 'routicle_recently_viewed'
 const RECENT_LIMIT = 12
-const DEPARTMENT_IDS = DEPARTMENTS.map((d) => d.id)
+const CATEGORY_IDS = CATEGORIES.map((c) => c.id)
 
 function parseTeamMetadata(raw) {
   try {
@@ -251,7 +251,7 @@ export function AppProvider({ children }) {
             submittedAt: new Date(row.created_at).getTime(),
             status: row.moderation_status,
             title: row.title,
-            department: row.department,
+            category: row.category,
             fileTypes: row.file_types || [],
             behindTheDesign: row.behind_the_design || '',
             thumbnail: row.thumbnail_key,
@@ -721,12 +721,12 @@ export function AppProvider({ children }) {
        * Stores what the welcome flow collected and takes the account out of it.
        *
        * Two of these answers are real settings rather than survey data: the
-       * departments picked become the browsing filter, and the path decides
+       * categories picked become the browsing filter, and the path decides
        * whether the creator route is offered next.
        */
-      async completeOnboarding({ path, name, website, role, goals, departments, heard, tier }) {
-        const allDepartments = DEPARTMENT_IDS
-        const muted = allDepartments.filter((id) => !departments.includes(id))
+      async completeOnboarding({ path, name, website, role, goals, categories, heard, tier }) {
+        const allCategories = CATEGORY_IDS
+        const muted = allCategories.filter((id) => !categories.includes(id))
 
         updateUser((user) => ({
           ...user,
@@ -737,11 +737,11 @@ export function AppProvider({ children }) {
           needsOnboarding: false,
         }))
 
-        // Turning every department off would leave an empty library, so an
+        // Turning every category off would leave an empty library, so an
         // all-off answer is treated as no preference rather than a total mute.
         setSettings((prev) => ({
           ...prev,
-          browsing: { ...prev.browsing, mutedDepartments: muted.length === allDepartments.length ? [] : muted },
+          browsing: { ...prev.browsing, mutedCategories: muted.length === allCategories.length ? [] : muted },
         }))
 
         const user = stateRef.current.currentUser

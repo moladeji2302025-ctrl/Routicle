@@ -118,7 +118,7 @@ export default function DesignDetailPage() {
 
       <div className="detail-info">
         <div className="detail-tags-row">
-          <span className="tag tag-department">{item.department.replace('-', ' ')}</span>
+          <span className="tag tag-category">{item.category.replace('-', ' ')}</span>
           {item.free && <span className="tag tag-free">Free</span>}
           <span className="tag tag-tier">{TIERS[tier].label} tier</span>
         </div>
@@ -134,7 +134,7 @@ export default function DesignDetailPage() {
         </Link>
 
         <p className="detail-description">
-          A {TIERS[tier].label.toLowerCase()}-tier {item.department.replace('-', ' ')} piece
+          A {TIERS[tier].label.toLowerCase()}-tier {item.category.replace('-', ' ')} piece
           {item.fileTypes.length > 0 ? ` — includes ${item.fileTypes.join(', ')} source files.` : '.'}
         </p>
 

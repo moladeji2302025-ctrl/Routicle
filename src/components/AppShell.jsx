@@ -35,7 +35,7 @@ const NAV_GROUPS = [
     items: [
       { label: 'Home', to: '/', icon: HomeIcon, match: (p) => p === '/' },
       { label: 'Explore', to: '/explore', icon: SearchIcon },
-      { label: 'Departments', to: '/departments', icon: GridIcon },
+      { label: 'Categories', to: '/categories', icon: GridIcon },
       { label: 'Following', to: '/following', icon: UsersIcon },
     ],
   },

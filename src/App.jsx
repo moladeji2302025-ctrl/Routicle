@@ -5,7 +5,7 @@ import IntroReveal from './components/IntroReveal'
 import HomeRouter from './components/HomeRouter'
 import DesignDetailPage from './pages/DesignDetailPage'
 import ExplorePage from './pages/ExplorePage'
-import DepartmentsPage from './pages/DepartmentsPage'
+import CategoriesPage from './pages/CategoriesPage'
 import PricingPage from './pages/PricingPage'
 import SignUpPage from './pages/SignUpPage'
 import SignInPage from './pages/SignInPage'
@@ -70,7 +70,7 @@ export default function App() {
             <Route path="/" element={<HomeRouter />} />
             <Route path="/design/:id" element={<DesignDetailPage />} />
             <Route path="/explore" element={<ExplorePage />} />
-            <Route path="/departments" element={<DepartmentsPage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/signin" element={<SignInPage />} />

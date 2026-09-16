@@ -39,7 +39,7 @@ export const SETTINGS_GROUPS = [
     label: 'App',
     items: [
       { to: 'appearance', label: 'Appearance', icon: GridIcon, keywords: 'theme dark light density motion animation' },
-      { to: 'browsing', label: 'Browsing & content', icon: SearchIcon, keywords: 'feed explore sort departments ai filter landing' },
+      { to: 'browsing', label: 'Browsing & content', icon: SearchIcon, keywords: 'feed explore sort categories ai filter landing' },
       { to: 'studio', label: 'AI Studio', icon: SparkleIcon, keywords: 'credits image video generation history' },
     ],
   },

@@ -11,7 +11,7 @@ const EXPRESS_FORMATS = ['AEP', 'PPRO']
 export function requiredTier(item) {
   if (item.fileTypes?.some((f) => EXPRESS_FORMATS.includes(f))) return 'express'
   if (item.fileTypes?.length > 0) return 'standard'
-  if (item.department === 'ai-video') return 'express'
+  if (item.category === 'ai-video') return 'express'
   return 'standard'
 }
 

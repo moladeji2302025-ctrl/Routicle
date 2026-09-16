@@ -1,4 +1,4 @@
-export const DEPARTMENTS = [
+export const CATEGORIES = [
   { id: 'graphic-design', label: 'Graphic Design' },
   { id: 'motion-graphics', label: 'Motion Graphics' },
   { id: 'illustration', label: 'Illustration' },
@@ -6,4 +6,4 @@ export const DEPARTMENTS = [
   { id: 'ai-video', label: 'AI-Generated Video' },
 ]
 
-export const departmentLabel = (id) => DEPARTMENTS.find((d) => d.id === id)?.label ?? id
+export const categoryLabel = (id) => CATEGORIES.find((d) => d.id === id)?.label ?? id

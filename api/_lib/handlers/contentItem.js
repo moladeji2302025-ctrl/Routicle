@@ -14,7 +14,7 @@ function toFeedShape(row) {
     // harvestable, and the second names the paywalled objects directly. Only
     // the file labels go out, which fileTypes already implies.
     sourceFiles: (row.source_object_keys || []).map((f) => ({ label: f.label })),
-    department: row.department,
+    category: row.department,
     appreciations: row.appreciation_count,
     views: row.download_count,
     fileTypes: row.file_types || [],

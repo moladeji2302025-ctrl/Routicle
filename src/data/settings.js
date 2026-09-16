@@ -15,7 +15,7 @@ export const DEFAULT_SETTINGS = {
     landing: 'home', // where signed-in users land on '/'
     defaultSort: 'recommended', // Explore's starting sort
     hideAiContent: false,
-    mutedDepartments: [], // department ids kept out of feeds
+    mutedCategories: [], // category ids kept out of feeds
   },
   studio: {
     defaultVideoSeconds: 5,
@@ -57,21 +57,21 @@ export const LANDING_PAGES = [
   { id: 'collections', label: 'Collections', to: '/collections' },
 ]
 
-export const AI_DEPARTMENTS = ['ai-images', 'ai-video']
+export const AI_CATEGORIES = ['ai-images', 'ai-video']
 
 /**
  * Applies the viewer's browsing preferences to a content list. Used everywhere
- * a feed is built (Explore, dashboard rails, department counts) so a muted
- * department is genuinely absent rather than hidden in one place and not another.
+ * a feed is built (Explore, dashboard rails, category counts) so a muted
+ * category is genuinely absent rather than hidden in one place and not another.
  */
 export function applyBrowsingFilters(items, browsing) {
   if (!browsing) return items
-  const muted = browsing.mutedDepartments || []
+  const muted = browsing.mutedCategories || []
   if (muted.length === 0 && !browsing.hideAiContent) return items
   const mutedSet = new Set(muted)
   return items.filter((item) => {
-    if (mutedSet.has(item.department)) return false
-    if (browsing.hideAiContent && AI_DEPARTMENTS.includes(item.department)) return false
+    if (mutedSet.has(item.category)) return false
+    if (browsing.hideAiContent && AI_CATEGORIES.includes(item.category)) return false
     return true
   })
 }

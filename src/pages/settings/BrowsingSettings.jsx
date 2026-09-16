@@ -1,5 +1,5 @@
 import { useApp } from '../../context/AppContext'
-import { DEPARTMENTS } from '../../data/departments'
+import { CATEGORIES } from '../../data/categories'
 import { LANDING_PAGES } from '../../data/settings'
 import { Section, Row, Toggle, Segmented, Chips } from '../../components/settings/SettingsControls'
 
@@ -9,7 +9,7 @@ const SORTS = [
   { id: 'appreciated', label: 'Most appreciated' },
 ]
 
-const AI_DEPARTMENTS = ['ai-images', 'ai-video']
+const AI_CATEGORIES = ['ai-images', 'ai-video']
 
 export default function BrowsingSettings() {
   const { settings, updateSettings, resetSettings, contentItems } = useApp()
@@ -17,15 +17,15 @@ export default function BrowsingSettings() {
 
   const hiddenCount = contentItems.filter(
     (item) =>
-      b.mutedDepartments.includes(item.department) ||
-      (b.hideAiContent && AI_DEPARTMENTS.includes(item.department))
+      b.mutedCategories.includes(item.category) ||
+      (b.hideAiContent && AI_CATEGORIES.includes(item.category))
   ).length
 
-  function toggleDepartment(id) {
-    const next = b.mutedDepartments.includes(id)
-      ? b.mutedDepartments.filter((d) => d !== id)
-      : [...b.mutedDepartments, id]
-    updateSettings('browsing', { mutedDepartments: next })
+  function toggleCategory(id) {
+    const next = b.mutedCategories.includes(id)
+      ? b.mutedCategories.filter((d) => d !== id)
+      : [...b.mutedCategories, id]
+    updateSettings('browsing', { mutedCategories: next })
   }
 
   return (
@@ -61,7 +61,7 @@ export default function BrowsingSettings() {
       >
         <Row
           title="Hide AI-generated work"
-          description="Keeps AI image and video departments out of every feed."
+          description="Keeps AI image and video categories out of every feed."
         >
           <Toggle
             label="Hide AI-generated work"
@@ -70,11 +70,11 @@ export default function BrowsingSettings() {
           />
         </Row>
         <Row
-          title="Muted departments"
-          description="Tap a department to keep it out of your feeds. Direct links still work."
+          title="Muted categories"
+          description="Tap a category to keep it out of your feeds. Direct links still work."
           stacked
         >
-          <Chips options={DEPARTMENTS} selected={b.mutedDepartments} onToggle={toggleDepartment} />
+          <Chips options={CATEGORIES} selected={b.mutedCategories} onToggle={toggleCategory} />
         </Row>
       </Section>
     </>

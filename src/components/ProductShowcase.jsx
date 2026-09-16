@@ -9,20 +9,20 @@ const FEATURES = [
     label: 'Graphic Design',
     icon: ImageIcon,
     desc: 'Templates, decks, and social graphics — ready to open in Canva, Illustrator, or Photoshop.',
-    to: '/explore?department=graphic-design',
+    to: '/explore?category=graphic-design',
     active: true,
   },
   {
     id: 'motion-graphics',
     label: 'Motion Graphics',
     icon: VideoIcon,
-    to: '/explore?department=motion-graphics',
+    to: '/explore?category=motion-graphics',
   },
   {
     id: 'illustration',
     label: 'Illustration',
     icon: PenIcon,
-    to: '/explore?department=illustration',
+    to: '/explore?category=illustration',
   },
   {
     id: 'ai-generation',

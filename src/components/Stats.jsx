@@ -1,7 +1,7 @@
 import Reveal from './Reveal'
 
 const STATS = [
-  { number: '5', label: 'Departments' },
+  { number: '5', label: 'Categories' },
   { number: '500+', label: 'Launch files' },
   { number: '25', label: 'Founding creators' },
   { number: '50%', label: 'Creator share' },

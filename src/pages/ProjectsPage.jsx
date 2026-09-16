@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { departmentLabel } from '../data/departments'
+import { categoryLabel } from '../data/categories'
 import { formatCount } from '../utils/format'
 import { HeartIcon, EyeIcon, UploadIcon } from '../components/icons'
 
@@ -101,7 +101,7 @@ export default function ProjectsPage() {
               <div className="download-info">
                 <span className="download-title">{s.title}</span>
                 <span className="download-meta">
-                  {departmentLabel(s.department)}
+                  {categoryLabel(s.category)}
                   {s.fileTypes.length > 0 ? ` · ${s.fileTypes.join(', ')}` : ''}
                 </span>
               </div>
@@ -125,7 +125,7 @@ export default function ProjectsPage() {
                 <div className="download-info">
                   <span className="download-title">{item.title}</span>
                   <span className="download-meta">
-                    {departmentLabel(item.department)}
+                    {categoryLabel(item.category)}
                     {item.free ? ' · Free' : ''}
                   </span>
                 </div>

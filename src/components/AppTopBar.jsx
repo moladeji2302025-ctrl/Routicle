@@ -11,7 +11,7 @@ const SEEN_KEY = 'routicle_updates_seen'
 const LABELS = {
   '': 'Home',
   explore: 'Explore',
-  departments: 'Departments',
+  categories: 'Categories',
   following: 'Following',
   collections: 'Collections',
   downloads: 'Downloads',

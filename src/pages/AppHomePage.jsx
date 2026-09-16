@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { DEPARTMENTS, departmentLabel } from '../data/departments'
+import { CATEGORIES, categoryLabel } from '../data/categories'
 import { CREATORS, getCreatorByName } from '../data/creators'
 import { applyBrowsingFilters } from '../data/settings'
 import { TIERS } from '../data/pricing'
@@ -95,15 +95,15 @@ export default function AppHomePage() {
     [contentItems, settings.browsing]
   )
 
-  /* ---- Command bar: real matches across designs, creators and departments ---- */
+  /* ---- Command bar: real matches across designs, creators and categories ---- */
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return []
     const out = []
 
-    DEPARTMENTS.filter((d) => d.label.toLowerCase().includes(q))
+    CATEGORIES.filter((d) => d.label.toLowerCase().includes(q))
       .slice(0, 2)
-      .forEach((d) => out.push({ kind: 'Department', label: d.label, to: `/explore?department=${d.id}` }))
+      .forEach((d) => out.push({ kind: 'Category', label: d.label, to: `/explore?category=${d.id}` }))
 
     CREATORS.filter((c) => c.name.toLowerCase().includes(q))
       .slice(0, 3)
@@ -192,12 +192,12 @@ export default function AppHomePage() {
 
   const freshItems = useMemo(() => approved.slice(0, 10), [approved])
 
-  const departmentCounts = useMemo(
+  const categoryCounts = useMemo(
     () =>
-      DEPARTMENTS.map((d) => ({
+      CATEGORIES.map((d) => ({
         ...d,
-        count: approved.filter((i) => i.department === d.id).length,
-        cover: approved.find((i) => i.department === d.id)?.image,
+        count: approved.filter((i) => i.category === d.id).length,
+        cover: approved.find((i) => i.category === d.id)?.image,
       })),
     [approved]
   )
@@ -218,7 +218,7 @@ export default function AppHomePage() {
 
   const tools = [
     { label: 'Explore', to: '/explore', icon: GridIcon },
-    { label: 'Departments', to: '/departments', icon: FolderIcon },
+    { label: 'Categories', to: '/categories', icon: FolderIcon },
     { label: 'AI Image', to: '/studio/image', icon: ImageIcon },
     { label: 'AI Video', to: '/studio/video', icon: VideoIcon },
     { label: 'Collections', to: '/collections', icon: HeartIcon },
@@ -248,7 +248,7 @@ export default function AppHomePage() {
         <input
           ref={searchRef}
           type="text"
-          placeholder="Search designs, creators or departments…"
+          placeholder="Search designs, creators or categories…"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value)
@@ -415,12 +415,12 @@ export default function AppHomePage() {
 
       <section className="app-section app-section-wide">
         <div className="app-section-head">
-          <h2>Browse by department</h2>
-          <Link to="/departments">See all <ChevronRightIcon size={13} color="currentColor" /></Link>
+          <h2>Browse by category</h2>
+          <Link to="/categories">See all <ChevronRightIcon size={13} color="currentColor" /></Link>
         </div>
         <div className="app-dept-grid">
-          {departmentCounts.map((d) => (
-            <Link key={d.id} to={`/explore?department=${d.id}`} className="app-dept-card">
+          {categoryCounts.map((d) => (
+            <Link key={d.id} to={`/explore?category=${d.id}`} className="app-dept-card">
               {d.cover && <img src={d.cover} alt="" />}
               <span className="app-dept-name">{d.label}</span>
               <span className="app-dept-count">{d.count} item{d.count === 1 ? '' : 's'}</span>

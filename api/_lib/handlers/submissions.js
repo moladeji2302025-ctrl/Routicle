@@ -33,8 +33,8 @@ export default async function handler(req, res) {
 
     const {
       title,
-      department,
-      subDepartment,
+      category,
+      subCategory,
       fileTypes,
       description,
       behindTheDesign,
@@ -44,8 +44,8 @@ export default async function handler(req, res) {
       sourceObjectKeys,
     } = req.body || {}
 
-    if (!title || !department || !thumbnailKey) {
-      return send(res, 400, { error: 'title, department, and thumbnailKey are required' })
+    if (!title || !category || !thumbnailKey) {
+      return send(res, 400, { error: 'title, category, and thumbnailKey are required' })
     }
 
     // Attributed to the session's own creator record, so a submission cannot be
@@ -71,7 +71,7 @@ export default async function handler(req, res) {
         behind_the_design, is_ai_generated, thumbnail_key, preview_video_key, source_object_keys,
         total_bytes
       ) VALUES (
-        ${creatorId}, ${title}, ${department}, ${subDepartment || null}, ${fileTypes || []}, ${description || null},
+        ${creatorId}, ${title}, ${category}, ${subCategory || null}, ${fileTypes || []}, ${description || null},
         ${behindTheDesign || null}, ${Boolean(isAiGenerated)}, ${thumbnailKey}, ${previewVideoKey || null}, ${JSON.stringify(sources)},
         ${totalBytes}
       )

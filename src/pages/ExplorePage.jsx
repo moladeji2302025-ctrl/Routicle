@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { DEPARTMENTS } from '../data/departments'
+import { CATEGORIES } from '../data/categories'
 import { applyBrowsingFilters } from '../data/settings'
 import { getCreatorByName } from '../data/creators'
 import FeedGrid from '../components/FeedGrid'
@@ -16,7 +16,7 @@ const SORTS = [
 export default function ExplorePage() {
   const { contentItems, currentUser, settings } = useApp()
   const [searchParams] = useSearchParams()
-  const [department, setDepartment] = useState(searchParams.get('department') || null)
+  const [category, setCategory] = useState(searchParams.get('category') || null)
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [peopleOnly, setPeopleOnly] = useState(false)
   const [fileType, setFileType] = useState(searchParams.get('fileType') || null)
@@ -25,7 +25,7 @@ export default function ExplorePage() {
   const [filterOpen, setFilterOpen] = useState(false)
   const [sortOpen, setSortOpen] = useState(false)
 
-  // Muted departments / "hide AI work" are applied before anything on this page's
+  // Muted categories / "hide AI work" are applied before anything on this page's
   // own toolbar, so the counts and facets below only ever describe visible work.
   const visibleItems = useMemo(
     () => applyBrowsingFilters(contentItems, settings.browsing),
@@ -41,9 +41,9 @@ export default function ExplorePage() {
   const results = useMemo(() => {
     let list = visibleItems.filter((item) => {
       if (item.moderationStatus !== 'approved') return false
-      if (department && item.department !== department) return false
+      if (category && item.category !== category) return false
       if (fileType && !item.fileTypes.includes(fileType)) return false
-      if (peopleOnly && item.department !== 'ai-images') return false
+      if (peopleOnly && item.category !== 'ai-images') return false
       if (followingOnly) {
         const creatorId = getCreatorByName(item.creator)?.id
         if (!creatorId || !currentUser?.followingCreatorIds?.includes(creatorId)) return false
@@ -59,12 +59,12 @@ export default function ExplorePage() {
     else if (sort === 'recent') list = [...list].sort((a, b) => b.id - a.id)
 
     return list
-  }, [visibleItems, department, fileType, peopleOnly, followingOnly, currentUser, query, sort])
+  }, [visibleItems, category, fileType, peopleOnly, followingOnly, currentUser, query, sort])
 
-  // A muted department shouldn't offer a chip that filters down to nothing.
+  // A muted category shouldn't offer a chip that filters down to nothing.
   const chips = [
     { id: null, label: 'All' },
-    ...DEPARTMENTS.filter((d) => visibleItems.some((item) => item.department === d.id)),
+    ...CATEGORIES.filter((d) => visibleItems.some((item) => item.category === d.id)),
   ]
 
   return (
@@ -116,8 +116,8 @@ export default function ExplorePage() {
           <button
             key={chip.id ?? 'all'}
             type="button"
-            className={department === chip.id ? 'explore-chip explore-chip-active' : 'explore-chip'}
-            onClick={() => setDepartment(chip.id)}
+            className={category === chip.id ? 'explore-chip explore-chip-active' : 'explore-chip'}
+            onClick={() => setCategory(chip.id)}
           >
             {chip.label}
           </button>

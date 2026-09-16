@@ -49,8 +49,8 @@ export function upsertCreator(data) {
   return request('/creator/profile', { method: 'POST', body: JSON.stringify(data) })
 }
 
-export function fetchApprovedContent(department) {
-  const query = department ? `?department=${encodeURIComponent(department)}` : ''
+export function fetchApprovedContent(category) {
+  const query = category ? `?category=${encodeURIComponent(category)}` : ''
   return request(`/content${query}`)
 }
 
@@ -79,8 +79,8 @@ async function presignUpload({ file, kind }) {
 export async function submitRealUpload({
   creatorEmail,
   title,
-  department,
-  subDepartment,
+  category,
+  subCategory,
   description,
   behindTheDesign,
   isAiGenerated,
@@ -107,8 +107,8 @@ export async function submitRealUpload({
     body: JSON.stringify({
       creatorEmail,
       title,
-      department,
-      subDepartment,
+      category,
+      subCategory,
       fileTypes: sourceFiles.map((f) => f.label),
       description,
       behindTheDesign,

@@ -3,7 +3,7 @@ import { SearchIcon } from './icons'
 
 const LINKS = [
   { label: 'Explore', to: '/explore' },
-  { label: 'Departments', to: '/explore' },
+  { label: 'Categories', to: '/explore' },
   { label: 'Pricing', to: '/pricing' },
   { label: 'AI Studio', to: '/studio/image' },
   { label: 'Become a Creator', to: '/become-creator' },

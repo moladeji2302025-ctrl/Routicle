@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useApp } from '../context/AppContext'
-import { DEPARTMENTS, departmentLabel } from '../data/departments'
+import { CATEGORIES, categoryLabel } from '../data/categories'
 import { useTimeline, easeOutCubic } from '../hooks/useTimeline'
 import PinnedSection, { reveal } from './PinnedSection'
 
@@ -34,11 +34,11 @@ export default function PlatformStats() {
   const breakdown = useMemo(() => {
     const approved = contentItems.filter((item) => item.moderationStatus === 'approved')
     const total = approved.length || 1
-    return DEPARTMENTS.map((dept) => ({
+    return CATEGORIES.map((dept) => ({
       id: dept.id,
       label: dept.label,
-      count: approved.filter((item) => item.department === dept.id).length,
-      pct: approved.filter((item) => item.department === dept.id).length / total,
+      count: approved.filter((item) => item.category === dept.id).length,
+      pct: approved.filter((item) => item.category === dept.id).length / total,
     })).filter((d) => d.count > 0)
   }, [contentItems])
 
@@ -73,7 +73,7 @@ function StatsBody({ shown, still, breakdown }) {
         <div>
           <h2 className="deck-heading">Library Mix</h2>
           <div className="deck-accent" aria-hidden="true" />
-          <p className="stats-deck-intro">Approved uploads across the library, by department.</p>
+          <p className="stats-deck-intro">Approved uploads across the library, by category.</p>
         </div>
 
         <div {...reveal(shown, 0, 'donut-wrap')}>
@@ -105,7 +105,7 @@ function StatsBody({ shown, still, breakdown }) {
             {breakdown.map((d, i) => (
               <div key={d.id} className="donut-legend-row">
                 <span className="donut-legend-dot" style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }} />
-                {departmentLabel(d.id)}
+                {categoryLabel(d.id)}
                 <span className="donut-legend-pct">{Math.round(d.pct * 100 * sweep)}%</span>
               </div>
             ))}

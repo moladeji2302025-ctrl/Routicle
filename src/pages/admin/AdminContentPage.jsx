@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import * as api from '../../lib/api'
-import { departmentLabel } from '../../data/departments'
+import { categoryLabel } from '../../data/categories'
 
 const STATUSES = [
   { id: '', label: 'All' },
@@ -88,7 +88,7 @@ export default function AdminContentPage() {
               <div className="download-info">
                 <span className="download-title">{item.title}</span>
                 <span className="download-meta">
-                  {item.creatorName} · {departmentLabel(item.department)}
+                  {item.creatorName} · {categoryLabel(item.category)}
                   {item.fileTypes.length > 0 ? ` · ${item.fileTypes.join(', ')}` : ''} ·{' '}
                   {item.downloads} downloads
                 </span>

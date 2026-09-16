@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { DEPARTMENTS } from '../data/departments'
+import { CATEGORIES } from '../data/categories'
 import { TIERS } from '../data/pricing'
 import {
   SearchIcon,
@@ -83,7 +83,7 @@ export default function OnboardingPage() {
     heard: '',
     role: '',
     goals: [],
-    departments: DEPARTMENTS.map((d) => d.id),
+    categories: CATEGORIES.map((d) => d.id),
     tier: '',
   })
 
@@ -112,7 +112,7 @@ export default function OnboardingPage() {
       { id: 'role', title: 'Which describes you best?', sub: 'Pick the closest one.', ready: true },
       { id: 'goals', title: 'What do you want to do here?', sub: 'Select all that apply.', ready: true },
       {
-        id: 'departments',
+        id: 'categories',
         title: 'What should we show you?',
         sub: 'Anything you switch off stays out of your feeds. Change it any time in Settings.',
         ready: true,
@@ -300,17 +300,17 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {current.id === 'departments' && (
+          {current.id === 'categories' && (
             <div className="onb-grid onb-grid-3">
-              {DEPARTMENTS.map((d, i) => {
-                const on = form.departments.includes(d.id)
+              {CATEGORIES.map((d, i) => {
+                const on = form.categories.includes(d.id)
                 return (
                   <button
                     key={d.id}
                     type="button"
                     className={`onb-card onb-card-wide onb-item${on ? ' onb-card-on' : ''}`}
                     style={{ '--i': i + 2 }}
-                    onClick={() => toggle('departments', d.id)}
+                    onClick={() => toggle('categories', d.id)}
                     aria-pressed={on}
                   >
                     <span className="onb-check" aria-hidden="true" />

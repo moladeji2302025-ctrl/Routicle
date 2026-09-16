@@ -25,7 +25,7 @@ export default function Capabilities() {
         <Reveal className="bento-card bento-wide" delay={0}>
           <h3 className="bento-title">Every upload has a name behind it</h3>
           <p className="bento-desc">
-            Not anonymous stock. Every file carries its creator's story — browse by department, or
+            Not anonymous stock. Every file carries its creator's story — browse by category, or
             follow the people making it.
           </p>
 
@@ -42,7 +42,7 @@ export default function Capabilities() {
         </Reveal>
 
         <Reveal className="bento-card bento-maroon" delay={90}>
-          <h3 className="bento-title">One library, every department</h3>
+          <h3 className="bento-title">One library, every category</h3>
           <p className="bento-desc">
             Graphic design, motion, illustration, and AI-generated work — organized, not scattered
             across folders.

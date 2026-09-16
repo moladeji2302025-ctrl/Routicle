@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { DEPARTMENTS } from '../data/departments'
+import { CATEGORIES } from '../data/categories'
 import { TIERS } from '../data/pricing'
 
 const FORMATS = ['PSD', 'AI', 'Canva', 'AEP', 'PPRO', 'Figma']
@@ -15,7 +15,7 @@ export default function CreatorUploadPage() {
   const [sourceFiles, setSourceFiles] = useState({}) // { format: File }
   const [thumbnailFile, setThumbnailFile] = useState(null)
   const [previewVideoFile, setPreviewVideoFile] = useState(null)
-  const [department, setDepartment] = useState(DEPARTMENTS[0].id)
+  const [category, setCategory] = useState(CATEGORIES[0].id)
   const [tags, setTags] = useState('')
   const [description, setDescription] = useState('')
   const [behindTheDesign, setBehindTheDesign] = useState('')
@@ -59,7 +59,7 @@ export default function CreatorUploadPage() {
     try {
       await submitUpload({
         title: tags.split(',')[0]?.trim() || 'Untitled upload',
-        department,
+        category,
         description,
         behindTheDesign,
         isAiGenerated: false,
@@ -148,11 +148,11 @@ export default function CreatorUploadPage() {
         </div>
 
         <div className="upload-section">
-          <h3>3. Department &amp; details</h3>
+          <h3>3. Category &amp; details</h3>
           <label className="auth-field">
-            Department
-            <select value={department} onChange={(e) => setDepartment(e.target.value)}>
-              {DEPARTMENTS.map((d) => (
+            Category
+            <select value={category} onChange={(e) => setCategory(e.target.value)}>
+              {CATEGORIES.map((d) => (
                 <option key={d.id} value={d.id}>{d.label}</option>
               ))}
             </select>

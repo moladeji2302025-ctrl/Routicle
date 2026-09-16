@@ -24,7 +24,7 @@ const GROUPS = [
     title: 'Getting started',
     items: [
       { to: '/help', label: 'Help centre', desc: 'Answers to the questions people actually ask.', icon: HelpIcon, more: { blurb: "Search by keyword, or browse by the part of the app you're stuck in.", points: ["Downloads and file formats", "Billing and cancellations", "Why a submission was rejected"] } },
-      { to: '/departments', label: 'The five departments', desc: 'How the library is organised and what belongs where.', icon: FolderIcon, more: { blurb: "Five departments, each with its own sub-departments. Where a piece sits decides who finds it.", points: ["Graphic Design \u00b7 Motion \u00b7 Illustration", "AI-Generated Images and Video", "Sub-departments narrow it further"] } },
+      { to: '/categories', label: 'The five categories', desc: 'How the library is organised and what belongs where.', icon: FolderIcon, more: { blurb: "Five categories, each with its own sub-categories. Where a piece sits decides who finds it.", points: ["Graphic Design \u00b7 Motion \u00b7 Illustration", "AI-Generated Images and Video", "Sub-categories narrow it further"] } },
       { to: '/pricing', label: 'Plans & what each unlocks', desc: 'Free, Standard and Express side by side.', icon: CardIcon, more: { blurb: "Browsing is free forever. A plan is what unlocks the editable files and the Studios.", points: ["Standard \u2014 PSD, AI and Canva files", "Express \u2014 adds After Effects and Premiere", "Annual billing saves 25%"] } },
     ],
   },
@@ -32,7 +32,7 @@ const GROUPS = [
     title: 'For creators',
     items: [
       { to: '/become-creator', label: 'Become a Creator', desc: 'Upload guidelines, the payout split, and the rights you keep.', icon: UploadIcon, hideWhenCreator: true, more: { blurb: "You keep the copyright. Routicle only gets a non-exclusive licence to distribute the files.", points: ["Half of subscription revenue is pooled", "Paid out monthly, pro rata by downloads", "Upload work you already finished"] } },
-      { to: '/upload', label: 'Upload work', desc: 'Submit a finished piece with its real source files.', icon: UploadIcon, creatorOnly: true, more: { blurb: "A submission needs the real working file, not just an export.", points: ["Thumbnail plus an optional MP4 preview", "Department and sub-department", "An optional Behind the Design note"] } },
+      { to: '/upload', label: 'Upload work', desc: 'Submit a finished piece with its real source files.', icon: UploadIcon, creatorOnly: true, more: { blurb: "A submission needs the real working file, not just an export.", points: ["Thumbnail plus an optional MP4 preview", "Category and sub-category", "An optional Behind the Design note"] } },
       { to: '/projects', label: 'Your projects', desc: 'What you have live, and what is still in review.', icon: PenIcon, creatorOnly: true, more: { blurb: "Everything you've submitted, in one list, with its current moderation state.", points: ["Live, in review, or needs changes", "Per-piece download counts", "Edit and resubmit in place"] } },
       { to: '/dashboard', label: 'Earnings & referrals', desc: 'Your share of the monthly pool, and your referral link.', icon: ChartIcon, creatorOnly: true, more: { blurb: "Your own numbers only \u2014 never platform-wide totals.", points: ["This month's share of the pool", "All-time earnings and payout history", "Your referral link and its count"] } },
     ],

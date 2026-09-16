@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { departmentLabel } from '../data/departments'
+import { categoryLabel } from '../data/categories'
 
 export default function AdminModerationPage() {
   const { currentUser, pendingSubmissions, contentItems, moderateSubmission, markItemFree } = useApp()
@@ -31,7 +31,7 @@ export default function AdminModerationPage() {
             <div>
               <div className="dashboard-piece-title">{submission.title}</div>
               <div className="dashboard-piece-meta">
-                {submission.creatorName} · {departmentLabel(submission.department)} · {(submission.fileTypes || []).join(', ') || 'AI-generated'}
+                {submission.creatorName} · {categoryLabel(submission.category)} · {(submission.fileTypes || []).join(', ') || 'AI-generated'}
               </div>
             </div>
             <div className="admin-actions">

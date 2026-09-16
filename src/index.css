@@ -1979,7 +1979,7 @@ a:hover {
   margin-bottom: 16px;
 }
 
-.tag-department {
+.tag-category {
   background: oklch(0.94 0.003 90);
   color: oklch(0.3 0.006 90);
   text-transform: capitalize;
@@ -2115,7 +2115,7 @@ a:hover {
 
 /* Explore page — Behance-style toolbar (filter button, search, sort) +
    a horizontal-scrolling chip row instead of a vertical facet sidebar.
-   Theme-aware; deliberately different from the Departments page. */
+   Theme-aware; deliberately different from the Categories page. */
 
 .explore-page {
   width: 100%;
@@ -3527,7 +3527,7 @@ a:hover {
 .app-shell {
   /* Re-scope the shared site-wide tokens to the app-shell's own
      (dark-capable) ones for everything rendered inside it — so pages
-     like Explore/Departments, which are shared between the signed-out
+     like Explore/Categories, which are shared between the signed-out
      marketing chrome and the signed-in app, pick up real dark mode here
      without needing their own per-page theme logic. Outside the shell
      (signed-out), --surface/--text stay forced-light at :root. */
@@ -5485,10 +5485,10 @@ a:hover {
   }
 }
 
-/* Departments page — distinct from Explore: a simple browsable card grid,
+/* Categories page — distinct from Explore: a simple browsable card grid,
    theme-aware via --surface/--text (no vertical filter sidebar, no masonry). */
 
-.departments-page {
+.categories-page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 64px 40px 120px;
@@ -5496,25 +5496,25 @@ a:hover {
   color: var(--text);
 }
 
-.departments-head {
+.categories-head {
   max-width: 640px;
   margin-bottom: 56px;
 }
 
-.departments-intro {
+.categories-intro {
   margin: 18px 0 0;
   font-size: 15px;
   line-height: 1.6;
   color: var(--text-muted);
 }
 
-.departments-grid {
+.categories-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
-.department-card {
+.category-card {
   display: block;
   border-radius: 14px;
   overflow: hidden;
@@ -5523,43 +5523,43 @@ a:hover {
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
-.department-card:hover {
+.category-card:hover {
   border-color: var(--brand-purple);
   transform: translateY(-2px);
 }
 
-.department-card-media {
+.category-card-media {
   aspect-ratio: 4 / 3;
   background: var(--surface);
   overflow: hidden;
 }
 
-.department-card-media img {
+.category-card-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.department-card-body {
+.category-card-body {
   padding: 20px;
 }
 
-.department-card-label {
+.category-card-label {
   margin: 0;
   font-size: 17px;
   font-weight: 600;
   color: var(--text);
 }
 
-.department-card-desc {
+.category-card-desc {
   margin: 8px 0 14px;
   font-size: 13.5px;
   line-height: 1.55;
   color: var(--text-muted);
 }
 
-.department-card-count {
+.category-card-count {
   display: inline-block;
   font-size: 12px;
   font-weight: 600;
@@ -5569,17 +5569,17 @@ a:hover {
 }
 
 @media (max-width: 900px) {
-  .departments-grid {
+  .categories-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 600px) {
-  .departments-page {
+  .categories-page {
     padding: 48px 24px 88px;
   }
 
-  .departments-grid {
+  .categories-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -6038,7 +6038,7 @@ a:hover {
   transform: scale(1.04);
 }
 
-/* Departments */
+/* Categories */
 
 .app-dept-grid {
   display: grid;
@@ -6766,7 +6766,7 @@ a:hover {
   color: var(--app-text);
 }
 
-/* Muted, not selected â€” an active chip here means this department is switched off. */
+/* Muted, not selected â€” an active chip here means this category is switched off. */
 .settings-chip-active {
   background: color-mix(in srgb, #e5484d 14%, transparent);
   border-color: color-mix(in srgb, #e5484d 40%, transparent);
@@ -10851,7 +10851,7 @@ html {
   margin: 0;
 }
 
-/* The department strip spans the full width between the two bands, so the page
+/* The category strip spans the full width between the two bands, so the page
    alternates rather than settling into one rhythm. */
 .app-section-wide {
   margin-bottom: 44px;

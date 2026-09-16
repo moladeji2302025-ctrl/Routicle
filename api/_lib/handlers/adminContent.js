@@ -38,7 +38,7 @@ export default async function handler(req, res) {
         items: rows.map((r) => ({
           id: r.id,
           title: r.title,
-          department: r.department,
+          category: r.department,
           fileTypes: r.file_types || [],
           isFree: r.is_free,
           moderationStatus: r.moderation_status,

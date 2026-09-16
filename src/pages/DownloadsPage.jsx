@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { departmentLabel } from '../data/departments'
+import { categoryLabel } from '../data/categories'
 import { fetchDownloads } from '../lib/api'
 import { FolderIcon } from '../components/icons'
 
@@ -81,7 +81,7 @@ export default function DownloadsPage() {
                 <div className="download-info">
                   <span className="download-title">{item?.title || row.title}</span>
                   <span className="download-meta">
-                    {departmentLabel(item?.department || row.department)}
+                    {categoryLabel(item?.category || row.category)}
                     {activeTeam ? ` · ${row.user_email}` : ''}
                   </span>
                 </div>
