@@ -148,6 +148,16 @@ select {
   font-family: inherit;
 }
 
+/* Browsers give every <button> a 2px grey outset border by default. Several
+   button styles here were written for links, which have no such border, and
+   put on a <button> they wore that grey ring around their fill — the outlined
+   violet "See pricing" and "Upgrade to Express" among them. Zeroed at element
+   specificity, so any class that sets a border still wins; inputs and selects
+   are left alone because they need theirs. */
+button {
+  border: 0;
+}
+
 html,
 body,
 #root {
