@@ -11860,3 +11860,219 @@ html {
     cursor: auto;
   }
 }
+
+
+/* ====================================================== the font picker === */
+
+.fp {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.fp-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-muted);
+}
+
+.fp-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-bg);
+  font: inherit;
+  color: var(--app-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.fp-trigger:hover {
+  border-color: var(--brand-purple);
+}
+
+.fp-trigger-name {
+  font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fp-panel {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-card-bg);
+  box-shadow: 0 22px 52px -16px rgb(0 0 0 / 0.5);
+  overflow: hidden;
+}
+
+.fp-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--app-border);
+  color: var(--app-text-muted);
+}
+
+.fp-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--app-text);
+}
+
+.fp-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.fp-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.fp-cat {
+  padding: 5px 11px;
+  border: none;
+  border-radius: 999px;
+  background: var(--app-hover);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.fp-cat:hover {
+  color: var(--app-text);
+}
+
+.fp-cat-on {
+  background: var(--brand-violet);
+  color: #fff;
+}
+
+/* Capped and scrollable: the list is nearly two thousand rows, and only the
+   slice in view is ever in the DOM. */
+.fp-list {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.fp-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 11px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.fp-row:hover {
+  background: var(--app-hover);
+}
+
+.fp-row-on {
+  background: color-mix(in oklab, var(--brand-violet) 16%, transparent);
+}
+
+/* Each row previews itself in its own face — the point of the list. */
+.fp-row-name {
+  font-size: 17px;
+  color: var(--app-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fp-row-meta {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.fp-more,
+.fp-empty,
+.fp-foot {
+  padding: 12px;
+  font-size: 12.5px;
+  text-align: center;
+  color: var(--app-text-muted);
+}
+
+.fp-local {
+  padding: 11px;
+  border: none;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-bg);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-text);
+  cursor: pointer;
+}
+
+.fp-local:hover {
+  background: var(--app-hover);
+}
+
+/* ============================================= dashboard entrance motion ===
+
+   Every block on the dashboard arrives on its own beat. The delay is set
+   inline per element rather than with :nth-child, because the blocks are
+   conditional — a creator sees panels a browsing account does not — and
+   nth-child would count the ones that rendered, making the rhythm depend on
+   who you are. */
+
+.app-rise {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: app-rise-in 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes app-rise-in {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-rise {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

@@ -10,11 +10,26 @@
 const esc = (s) =>
   String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 
-const FONT_STACK = {
+/**
+ * Any family name is accepted now, not one of four presets: the picker draws
+ * from the whole Google Fonts catalogue plus whatever is installed locally, so
+ * this only has to wrap the name and supply a fallback.
+ *
+ * Worth knowing about the output: an SVG references a font by name, so it
+ * renders with that font only on a machine that has it. The PNG and JPEG
+ * exports are rasterised here, in a browser where the font is already loaded,
+ * so those are faithful anywhere.
+ */
+const LEGACY = {
   satoshi: "'Satoshi', system-ui, sans-serif",
   serif: "Georgia, 'Times New Roman', serif",
   mono: "'SF Mono', ui-monospace, 'Cascadia Code', monospace",
   grotesk: "'Inter', system-ui, -apple-system, sans-serif",
+}
+
+function stackFor(font) {
+  if (!font) return LEGACY.satoshi
+  return LEGACY[font] || `'${String(font).replace(/'/g, '')}', system-ui, sans-serif`
 }
 
 /** Rough advance width, so the viewBox fits the text without measuring in DOM. */
@@ -46,7 +61,7 @@ function markGroup({ pathData, viewBox }, { x, y, size, color }) {
 }
 
 export function buildLogoPack({ trace, name, tagline, palette, font = 'satoshi' }) {
-  const family = FONT_STACK[font] || FONT_STACK.satoshi
+  const family = stackFor(font)
   const ink = palette?.[0] || '#16161a'
   const accent = palette?.[1] || ink
   const paper = palette?.[palette.length - 1] || '#ffffff'

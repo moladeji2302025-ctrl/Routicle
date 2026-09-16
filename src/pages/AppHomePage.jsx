@@ -50,6 +50,19 @@ function SpaceGlyph() {
   )
 }
 
+/**
+ * Entrance props for one block on the dashboard.
+ *
+ * The delay is inline rather than an :nth-child rule because the blocks are
+ * conditional — a creator sees panels a browsing account does not — and
+ * nth-child would count whatever happened to render, so the rhythm would
+ * change depending on who you are.
+ */
+const rise = (step) => ({
+  className: 'app-rise',
+  style: { animationDelay: `${step * 70}ms` },
+})
+
 function greeting() {
   const hour = new Date().getHours()
   if (hour < 12) return 'Good morning'
@@ -235,15 +248,15 @@ export default function AppHomePage() {
 
   return (
     <div className="app-home">
-      <h1 className="app-home-greeting">
+      <h1 className="app-home-greeting app-rise" style={{ animationDelay: '0ms' }}>
         {greeting()}, {currentUser?.name?.split(' ')[0] || 'there'}
       </h1>
-      <p className="app-home-sub">
+      <p className="app-home-sub app-rise" style={{ animationDelay: '70ms' }}>
         {approved.length} finished piece{approved.length === 1 ? '' : 's'} in the library right now
         {activeTeam ? ` · working in ${activeTeam.name}` : ''}
       </p>
 
-      <form className="app-home-search" onSubmit={handleSearchSubmit} role="search">
+      <form className="app-home-search app-rise" style={{ animationDelay: '140ms' }} onSubmit={handleSearchSubmit} role="search">
         <SearchIcon size={16} color="currentColor" />
         <input
           ref={searchRef}
@@ -287,9 +300,11 @@ export default function AppHomePage() {
         )}
       </form>
 
-      <WhatsNew />
+      <div {...rise(3)}>
+        <WhatsNew />
+      </div>
 
-      <div className="app-tool-grid">
+      <div className="app-tool-grid app-rise" style={{ animationDelay: '280ms' }}>
         {tools.map((tool) => {
           const Icon = tool.icon
           return (
@@ -304,7 +319,7 @@ export default function AppHomePage() {
       </div>
 
       {recentItems.length > 0 && (
-        <section className="app-section">
+        <section className="app-section app-rise" style={{ animationDelay: '350ms' }}>
           <div className="app-section-head">
             <h2>Pick up where you left off</h2>
           </div>
@@ -320,7 +335,7 @@ export default function AppHomePage() {
         </section>
       )}
 
-      <div className="app-split">
+      <div className="app-split app-rise" style={{ animationDelay: '420ms' }}>
         <div className="app-split-side">
         <div className="app-panel">
           <div className="app-panel-head">
@@ -413,7 +428,7 @@ export default function AppHomePage() {
         </div>
       </div>
 
-      <section className="app-section app-section-wide">
+      <section className="app-section app-section-wide app-rise" style={{ animationDelay: '490ms' }}>
         <div className="app-section-head">
           <h2>Browse by category</h2>
           <Link to="/categories">See all <ChevronRightIcon size={13} color="currentColor" /></Link>
@@ -432,7 +447,7 @@ export default function AppHomePage() {
       {/* Workspaces: the list on the left drives the panel on the right, so
           switching is a single click from the dashboard rather than a trip to
           /workspaces and back. */}
-      <section className="app-ws-band">
+      <section className="app-ws-band app-rise" style={{ animationDelay: '630ms' }}>
         <div className="app-panel app-ws-list">
           <div className="app-panel-head">
             <Link to="/workspaces" className="app-ws-list-title">
@@ -542,11 +557,11 @@ export default function AppHomePage() {
         </div>
       </section>
 
-      <Link to="/collections" className="app-mywork">
+      <Link to="/collections" className="app-mywork app-rise" style={{ animationDelay: '700ms' }}>
         My work <ChevronRightIcon size={14} color="currentColor" />
       </Link>
 
-      <div className="app-split app-split-flip">
+      <div className="app-split app-split-flip app-rise" style={{ animationDelay: '560ms' }}>
       {suggestedCreators.length > 0 && (
         <section className="app-section app-split-main">
           <div className="app-section-head">

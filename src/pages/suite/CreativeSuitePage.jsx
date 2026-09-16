@@ -2,14 +2,8 @@ import { useRef, useState } from 'react'
 import { vectorize } from '../../lib/vectorize'
 import { buildLogoPack, svgToRaster, downloadBlob, PALETTE_PRESETS, isDark } from '../../lib/logoPack'
 import { PenIcon, UploadIcon } from '../../components/icons'
+import FontPicker from '../../components/FontPicker'
 import MarkEditor from '../../components/MarkEditor'
-
-const FONTS = [
-  { id: 'satoshi', label: 'Satoshi' },
-  { id: 'grotesk', label: 'Grotesk' },
-  { id: 'serif', label: 'Serif' },
-  { id: 'mono', label: 'Mono' },
-]
 
 const FORMATS = [
   { ext: 'svg', label: 'SVG', type: null },
@@ -33,7 +27,7 @@ export default function CreativeSuitePage() {
   const [name, setName] = useState('')
   const [tagline, setTagline] = useState('')
   const [palette, setPalette] = useState(PALETTE_PRESETS[0].colors)
-  const [font, setFont] = useState('satoshi')
+  const [font, setFont] = useState('Inter')
   const [lastFile, setLastFile] = useState(null)
 
   async function run(file, opts = {}) {
@@ -201,21 +195,7 @@ export default function CreativeSuitePage() {
             <span className="settings-stack-label">Tagline (optional)</span>
             <input className="settings-input" value={tagline} onChange={(e) => setTagline(e.target.value)} />
           </label>
-          <label className="settings-stack-field">
-            <span className="settings-stack-label">Typeface</span>
-            <div className="settings-seg">
-              {FONTS.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  className={font === f.id ? 'settings-seg-btn settings-seg-btn-active' : 'settings-seg-btn'}
-                  onClick={() => setFont(f.id)}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-          </label>
+          <FontPicker value={font} onChange={setFont} />
 
           <span className="settings-stack-label" style={{ marginTop: 6 }}>Palette</span>
           <div className="cs-palettes">
