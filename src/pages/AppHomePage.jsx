@@ -23,7 +23,32 @@ import {
   PlusIcon,
   ChevronRightIcon,
   SettingsIcon,
+  UserIcon,
+  LockIcon,
 } from '../components/icons'
+
+/* A stable colour per workspace, so the dot next to a name means the same thing
+   every time you look at it rather than shuffling on re-render. */
+const WS_DOTS = ['#f5b53f', '#8b76f0', '#3fbf86', '#e8596b', '#4aa8e0', '#e07f3f']
+
+function dotFor(id) {
+  let h = 0
+  for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0
+  return WS_DOTS[h % WS_DOTS.length]
+}
+
+/** The loose stack of frames from the empty state — decorative only. */
+function SpaceGlyph() {
+  return (
+    <svg width="132" height="96" viewBox="0 0 132 96" fill="none" aria-hidden="true" className="app-ws-glyph">
+      <rect x="31" y="3" width="56" height="30" rx="6" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="1" y="52" width="58" height="42" rx="6" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="73" y="44" width="58" height="42" rx="6" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M12 66h30M12 74h22M12 82h26" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M88 33c4 10 4 14 10 20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
 
 function greeting() {
   const hour = new Date().getHours()
@@ -43,6 +68,9 @@ export default function AppHomePage() {
     recentlyViewed,
     settings,
     toggleFollow,
+    activeTeamId,
+    setActiveTeam,
+    createTeam,
   } = useApp()
   const navigate = useNavigate()
 
@@ -50,6 +78,11 @@ export default function AppHomePage() {
   const [openSuggestions, setOpenSuggestions] = useState(false)
   const [cursor, setCursor] = useState(0)
   const searchRef = useRef(null)
+
+  const [naming, setNaming] = useState(false)
+  const [wsName, setWsName] = useState('')
+  const [creatingWs, setCreatingWs] = useState(false)
+  const [wsError, setWsError] = useState('')
 
   // Every rail, count and command-bar result on this page comes off `approved`,
   // so applying the browsing preferences once here covers the whole dashboard.
@@ -97,6 +130,24 @@ export default function AppHomePage() {
   }, [])
 
   useEffect(() => setCursor(0), [query])
+
+  async function handleCreateWorkspace(e) {
+    e.preventDefault()
+    if (!wsName.trim() || creatingWs) return
+    setCreatingWs(true)
+    setWsError('')
+    try {
+      // createTeam switches to the new workspace itself, so the stage panel
+      // beside the list updates without a second click.
+      await createTeam(wsName.trim())
+      setWsName('')
+      setNaming(false)
+    } catch (err) {
+      setWsError(err.message)
+    } finally {
+      setCreatingWs(false)
+    }
+  }
 
   function go(to) {
     setOpenSuggestions(false)
@@ -323,41 +374,6 @@ export default function AppHomePage() {
 
         <div className="app-panel">
           <div className="app-panel-head">
-            <h3>Workspace</h3>
-            <Link to="/team">{teams.length > 0 ? 'Manage' : 'Create'}</Link>
-          </div>
-
-          {activeTeam ? (
-            <>
-              <div className="app-plan-line">
-                <span className="app-plan-chip app-plan-chip-team">{activeTeam.name}</span>
-                <span className="app-plan-meta">
-                  {teamMembers.length} member{teamMembers.length === 1 ? '' : 's'} · shared collections
-                </span>
-              </div>
-              <div className="app-avatar-stack">
-                {teamMembers.slice(0, 6).map((m) =>
-                  m.user?.image ? (
-                    <img key={m.id} src={m.user.image} alt={m.user?.name || ''} title={m.user?.name || m.user?.email} />
-                  ) : (
-                    <span key={m.id} className="app-avatar-stack-fallback" title={m.user?.name || m.user?.email}>
-                      {(m.user?.name || m.user?.email || '?').charAt(0).toUpperCase()}
-                    </span>
-                  )
-                )}
-                <Link to="/team" className="app-avatar-stack-add" title="Invite someone">
-                  <PlusIcon size={13} color="currentColor" />
-                </Link>
-              </div>
-            </>
-          ) : (
-            <p className="app-panel-note">
-              You're working solo. A team shares one plan, one collection, and one download history
-              across everyone in it.
-            </p>
-          )}
-
-          <div className="app-panel-head app-panel-head-tight">
             <h3>Saved</h3>
             <Link to="/collections">All ({currentUser?.savedItemIds.length || 0})</Link>
           </div>
@@ -412,6 +428,123 @@ export default function AppHomePage() {
           ))}
         </div>
       </section>
+
+      {/* Workspaces: the list on the left drives the panel on the right, so
+          switching is a single click from the dashboard rather than a trip to
+          /workspaces and back. */}
+      <section className="app-ws-band">
+        <div className="app-panel app-ws-list">
+          <div className="app-panel-head">
+            <Link to="/workspaces" className="app-ws-list-title">
+              Workspaces <ChevronRightIcon size={13} color="currentColor" />
+            </Link>
+            <button
+              type="button"
+              className="app-ws-add"
+              onClick={() => setNaming((v) => !v)}
+              aria-label="New workspace"
+              title="New workspace"
+            >
+              <PlusIcon size={14} color="currentColor" />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className={!activeTeamId ? 'app-ws-row app-ws-row-active' : 'app-ws-row'}
+            onClick={() => setActiveTeam(null)}
+          >
+            <span className="app-ws-dot" style={{ background: '#f5b53f' }} />
+            <span className="app-ws-name">Personal</span>
+            <LockIcon size={13} color="currentColor" />
+          </button>
+
+          {teams.map((team) => (
+            <button
+              key={team.id}
+              type="button"
+              className={activeTeamId === team.id ? 'app-ws-row app-ws-row-active' : 'app-ws-row'}
+              onClick={() => setActiveTeam(team.id)}
+            >
+              <span className="app-ws-dot" style={{ background: dotFor(team.id) }} />
+              <span className="app-ws-name">{team.name}</span>
+              {(team.tier || 'free') === 'free' ? (
+                <Link to="/pricing" className="app-ws-upgrade" onClick={(e) => e.stopPropagation()}>
+                  Upgrade
+                </Link>
+              ) : (
+                <UsersIcon size={13} color="currentColor" />
+              )}
+            </button>
+          ))}
+
+          {naming && (
+            <form className="app-ws-new" onSubmit={handleCreateWorkspace}>
+              <input
+                type="text"
+                autoFocus
+                value={wsName}
+                placeholder="Workspace name"
+                onChange={(e) => setWsName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Escape' && setNaming(false)}
+              />
+              <button type="submit" disabled={!wsName.trim() || creatingWs}>
+                {creatingWs ? '…' : 'Create'}
+              </button>
+            </form>
+          )}
+          {wsError && <p className="app-ws-error">{wsError}</p>}
+        </div>
+
+        <div className="app-panel app-ws-stage">
+          {activeTeam ? (
+            <>
+              <div className="app-ws-stage-head">
+                <h3>{activeTeam.name}</h3>
+                <span className="app-plan-meta">
+                  {TIERS[activeTeam.tier || 'free']?.label || 'Free'} plan ·{' '}
+                  {teamMembers.length} member{teamMembers.length === 1 ? '' : 's'}
+                </span>
+              </div>
+              <div className="app-avatar-stack">
+                {teamMembers.slice(0, 8).map((m) =>
+                  m.user?.image ? (
+                    <img key={m.id} src={m.user.image} alt={m.user?.name || ''} title={m.user?.name || m.user?.email} />
+                  ) : (
+                    <span key={m.id} className="app-avatar-stack-fallback" title={m.user?.name || m.user?.email}>
+                      {(m.user?.name || m.user?.email || '?').charAt(0).toUpperCase()}
+                    </span>
+                  )
+                )}
+                <Link to="/team" className="app-avatar-stack-add" title="Invite someone">
+                  <PlusIcon size={13} color="currentColor" />
+                </Link>
+              </div>
+              <div className="app-ws-links">
+                <Link to="/collections">Shared collection</Link>
+                <Link to="/downloads">Shared downloads</Link>
+                <Link to="/team">Manage members</Link>
+              </div>
+            </>
+          ) : (
+            <div className="app-ws-empty">
+              <SpaceGlyph />
+              <h3>Create a workspace</h3>
+              <p>
+                One plan, one collection and one download history shared across everyone in it.
+                You're working solo right now.
+              </p>
+              <button type="button" className="app-ws-empty-btn" onClick={() => setNaming(true)}>
+                New workspace <PlusIcon size={13} color="currentColor" />
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <Link to="/collections" className="app-mywork">
+        My work <ChevronRightIcon size={14} color="currentColor" />
+      </Link>
 
       <div className="app-split app-split-flip">
       {suggestedCreators.length > 0 && (

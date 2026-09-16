@@ -66,6 +66,9 @@ const NAV_GROUPS = [
   },
   {
     label: 'More',
+    // Utility destinations, pinned to the bottom of the rail rather than left
+    // to trail off the end of a long nav.
+    foot: true,
     items: [
       { label: "What's new", to: '/updates', icon: BellIcon },
       { label: 'Resources', to: '/resources', icon: HelpIcon },
@@ -75,6 +78,7 @@ const NAV_GROUPS = [
   },
   {
     label: 'Platform',
+    foot: true,
     // Gated on the server's answer, not the local prototype flag — and the
     // console re-checks the session on every request behind it anyway.
     when: (ctx) => ctx.isPlatformAdmin,
@@ -119,6 +123,39 @@ export default function AppShell() {
     return location.pathname === item.to || location.pathname.startsWith(`${item.to}/`)
   }
 
+  function renderGroups(groups, className) {
+    const rendered = groups
+      .filter((group) => !group.when || group.when(navContext))
+      .map((group) => ({ group, items: group.items.filter((item) => !item.when || item.when(navContext)) }))
+      .filter(({ items }) => items.length > 0)
+
+    if (rendered.length === 0) return null
+
+    return (
+      <nav className={className}>
+        {rendered.map(({ group, items }) => (
+          <div key={group.label} className="app-nav-group">
+            <p className="app-nav-label"><span>{group.label}</span></p>
+            {items.map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  className={isActive(item) ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}
+                  title={item.label}
+                >
+                  <Icon size={16} color="currentColor" />
+                  <span className="app-rail-label">{item.label}</span>
+                </Link>
+              )
+            })}
+          </div>
+        ))}
+      </nav>
+    )
+  }
+
   return (
     <div className={collapsed ? 'app-shell app-shell-collapsed' : 'app-shell'}>
       <aside className="app-sidebar">
@@ -137,35 +174,8 @@ export default function AppShell() {
           <span className="app-rail-label">Create</span>
         </button>
 
-        <nav className="app-nav">
-          {NAV_GROUPS.map((group) => {
-            if (group.when && !group.when(navContext)) return null
-            const items = group.items.filter((item) => !item.when || item.when(navContext))
-            if (items.length === 0) return null
-            return (
-              <div key={group.label} className="app-nav-group">
-                <p className="app-nav-label">{group.label}</p>
-                {/* Stands in for the group label once collapsed, so the rail
-                    keeps its grouping without room for words. */}
-                <span className="app-nav-rule" aria-hidden="true" />
-                {items.map((item) => {
-                  const Icon = item.icon
-                  return (
-                    <Link
-                      key={item.label}
-                      to={item.to}
-                      className={isActive(item) ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}
-                      title={item.label}
-                    >
-                      <Icon size={16} color="currentColor" />
-                      <span className="app-rail-label">{item.label}</span>
-                    </Link>
-                  )
-                })}
-              </div>
-            )
-          })}
-        </nav>
+        {renderGroups(NAV_GROUPS.filter((g) => !g.foot), 'app-nav')}
+        {renderGroups(NAV_GROUPS.filter((g) => g.foot), 'app-nav app-nav-foot')}
 
       </aside>
 

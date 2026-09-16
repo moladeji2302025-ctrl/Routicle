@@ -277,3 +277,12 @@ export function PanelIcon({ size = 18, color = 'currentColor' }) {
     </svg>
   )
 }
+
+export function LockIcon({ size = 14, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="10" width="16" height="11" rx="2.5" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    </svg>
+  )
+}

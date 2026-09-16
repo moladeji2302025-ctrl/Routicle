@@ -169,9 +169,13 @@ a:visited {
   text-decoration: none;
 }
 
+/* Tokenised rather than a hardcoded near-black. Inside the app shell `--text`
+   is remapped to `--app-text`, which is white in dark mode — with the literal
+   colour here, every link that didn't declare its own hover colour turned
+   almost invisible against a dark surface. The 0.6 opacity went with it: a
+   dimmed white is a grey, which is the same washed-out hover by another name. */
 a:hover {
-  color: oklch(0.16 0.004 90);
-  opacity: 0.6;
+  color: var(--text);
 }
 
 .page-main {
@@ -726,7 +730,7 @@ a:hover {
 }
 
 .feature-item:hover {
-  color: oklch(0.85 0.006 90);
+  color: oklch(0.99 0.002 90);
 }
 
 .feature-item:last-child {
@@ -3539,30 +3543,44 @@ a:hover {
   color: var(--app-text);
 }
 
+/* Both states share one vertical geometry: identical padding, gaps, row heights
+   and group slots. Only the width and the labels differ, so collapsing reads as
+   the panel narrowing around icons that never move, rather than as a relayout. */
 .app-sidebar {
   flex: 0 0 232px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  padding: 22px 16px;
+  gap: 12px;
+  padding: 16px 11px;
   background: var(--app-sidebar-bg);
   border-right: 1px solid var(--app-border);
   position: sticky;
   top: 0;
   height: 100vh;
+  overflow-x: hidden;
+  transition: flex-basis 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar {
+    transition: none;
+  }
 }
 
 .app-logo {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 6px;
+  gap: 9px;
+  height: 22px;
+  padding: 0 8px;
   font-size: 17px;
   font-weight: 700;
   color: var(--app-text);
+  white-space: nowrap;
 }
 
 .app-logo-icon {
+  flex-shrink: 0;
   width: 22px;
   height: 22px;
 }
@@ -3577,7 +3595,10 @@ a:hover {
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 11px 14px;
+  height: 36px;
+  padding: 0 14px;
+  white-space: nowrap;
+  overflow: hidden;
   border: none;
   border-radius: 10px;
   background: var(--brand-violet);
@@ -3599,16 +3620,52 @@ a:hover {
   gap: 2px;
 }
 
+/* The main nav takes whatever height is left and scrolls inside it, so the
+   utility group below stays pinned to the bottom of the sidebar instead of
+   trailing off the end of a long list.
+
+   It centres in that space rather than sitting flush under the Create button,
+   which leaves the weight of the rail nearer its middle. `safe` matters: on a
+   short window the content overflows, and plain `center` would push the first
+   item off the top where it can't be scrolled back to. */
+.app-nav:not(.app-nav-foot) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  justify-content: safe center;
+}
+
+.app-nav:not(.app-nav-foot)::-webkit-scrollbar {
+  display: none;
+}
+
+.app-nav-foot {
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--app-border);
+}
+
+
+/* 34px tall with 10px of inset padding, so an icon sits 21px from the sidebar's
+   edge — exactly where the collapsed rail centres it in its 36px tile. */
 .app-nav-item {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 9px 10px;
+  height: 34px;
+  padding: 0 10px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   color: var(--app-text-muted);
+  white-space: nowrap;
   transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-nav-item > svg {
+  flex-shrink: 0;
 }
 
 .app-nav-item:hover {
@@ -4449,7 +4506,7 @@ a:hover {
 }
 
 .cinematic-project-item:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: #fff;
 }
 
 .cinematic-project-item.is-active {
@@ -7081,24 +7138,55 @@ a:hover {
   margin-top: 16px;
 }
 
+/* The heading and the collapsed hairline share this one 15px box, so the rows
+   above and below it land on the same y whichever state the sidebar is in. */
 .app-nav-label {
-  margin: 0 0 5px 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 15px;
+  margin: 7px 0 3px;
+  padding: 0 10px;
   font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--app-text-muted);
-  opacity: 0.75;
+  white-space: nowrap;
 }
 
-/* The nav is now long enough to overflow on short viewports â€” let it scroll
-   inside the sidebar rather than pushing the account menu off-screen. */
-.app-nav {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
+/* Collapses to zero width, not just to transparent. Left at its natural width
+   the invisible text still made the nav's content box ~70px wide, and since
+   `overflow-y: auto` forces `overflow-x` to `auto` as well, the 36px rail
+   clipped the right-hand edge off every icon. */
+.app-nav-label > span {
+  display: block;
+  max-width: 170px;
+  overflow: hidden;
+  opacity: 0.75;
+  transition:
+    max-width 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.18s ease;
 }
+
+/* The hairline the heading becomes once there is no room for words. */
+.app-nav-label::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 7px;
+  width: 20px;
+  height: 1px;
+  background: var(--app-border);
+  opacity: 0;
+  transition: opacity 0.22s ease 0.1s;
+}
+
+.app-nav-group:first-child .app-nav-label::after {
+  /* Nothing to divide from above. The slot still holds its space. */
+  content: none;
+}
+
 
 /* ---- Shared empty state ---- */
 
@@ -7399,10 +7487,121 @@ a:hover {
 }
 
 .resource-grid {
+  position: relative;
   margin-top: 12px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
   gap: 12px;
+}
+
+/* ---- the hover peek ----
+
+   Sits in whatever space is left beside the last card on the hovered card's
+   row, measured in JS and set as inline top/left/width. It never takes a grid
+   cell, so appearing and disappearing can't reflow the cards around it.
+
+   `pointer-events: none` is deliberate: the panel is a glance, not somewhere
+   to move the cursor, and the card owns the whole interaction. */
+.resource-peek {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 16px 18px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-card-bg);
+
+  opacity: 0;
+  transform: translateX(-14px);
+  /* Wipes open from its left edge, which is the side it grows out of. */
+  clip-path: inset(0 100% 0 0 round 12px);
+  transition:
+    opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+    clip-path 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.resource-peek-in {
+  opacity: 1;
+  transform: translateX(0);
+  clip-path: inset(0 0 0 0 round 12px);
+}
+
+/* Full row: nothing to slide into, so it lifts over the end of the row
+   instead of pushing the cards below onto a new line. */
+.resource-peek-float {
+  box-shadow: 0 18px 44px -12px rgb(0 0 0 / 0.45);
+  border-color: var(--brand-purple);
+}
+
+.resource-peek-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--app-text);
+}
+
+.resource-peek-blurb {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--app-text-muted);
+}
+
+.resource-peek-points {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.resource-peek-points li {
+  position: relative;
+  padding-left: 14px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--app-text-muted);
+  /* Each point trails the panel in, on the delay set inline per item. */
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.resource-peek-in .resource-peek-points li {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.resource-peek-points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 2px;
+  background: var(--brand-violet);
+}
+
+/* Leaving is a plain fade — replaying the wipe backwards reads as a stutter. */
+@media (prefers-reduced-motion: reduce) {
+  .resource-peek {
+    transform: none;
+    clip-path: none;
+    transition: opacity 0.15s linear;
+  }
+
+  .resource-peek-points li {
+    transform: none;
+    transition: opacity 0.15s linear;
+  }
 }
 
 .resource-card {
@@ -10506,22 +10705,42 @@ a.admin-stat:hover {
 
 /* Collapsed narrows to an icon rail rather than disappearing: navigation stays
    one click away, and every item carries a title so the icon still names
-   itself on hover. */
-.app-nav-rule {
-  display: none;
-}
+   itself on hover.
 
+   Nothing here changes a height, a gap or a vertical padding — the base rules
+   already set those to the same values the rail needs. Only widths and the
+   labels differ, which is what lets the two states cross-fade cleanly. */
 .app-shell-collapsed .app-sidebar {
-  flex-basis: 62px;
-  padding: 22px 11px;
-  gap: 16px;
-  align-items: center;
+  flex-basis: 58px;
 }
 
-/* One rule hides every label in the rail — logo, Create, and each nav item. */
-.app-shell-collapsed .app-rail-label,
-.app-shell-collapsed .app-nav-label {
-  display: none;
+/* Labels collapse to nothing rather than being hidden outright: `display: none`
+   can't be transitioned, and this way the text slides away with the width. */
+.app-shell-collapsed .app-rail-label {
+  max-width: 0;
+  margin-left: -11px;
+  opacity: 0;
+}
+
+.app-rail-label {
+  max-width: 160px;
+  opacity: 1;
+  overflow: hidden;
+  transition:
+    max-width 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    margin-left 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
+}
+
+/* The heading's words go, its hairline arrives, and the 15px slot they share
+   never changes height. */
+.app-shell-collapsed .app-nav-label > span {
+  max-width: 0;
+  opacity: 0;
+}
+
+.app-shell-collapsed .app-nav-label::after {
+  opacity: 1;
 }
 
 .app-shell-collapsed .app-logo {
@@ -10530,43 +10749,27 @@ a.admin-stat:hover {
 }
 
 .app-shell-collapsed .app-create-btn {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  align-self: center;
   padding: 0;
 }
 
-.app-shell-collapsed .app-nav {
-  width: 100%;
-  align-items: center;
-}
-
+.app-shell-collapsed .app-nav,
 .app-shell-collapsed .app-nav-group {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
 }
 
 .app-shell-collapsed .app-nav-item {
-  width: 40px;
-  height: 40px;
+  width: 36px;
   padding: 0;
   justify-content: center;
-  gap: 0;
 }
 
-/* The hairline replaces the group heading, so the rail still reads as sections
-   instead of one undifferentiated column of icons. */
-.app-shell-collapsed .app-nav-rule {
-  display: block;
-  width: 22px;
-  height: 1px;
-  margin: 7px 0;
-  background: var(--app-border);
-}
-
-.app-shell-collapsed .app-nav-group:first-child .app-nav-rule {
-  display: none;
+@media (prefers-reduced-motion: reduce) {
+  .app-rail-label,
+  .app-nav-label > span {
+    transition: none;
+  }
 }
 
 @media (max-width: 900px) {
@@ -10668,4 +10871,305 @@ html {
   .app-split-main {
     order: 1;
   }
+}
+
+
+/* ---------------------------------------------------------------- workspaces
+   The dashboard's workspace band: a narrow list that drives a wide stage
+   beside it. Switching is one click, and the stage answers immediately with
+   whatever that workspace actually holds. */
+
+.app-ws-band {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+  margin-bottom: 20px;
+}
+
+.app-ws-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.app-ws-list-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.app-ws-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 8px;
+  background: var(--app-hover);
+  color: var(--app-text);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.app-ws-add:hover {
+  transform: scale(1.08);
+}
+
+.app-ws-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--app-text-muted);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-ws-row:hover {
+  background: var(--app-hover);
+  color: var(--app-text);
+}
+
+.app-ws-row-active {
+  background: var(--app-hover);
+  color: var(--app-text);
+  font-weight: 600;
+}
+
+.app-ws-dot {
+  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 4px;
+}
+
+.app-ws-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-ws-upgrade {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-violet);
+  background: color-mix(in oklab, var(--brand-violet) 16%, transparent);
+}
+
+.app-ws-new {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.app-ws-new input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 9px;
+  background: var(--app-bg);
+  font: inherit;
+  font-size: 13px;
+  color: var(--app-text);
+  outline: none;
+}
+
+.app-ws-new input:focus {
+  border-color: var(--brand-purple);
+}
+
+.app-ws-new button {
+  flex-shrink: 0;
+  padding: 8px 13px;
+  border: none;
+  border-radius: 9px;
+  background: var(--brand-violet);
+  color: white;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.app-ws-new button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.app-ws-error {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--danger, #e8596b);
+}
+
+/* ---- the stage ---- */
+
+.app-ws-stage {
+  display: flex;
+  flex-direction: column;
+  min-height: 268px;
+}
+
+.app-ws-stage-head h3 {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.app-ws-stage .app-avatar-stack {
+  margin-top: 18px;
+}
+
+.app-ws-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.app-ws-links a {
+  padding: 8px 14px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.app-ws-links a:hover {
+  transform: scale(1.03);
+  border-color: var(--brand-purple);
+}
+
+/* The empty state carries the whole panel, so it centres in both axes rather
+   than sitting at the top of a tall box of nothing. */
+.app-ws-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.app-ws-glyph {
+  color: var(--app-border);
+  margin-bottom: 6px;
+}
+
+.app-ws-empty h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.app-ws-empty p {
+  max-width: 380px;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--app-text-muted);
+}
+
+.app-ws-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  background: var(--app-hover);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--app-text);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.app-ws-empty-btn:hover {
+  transform: scale(1.03);
+}
+
+/* ---- the footer link under the band ---- */
+
+.app-mywork {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 14px 0 6px;
+  margin-bottom: 40px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.app-mywork:hover {
+  color: var(--brand-violet);
+}
+
+@media (max-width: 900px) {
+  .app-ws-band {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ------------------------------------------------- dark-mode hover contrast
+
+   Text hovers stay white in dark mode. These are the rules that tinted their
+   text toward a brand colour on hover, which reads as a dimmer grey-violet
+   against a dark surface rather than as emphasis.
+
+   Two kinds are deliberately left alone, because forcing white would break
+   them rather than fix them:
+     · filled inversions, where hover swaps to a light background and the text
+       must go dark to stay legible (`.app-cta-btn`, `.btn-hero-secondary`);
+     · destructive actions, where the red is the warning (`.account-menu-item-danger`,
+       `.team-member-remove`). */
+[data-theme='dark'] .app-tool-tile-icon:hover,
+[data-theme='dark'] .app-tool-tile:hover .app-tool-tile-icon,
+[data-theme='dark'] .app-tool-tile:hover .app-tool-tile-label,
+[data-theme='dark'] .app-avatar-stack-add:hover,
+[data-theme='dark'] .app-follow-btn:hover,
+[data-theme='dark'] .app-mywork:hover,
+[data-theme='dark'] .app-ws-list-title:hover,
+[data-theme='dark'] .overview-deck-label:hover,
+[data-theme='dark'] .app-shell a:hover,
+[data-theme='dark'] .onb a:hover {
+  color: var(--app-text);
+  opacity: 1;
+}
+
+/* The exclusions above, restated at higher specificity so the blanket
+   `.app-shell a:hover` can't reach them. */
+[data-theme='dark'] .app-shell .app-cta-panel .app-cta-btn:hover {
+  color: var(--brand-violet);
 }
