@@ -80,7 +80,7 @@ export default function SecuritySettings() {
 
   return (
     <>
-      <Section title="Sign-in" description="The identity behind everything you own here.">
+      <Section title="Sign-in">
         <Row title="Email" description="Used for sign-in, receipts and payout notices.">
           <span className="settings-static-value">{currentUser.email}</span>
         </Row>
@@ -107,10 +107,7 @@ export default function SecuritySettings() {
           type a new password twice. Behind the fold there is no password field
           at all — the change happens through a link sent to the address on the
           account, so it takes the mailbox, not just the screen. */}
-      <Section
-        title="Password"
-        description="Changed by email only. Applies to email/password accounts — if you signed in with Google, manage it there."
-      >
+      <Section title="Password">
         <Row
           title="Change your password"
           description="We email a single-use link to the address on this account. Nothing changes until you follow it."
@@ -151,7 +148,7 @@ export default function SecuritySettings() {
         )}
       </Section>
 
-      <Section title="Active sessions" description="Every device currently signed in to this account.">
+      <Section title="Active sessions">
         {sessions === null && <p className="settings-row-desc">Loading…</p>}
         {sessions === false && (
           <p className="settings-row-desc">
@@ -182,10 +179,7 @@ export default function SecuritySettings() {
         )}
       </Section>
 
-      <DangerZone
-        title="Delete account"
-        description="Removes your account, profile, saved items, team memberships and any workspace only you are in. Any live subscription is cancelled first. Work you've published stays credited in the library unless you take it down yourself."
-      >
+      <DangerZone title="Delete account">
         <Row
           title="This can't be undone"
           description={`Type ${currentUser.email} to confirm.`}

@@ -32,7 +32,6 @@ export default function BrowsingSettings() {
     <>
       <Section
         title="Where you start"
-        description="The page Routicle opens on when you come back."
         actions={
           <button type="button" className="settings-btn settings-btn-ghost" onClick={() => resetSettings('browsing')}>
             Reset
@@ -59,11 +58,6 @@ export default function BrowsingSettings() {
 
       <Section
         title="What you see"
-        description={
-          hiddenCount > 0
-            ? `${hiddenCount} piece${hiddenCount === 1 ? '' : 's'} in the current library are hidden by these filters.`
-            : 'Filters apply to Explore, Departments and your dashboard rails.'
-        }
       >
         <Row
           title="Hide AI-generated work"

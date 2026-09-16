@@ -42,11 +42,6 @@ export default function StudioSettings() {
     <>
       <Section
         title="Credits"
-        description={
-          tier === 'free'
-            ? 'AI Studio credits come with a paid plan.'
-            : `Included with ${plan.label}, reset each billing cycle.`
-        }
         actions={
           tier !== 'express' ? (
             <Link to="/pricing" className="settings-btn settings-btn-ghost">
@@ -67,7 +62,7 @@ export default function StudioSettings() {
         )}
       </Section>
 
-      <Section title="Defaults" description="What the studios are preset to each time you open them.">
+      <Section title="Defaults">
         <Row
           title="Default clip length"
           description={
@@ -95,12 +90,7 @@ export default function StudioSettings() {
         </Row>
       </Section>
 
-      <Section
-        title="History"
-        description={`${history.image.length} image · ${history.video.length} video generation${
-          history.image.length + history.video.length === 1 ? '' : 's'
-        } stored on this device.`}
-      >
+      <Section title="History">
         <Row title="Clear image history" description="Removes stored image prompts. Credits aren't refunded.">
           <button
             type="button"

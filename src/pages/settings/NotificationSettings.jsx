@@ -49,7 +49,6 @@ export default function NotificationSettings() {
     <>
       <Section
         title="Activity"
-        description={`Sent to ${currentUser.email}.`}
         actions={
           <button
             type="button"

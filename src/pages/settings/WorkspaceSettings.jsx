@@ -46,10 +46,7 @@ export default function WorkspaceSettings() {
 
   return (
     <>
-      <Section
-        title="Active workspace"
-        description="Collections, download history and billing all follow whichever workspace is active."
-      >
+      <Section title="Active workspace">
         <button
           type="button"
           className={!activeTeamId ? 'settings-workspace-row settings-workspace-row-active' : 'settings-workspace-row'}
@@ -86,7 +83,7 @@ export default function WorkspaceSettings() {
         <Feedback error={error} notice={notice} />
       </Section>
 
-      <Section title="Create a team" description="Everyone you invite shares the workspace's plan, collections and downloads.">
+      <Section title="Create a team">
         <div className="settings-inline-form">
           <input
             type="text"
@@ -113,14 +110,7 @@ export default function WorkspaceSettings() {
 
       {activeTeam && (
         <>
-          <Section
-            title={`${activeTeam.name} — plan`}
-            description={
-              canManage
-                ? "Sets the tier every member inherits while this workspace is active."
-                : 'Only owners and admins can change the shared plan.'
-            }
-          >
+          <Section title={`${activeTeam.name} — plan`}>
             <Row title="Shared tier" description={`You're ${ROLE_LABEL[activeTeam.role] || 'a member'} of this team.`}>
               <div className="settings-seg">
                 {Object.values(TIERS).map((t) => (
@@ -140,15 +130,7 @@ export default function WorkspaceSettings() {
             </Row>
           </Section>
 
-          <Section
-            title={`${activeTeam.name} — members`}
-            description={`${teamMembers.length} member${teamMembers.length === 1 ? '' : 's'}.`}
-            actions={
-              <Link to="/team" className="settings-btn settings-btn-ghost">
-                Full team page
-              </Link>
-            }
-          >
+          <Section title={`${activeTeam.name} — members`} actions={ <Link to="/team" className="settings-btn settings-btn-ghost"> Full team page </Link> }>
             {teamMembers.map((m) => (
               <div key={m.id} className="settings-list-row">
                 {m.user?.image ? (
@@ -201,10 +183,7 @@ export default function WorkspaceSettings() {
             )}
           </Section>
 
-          <DangerZone
-            title="Leave this team"
-            description="You lose access to its shared collections, downloads and plan immediately."
-          >
+          <DangerZone title="Leave this team">
             <Row title={activeTeam.name} description={`You're ${ROLE_LABEL[activeTeam.role] || 'a member'}.`}>
               <button
                 type="button"

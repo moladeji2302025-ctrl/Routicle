@@ -57,10 +57,7 @@ export default function PlanSettings() {
 
   return (
     <>
-      <Section
-        title="Current plan"
-        description={activeTeam ? `Billing shown is for the ${activeTeam.name} workspace.` : 'Billing shown is for your personal workspace.'}
-      >
+      <Section title="Current plan">
         <Row
           title={plan?.label || 'Free'}
           description={
@@ -105,10 +102,7 @@ export default function PlanSettings() {
         <Feedback error={error} notice={notice} />
       </Section>
 
-      <Section
-        title="How downloads are charged"
-        description="Switch to pay-per-download to keep your plan but pay for individual source files instead of using plan entitlement."
-      >
+      <Section title="How downloads are charged">
         <Row
           title="Download billing"
           description={
@@ -124,7 +118,7 @@ export default function PlanSettings() {
         </Row>
       </Section>
 
-      <Section title="Purchases" description="Files you bought individually. These stay downloadable forever.">
+      <Section title="Purchases">
         {purchases.length === 0 ? (
           <p className="settings-row-desc">No pay-per-download purchases yet.</p>
         ) : (

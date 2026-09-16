@@ -21,15 +21,7 @@ export default function CreatorSettings() {
 
   return (
     <>
-      <Section
-        title="Your library"
-        description="Everything you've put into the pool."
-        actions={
-          <Link to="/upload" className="settings-btn settings-btn-ghost">
-            Upload
-          </Link>
-        }
-      >
+      <Section title="Your library" actions={ <Link to="/upload" className="settings-btn settings-btn-ghost"> Upload </Link> }>
         <Row title="Live pieces" description="Approved and earning from the pool.">
           <span className="settings-static-value">{myPieces.length}</span>
         </Row>
@@ -43,10 +35,7 @@ export default function CreatorSettings() {
         </Row>
       </Section>
 
-      <Section
-        title="Payouts"
-        description="Where your share of the pool is sent. Balances pay out monthly once they pass $50."
-      >
+      <Section title="Payouts">
         <Row title="Payout method" description="Bank account, PayPal address or mobile-money number." stacked>
           <div className="settings-inline-form">
             <input
@@ -83,7 +72,7 @@ export default function CreatorSettings() {
         </Row>
       </Section>
 
-      <Section title="Referrals" description="A one-off $15 bonus once a referred signup's first payment clears.">
+      <Section title="Referrals">
         <Row title="Your link" description={`${currentUser.referralCount} signups · $${currentUser.referralEarnings.toFixed(2)} earned`} stacked>
           <div className="settings-inline-form">
             <input type="text" className="settings-input" value={referralUrl} readOnly />

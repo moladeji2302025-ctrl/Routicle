@@ -11757,3 +11757,95 @@ html {
   border-radius: 14px;
   background: var(--app-card-bg);
 }
+
+
+/* ====================================================== the in-app cursor ===
+
+   A dot that becomes a diamond of the same area over anything clickable. The
+   outer element carries position only and the inner one carries the shape, so
+   the follow (rewritten every frame) and the morph (a CSS transition) never
+   fight over the same transform. */
+
+.app-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  /* Its own layer, so moving it never repaints the page under it. */
+  will-change: transform;
+}
+
+.app-cursor-on {
+  opacity: 1;
+}
+
+.app-cursor-hidden {
+  opacity: 0;
+}
+
+.app-cursor-shape {
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--app-text, #16161a);
+  transform: rotate(0deg) scale(1);
+  transition:
+    border-radius 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.2s ease;
+}
+
+/* 0.886 is √π/2 — the scale at which the square's area equals the circle's, so
+   the shape changes without the amount of ink changing. The overshoot in the
+   easing above is what makes it land with a little bounce. */
+.app-cursor-diamond .app-cursor-shape {
+  border-radius: 2px;
+  transform: rotate(45deg) scale(0.886);
+  background: var(--brand-violet, #6750de);
+}
+
+.app-cursor-down .app-cursor-shape {
+  transform: rotate(0deg) scale(0.7);
+}
+
+.app-cursor-diamond.app-cursor-down .app-cursor-shape {
+  transform: rotate(45deg) scale(0.62);
+}
+
+/* Hiding the native pointer is done by a class the component adds on mount, so
+   a viewer who never gets the custom cursor — coarse pointer, reduced motion,
+   or JS that failed — is never left with no pointer at all. */
+.has-app-cursor,
+.has-app-cursor * {
+  cursor: none;
+}
+
+/* Text entry is the exception: the caret says which character you are on, and
+   a dot cannot. */
+.has-app-cursor.app-cursor-text,
+.has-app-cursor.app-cursor-text * {
+  cursor: auto;
+}
+
+.has-app-cursor.app-cursor-text input,
+.has-app-cursor.app-cursor-text textarea,
+.has-app-cursor.app-cursor-text [contenteditable='true'] {
+  cursor: text;
+}
+
+/* Touch and pen never get it; nor does anyone who asked for less motion. */
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .app-cursor {
+    display: none;
+  }
+
+  .has-app-cursor,
+  .has-app-cursor * {
+    cursor: auto;
+  }
+}

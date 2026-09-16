@@ -115,9 +115,6 @@ export default function ProfileSettings() {
         <div className="settings-section-head settings-section-head-ruled">
           <div>
             <h2>Public profile</h2>
-            <p className="settings-section-desc">
-              How you appear on your work, in teams, and anywhere you're credited.
-            </p>
           </div>
         </div>
 

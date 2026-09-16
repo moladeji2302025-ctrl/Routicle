@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import AppTopBar from './AppTopBar'
+import AppCursor from './AppCursor'
 import {
   HomeIcon,
   SearchIcon,
@@ -158,6 +159,9 @@ export default function AppShell() {
 
   return (
     <div className={collapsed ? 'app-shell app-shell-collapsed' : 'app-shell'}>
+      {/* In-app only: the signed-out marketing pages keep the system cursor. */}
+      <AppCursor />
+
       <aside className="app-sidebar">
         <Link to="/" className="app-logo" title="Routicle">
           <img src="/brand/routicle-mark-black.svg" alt="" className="app-logo-icon" />

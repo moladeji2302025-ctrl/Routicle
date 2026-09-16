@@ -38,10 +38,7 @@ export default function PrivacySettings() {
 
   return (
     <>
-      <Section
-        title="Visibility"
-        description="What other people can see about you. Saved to your account and applied once profiles are served from the API — public profile pages are still rendered client-side today."
-      >
+      <Section title="Visibility">
         <Row
           title="Creator profile"
           description={
@@ -66,10 +63,7 @@ export default function PrivacySettings() {
         </Row>
       </Section>
 
-      <Section
-        title="Browsing history"
-        description="Powers “Pick up where you left off” on your dashboard. Stored on this device only."
-      >
+      <Section title="Browsing history">
         <Row
           title="Record what I view"
           description={
@@ -99,7 +93,7 @@ export default function PrivacySettings() {
         </Row>
       </Section>
 
-      <Section title="Your data" description="Take a copy of everything this account holds.">
+      <Section title="Your data">
         <Row
           title="Export account data"
           description="Profile, preferences, teams, subscription and history, as JSON."
@@ -111,10 +105,7 @@ export default function PrivacySettings() {
         <Feedback notice={notice} />
       </Section>
 
-      <DangerZone
-        title="Reset this device"
-        description="Clears the cached profile, preferences and history held in this browser. Your account, plan and uploads are untouched — signing back in restores them from the server."
-      >
+      <DangerZone title="Reset this device">
         <Row title="Reset local app data" description="You'll be returned to defaults and signed back in fresh.">
           {confirmReset ? (
             <div className="settings-inline-actions">

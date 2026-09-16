@@ -10,7 +10,6 @@ export default function AppearanceSettings() {
     <>
       <Section
         title="Theme"
-        description="Applies to the signed-in app. The public marketing pages are light-only by design."
         actions={
           <button type="button" className="settings-btn settings-btn-ghost" onClick={() => resetSettings('appearance')}>
             Reset
@@ -30,7 +29,7 @@ export default function AppearanceSettings() {
         </Row>
       </Section>
 
-      <Section title="Layout" description="How much work fits on screen at once.">
+      <Section title="Layout">
         <Row title="Grid density" description={DENSITIES.find((d) => d.id === a.density)?.desc}>
           <Segmented
             name="Grid density"
@@ -41,7 +40,7 @@ export default function AppearanceSettings() {
         </Row>
       </Section>
 
-      <Section title="Motion" description="Useful on slower machines, or if animation makes you uncomfortable.">
+      <Section title="Motion">
         <Row
           title="Reduce motion"
           description="Strips transitions and scroll reveals across the whole app."

@@ -19,10 +19,7 @@ export default function DeveloperSettings() {
 
   return (
     <>
-      <Section
-        title="Role simulation"
-        description="Prototype-only. Jumps this session into another tier so gated screens can be checked without paying."
-      >
+      <Section title="Role simulation">
         <Row
           title="Tier"
           description={
@@ -51,7 +48,7 @@ export default function DeveloperSettings() {
       </Section>
 
       {currentUser.isAdmin && (
-        <Section title="Moderation" description="Platform-wide queue — visible because this account has admin.">
+        <Section title="Moderation">
           <Row
             title="Pending submissions"
             description={
@@ -68,7 +65,7 @@ export default function DeveloperSettings() {
         </Section>
       )}
 
-      <Section title="Preferences" description="Restores every setting in this section list to its shipped default.">
+      <Section title="Preferences">
         <Row title="Reset all settings" description="Profile, plan and team membership aren't affected.">
           <button type="button" className="settings-btn settings-btn-danger" onClick={() => resetSettings()}>
             Reset all
