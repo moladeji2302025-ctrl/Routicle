@@ -69,7 +69,6 @@ export default function BecomeCreatorPage() {
           <h2>How payment works</h2>
           <p>You earn money when subscribers download your work, calculated and paid out monthly.</p>
           <ul className="creator-apply-list">
-            <li><strong>Subscription pool:</strong> 50% of subscription revenue is split by usage across creators every cycle.</li>
             <li><strong>Pay-per-download:</strong> a direct cut of any pay-per-download purchase — 50%, paid in full.</li>
             <li><strong>Your share:</strong> currently 50%, plain and simple.</li>
             <li><strong>Payout cycle:</strong> monthly close, with an early payout once your balance crosses $50 before day 15.</li>
