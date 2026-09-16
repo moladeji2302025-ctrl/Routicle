@@ -3,6 +3,7 @@ import { AppProvider } from './context/AppContext'
 import Layout from './components/Layout'
 import IntroReveal from './components/IntroReveal'
 import HomeRouter from './components/HomeRouter'
+import ErrorBoundary from './components/ErrorBoundary'
 import DesignDetailPage from './pages/DesignDetailPage'
 import ExplorePage from './pages/ExplorePage'
 import CategoriesPage from './pages/CategoriesPage'
@@ -59,6 +60,7 @@ import StaticPage from './pages/StaticPage'
 export default function App() {
   return (
     <AppProvider>
+      <ErrorBoundary>
       <BrowserRouter>
         <IntroReveal />
         <Routes>
@@ -135,6 +137,7 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+    </ErrorBoundary>
     </AppProvider>
   )
 }

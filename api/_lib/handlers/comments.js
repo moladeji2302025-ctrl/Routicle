@@ -19,6 +19,13 @@ import { limit, LIMITS } from '../ratelimit.js'
 
 const MAX = 2000
 
+/**
+ * content_item_id is a uuid column, so a non-uuid id makes Postgres raise
+ * rather than return no rows — which surfaced as a 500 on every demo item,
+ * whose ids are plain numbers. Checked here so the answer is an empty thread.
+ */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 function shape(row, viewerId, viewerIsAdmin) {
   return {
     id: row.id,
@@ -56,6 +63,13 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       const { itemId } = req.query || {}
       if (!itemId) return send(res, 400, { error: 'itemId is required' })
+      if (!UUID.test(String(itemId))) {
+        // Not a real library row — a demo item. An empty thread, not an error.
+        return send(res, 200, {
+          comments: [],
+          summary: { isOwnWork: false, ratingCount: 0, average: 0, mine: null },
+        })
+      }
 
       // Reading is open, but knowing who is asking is what marks their own
       // rows as editable — so the session is read, not required.
@@ -111,6 +125,9 @@ export default async function handler(req, res) {
 
       const { itemId, body, rating } = req.body || {}
       if (!itemId) return send(res, 400, { error: 'itemId is required' })
+      if (!UUID.test(String(itemId))) {
+        return send(res, 400, { error: 'You can only comment on published work.' })
+      }
 
       const problem = validate({ body, rating })
       if (problem) return send(res, 400, { error: problem })

@@ -96,8 +96,18 @@ export default function CommentsPanel({ itemId }) {
     if (!itemId) return
     try {
       const data = await api.fetchComments(itemId)
-      setComments(data.comments || [])
-      setSummary(data.summary || { ratingCount: 0, average: 0, mine: null, isOwnWork: false })
+      setComments(Array.isArray(data.comments) ? data.comments : [])
+      // Coerced rather than trusted: Postgres returns COUNT as a bigint and
+      // AVG as numeric, which some drivers hand back as strings. A string here
+      // passes `> 0` and then throws on `.toFixed`, and a throw during render
+      // takes the whole page down.
+      const s = data.summary || {}
+      setSummary({
+        isOwnWork: Boolean(s.isOwnWork),
+        ratingCount: Number(s.ratingCount) || 0,
+        average: Number(s.average) || 0,
+        mine: s.mine == null ? null : Number(s.mine),
+      })
       setUnavailable(false)
     } catch {
       // /api isn't served by `npm run dev`, and a mock item has no row to

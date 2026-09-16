@@ -12348,3 +12348,82 @@ html {
     align-items: flex-start;
   }
 }
+
+/* ------------------------------------------------------- error boundary --- */
+
+.eb {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.eb h1 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--app-text, var(--text));
+}
+
+.eb p {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--app-text-muted, var(--text-muted));
+}
+
+/* The message itself, kept readable rather than hidden in the console. */
+.eb-detail {
+  margin: 0 0 22px;
+  padding: 12px 14px;
+  border: 1px solid var(--app-border, var(--border));
+  border-radius: 10px;
+  background: var(--app-bg, var(--surface));
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+  color: var(--app-text, var(--text));
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.eb-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.eb-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background: var(--brand-violet);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}
+
+.eb-btn-ghost {
+  border: 1px solid var(--app-border, var(--border));
+  background: none;
+  color: var(--app-text, var(--text));
+}
+
+.eb-inline {
+  margin: 20px 0;
+  font-size: 13.5px;
+  color: var(--app-text-muted, var(--text-muted));
+}
+
+.eb-inline button {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: var(--brand-violet);
+  cursor: pointer;
+}

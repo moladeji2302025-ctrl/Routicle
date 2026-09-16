@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext'
 import { getCreatorByName } from '../data/creators'
 import { evaluateDownload, effectiveViewer, requiredTier, TIERS } from '../data/pricing'
 import CommentsPanel from '../components/CommentsPanel'
+import ErrorBoundary from '../components/ErrorBoundary'
 import { HeartIcon, EyeIcon, PlayIcon } from '../components/icons'
 import { formatCount } from '../utils/format'
 import { requestDownload, triggerFileDownload } from '../lib/api'
@@ -182,7 +183,9 @@ export default function DesignDetailPage() {
 
         {/* Threaded against the item's own id. Whether this is your own work
             is answered by the server, which is the only side that knows. */}
-        <CommentsPanel itemId={item.id} />
+        <ErrorBoundary inline label="Comments">
+          <CommentsPanel itemId={item.id} />
+        </ErrorBoundary>
       </div>
     </div>
   )
