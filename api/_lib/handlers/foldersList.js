@@ -1,21 +1,43 @@
 import { sql } from '../db.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
+import { requireUser } from '../auth.js'
+import { requireMembership } from '../guard.js'
 
 /**
  * Team folders — the shared, foldered view of a workspace's library.
  *
- * Trusts the caller-supplied organizationId/userId the same way collections.js
- * and downloads.js do; server-side session verification is still outstanding
- * for every endpoint in this app.
+ * Every branch is gated on membership of the workspace the folder belongs to.
+ * Where a branch is keyed by folder id rather than organization id, the owning
+ * organization is looked up first and membership checked against that — a
+ * folder id on its own is not authority to rename or delete it.
  *
  * GET    ?organizationId=            folders for a team, with item counts
- * POST   { organizationId, name, createdBy, isDefault? }   create one
+ * POST   { organizationId, name, isDefault? }   create one
  * PATCH  { id, name?, isStarred? }   rename / star
  * DELETE ?id=                        delete (its items cascade)
  */
+async function orgOfFolder(folderId) {
+  const rows = await sql`SELECT organization_id FROM team_folders WHERE id = ${folderId} LIMIT 1`
+  return rows[0]?.organization_id || null
+}
+
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['GET', 'POST', 'PATCH', 'DELETE'])) return
+
+    const user = await requireUser(req, res)
+    if (!user) return
+
+    const byId = req.method === 'PATCH' ? req.body?.id : req.method === 'DELETE' ? req.query?.id : null
+    if (byId) {
+      const org = await orgOfFolder(byId)
+      if (!org) return send(res, 404, { error: 'not found' })
+      if (!(await requireMembership(res, user.id, org))) return
+    } else {
+      const org = req.method === 'GET' ? req.query?.organizationId : req.body?.organizationId
+      if (!org) return send(res, 400, { error: 'organizationId is required' })
+      if (!(await requireMembership(res, user.id, org))) return
+    }
 
     if (req.method === 'GET') {
       const { organizationId } = req.query || {}

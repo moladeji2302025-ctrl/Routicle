@@ -232,7 +232,14 @@ export function AppProvider({ children }) {
       .catch((err) => console.error('fetchApprovedContent failed', err))
   }, [])
 
+  // The moderation queue is admin-only on the server now, so only ask for it
+  // when the server has already said this session is an admin. Firing it for
+  // everyone meant a 403 and a console error on every page load.
   const refreshPending = useCallback(() => {
+    if (!isPlatformAdmin) {
+      setLivePendingSubmissions([])
+      return
+    }
     api
       .fetchPendingSubmissions()
       .then((rows) =>
@@ -252,7 +259,7 @@ export function AppProvider({ children }) {
         )
       )
       .catch((err) => console.error('fetchPendingSubmissions failed', err))
-  }, [])
+  }, [isPlatformAdmin])
 
   useEffect(() => {
     refreshLiveContent()

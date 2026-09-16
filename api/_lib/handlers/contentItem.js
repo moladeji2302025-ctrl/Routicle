@@ -1,6 +1,7 @@
 import { sql } from '../db.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { publicPreviewUrl } from '../s3.js'
+import { requireAdmin } from '../auth.js'
 
 function toFeedShape(row) {
   return {
@@ -9,7 +10,10 @@ function toFeedShape(row) {
     avatar: '/images/a1.jpg',
     title: row.title,
     creator: row.creator_name,
-    creatorEmail: row.creator_email,
+    // No creator email and no storage keys in a public projection: the first is
+    // harvestable, and the second names the paywalled objects directly. Only
+    // the file labels go out, which fileTypes already implies.
+    sourceFiles: (row.source_object_keys || []).map((f) => ({ label: f.label })),
     department: row.department,
     appreciations: row.appreciation_count,
     views: row.download_count,
@@ -19,7 +23,6 @@ function toFeedShape(row) {
     moderationStatus: row.moderation_status,
     behindTheDesign: row.behind_the_design || '',
     description: row.description || '',
-    sourceObjectKeys: row.source_object_keys || [],
     isLive: true,
   }
 }
@@ -40,6 +43,11 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PATCH') {
+      // Flipping an item to free removes its paywall. Admin only — this was
+      // open to anyone, so the whole library could be unlocked item by item.
+      const admin = await requireAdmin(req, res)
+      if (!admin) return
+
       const { isFree } = req.body || {}
       const rows = await sql`
         UPDATE content_items SET is_free = ${Boolean(isFree)}, updated_at = now()

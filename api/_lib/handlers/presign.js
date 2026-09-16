@@ -2,15 +2,29 @@ import { sql } from '../db.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { buildObjectKey, presignUpload, SOURCE_BUCKET, PREVIEW_BUCKET, publicPreviewUrl } from '../s3.js'
 import { maxFileBytes, maxCreatorBytes, maxLibraryBytes, formatBytes } from '../limits.js'
+import { requireUser } from '../auth.js'
+import { requireCreator } from '../guard.js'
+import { limit, LIMITS } from '../ratelimit.js'
 
-/** Returns a presigned PUT URL the browser uploads directly to — file bytes never touch our server. */
+/**
+ * Returns a presigned PUT URL the browser uploads directly to — file bytes
+ * never touch our server.
+ *
+ * The creator is resolved from the verified session, not from a `creatorEmail`
+ * in the body. Taking it from the body meant anyone could mint upload URLs
+ * into anyone else's storage, against their quota, attributed to them.
+ */
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['POST'])) return
 
-    const { creatorEmail, fileName, contentType, kind, size } = req.body || {}
-    if (!creatorEmail || !fileName || !kind) {
-      return send(res, 400, { error: 'creatorEmail, fileName, and kind are required' })
+    const user = await requireUser(req, res)
+    if (!user) return
+    if (!(await limit(req, res, { name: 'presign', key: user.id, ...LIMITS.presign }))) return
+
+    const { fileName, contentType, kind, size } = req.body || {}
+    if (!fileName || !kind) {
+      return send(res, 400, { error: 'fileName and kind are required' })
     }
     if (!['source', 'thumbnail', 'preview'].includes(kind)) {
       return send(res, 400, { error: 'kind must be one of source, thumbnail, preview' })
@@ -29,9 +43,10 @@ export default async function handler(req, res) {
       })
     }
 
-    const rows = await sql`SELECT id, storage_bytes FROM creators WHERE email = ${creatorEmail.toLowerCase().trim()}`
-    if (rows.length === 0) return send(res, 404, { error: 'creator not found — apply as a creator first' })
-    const creatorId = rows[0].id
+    const creator = await requireCreator(res, user)
+    if (!creator) return
+    const creatorId = creator.id
+    const rows = [creator]
 
     // Quotas are unlimited unless deliberately configured, so these are skipped
     // entirely in the default setup rather than costing a query.

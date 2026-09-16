@@ -46,7 +46,7 @@ export default function DesignDetailPage() {
   }
 
   async function deliverRealFiles() {
-    if (!item.isLive || !item.sourceObjectKeys?.length) return
+    if (!item.isLive || !item.sourceFiles?.length) return
     try {
       const { files } = await requestDownload(item.id, currentUser.email, activeTeam?.id)
       files.forEach((file) => triggerFileDownload(file.url, file.label))

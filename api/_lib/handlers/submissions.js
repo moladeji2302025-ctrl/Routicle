@@ -1,11 +1,21 @@
 import { sql } from '../db.js'
 import { headObjectSize, SOURCE_BUCKET, PREVIEW_BUCKET } from '../s3.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
+import { requireUser, requireAdmin } from '../auth.js'
+import { requireCreator } from '../guard.js'
+
+const STATUSES = ['pending', 'approved', 'rejected', 'changes-requested']
 
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (req.method === 'GET') {
+      // The moderation queue, including creator email addresses. Admin only —
+      // it was readable by anyone.
+      const admin = await requireAdmin(req, res)
+      if (!admin) return
+
       const status = req.query.status || 'pending'
+      if (!STATUSES.includes(status)) return send(res, 400, { error: 'Unknown status' })
       const rows = await sql`
         SELECT ci.*, c.name AS creator_name, c.email AS creator_email
         FROM content_items ci
@@ -18,8 +28,10 @@ export default async function handler(req, res) {
 
     if (!methodGuard(req, res, ['POST'])) return
 
+    const user = await requireUser(req, res)
+    if (!user) return
+
     const {
-      creatorEmail,
       title,
       department,
       subDepartment,
@@ -32,13 +44,15 @@ export default async function handler(req, res) {
       sourceObjectKeys,
     } = req.body || {}
 
-    if (!creatorEmail || !title || !department || !thumbnailKey) {
-      return send(res, 400, { error: 'creatorEmail, title, department, and thumbnailKey are required' })
+    if (!title || !department || !thumbnailKey) {
+      return send(res, 400, { error: 'title, department, and thumbnailKey are required' })
     }
 
-    const creatorRows = await sql`SELECT id FROM creators WHERE email = ${creatorEmail.toLowerCase().trim()}`
-    if (creatorRows.length === 0) return send(res, 404, { error: 'creator not found — apply as a creator first' })
-    const creatorId = creatorRows[0].id
+    // Attributed to the session's own creator record, so a submission cannot be
+    // filed under someone else's name.
+    const creator = await requireCreator(res, user)
+    if (!creator) return
+    const creatorId = creator.id
 
     // Measure what actually landed in the bucket rather than trusting the
     // browser's claim: the presigned URL enforces the declared size, but the

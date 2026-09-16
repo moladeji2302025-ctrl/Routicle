@@ -58,10 +58,10 @@ export function fetchPendingSubmissions() {
   return request('/creator/submissions?status=pending')
 }
 
-async function presignUpload({ creatorEmail, file, kind }) {
+async function presignUpload({ file, kind }) {
   const { uploadUrl, objectKey, publicUrl } = await request('/creator/presign', {
     method: 'POST',
-    body: JSON.stringify({ creatorEmail, fileName: file.name, contentType: file.type, kind, size: file.size }),
+    body: JSON.stringify({ fileName: file.name, contentType: file.type, kind, size: file.size }),
   })
   const putRes = await fetch(uploadUrl, {
     method: 'PUT',
@@ -88,17 +88,17 @@ export async function submitRealUpload({
   previewVideoFile,
   sourceFiles, // [{ label, file }]
 }) {
-  const thumbnail = await presignUpload({ creatorEmail, file: thumbnailFile, kind: 'thumbnail' })
+  const thumbnail = await presignUpload({ file: thumbnailFile, kind: 'thumbnail' })
 
   let previewVideoKey = null
   if (previewVideoFile) {
-    const preview = await presignUpload({ creatorEmail, file: previewVideoFile, kind: 'preview' })
+    const preview = await presignUpload({ file: previewVideoFile, kind: 'preview' })
     previewVideoKey = preview.objectKey
   }
 
   const sourceObjectKeys = []
   for (const { label, file } of sourceFiles) {
-    const uploaded = await presignUpload({ creatorEmail, file, kind: 'source' })
+    const uploaded = await presignUpload({ file, kind: 'source' })
     sourceObjectKeys.push({ label, key: uploaded.objectKey })
   }
 

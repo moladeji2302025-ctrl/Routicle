@@ -3,6 +3,8 @@ import { sql } from '../db.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { initializeTransaction } from '../paystack.js'
 import { priceFor, planCodeFor, TIERS, CYCLES } from '../plans.js'
+import { requireUser } from '../auth.js'
+import { limit, LIMITS } from '../ratelimit.js'
 
 /**
  * Starts a subscription checkout.
@@ -18,8 +20,15 @@ export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['POST'])) return
 
-    const { userId, email, tier, billingCycle, organizationId, returnUrl } = req.body || {}
-    if (!userId || !email) return send(res, 400, { error: 'userId and email are required' })
+    // The buyer is the session user. Taking userId/email from the body let a
+    // caller start a checkout that would activate somebody else's plan.
+    const user = await requireUser(req, res)
+    if (!user) return
+    if (!(await limit(req, res, { name: 'checkout', key: user.id, ...LIMITS.write }))) return
+
+    const userId = user.id
+    const email = user.email
+    const { tier, billingCycle, organizationId, returnUrl } = req.body || {}
     if (!TIERS.includes(tier)) return send(res, 400, { error: `tier must be one of ${TIERS.join(', ')}` })
     if (!CYCLES.includes(billingCycle)) return send(res, 400, { error: `billingCycle must be one of ${CYCLES.join(', ')}` })
 

@@ -2,17 +2,26 @@ import { sql } from '../db.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { disableSubscription } from '../paystack.js'
 import { activeSubscription, serializeSubscription } from '../billing.js'
+import { requireUser } from '../auth.js'
+import { requireMembership } from '../guard.js'
 
 /**
- * GET    ?userId=&organizationId=   the subscription currently in force
- * DELETE ?userId=&organizationId=   cancel it (stays active until period end)
+ * GET    ?organizationId=   the subscription currently in force
+ * DELETE ?organizationId=   cancel it (stays active until period end)
+ *
+ * The subscriber is the session user. A `userId` in the query is ignored: when
+ * it was trusted, anyone could read — and cancel — anyone else's plan.
  */
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['GET', 'DELETE'])) return
 
-    const { userId, organizationId } = req.query || {}
-    if (!userId) return send(res, 400, { error: 'userId is required' })
+    const user = await requireUser(req, res)
+    if (!user) return
+    const userId = user.id
+
+    const { organizationId } = req.query || {}
+    if (organizationId && !(await requireMembership(res, userId, organizationId))) return
 
     if (req.method === 'GET') {
       const sub = await activeSubscription({ userId, organizationId })

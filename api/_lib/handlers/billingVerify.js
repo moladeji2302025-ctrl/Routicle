@@ -2,6 +2,9 @@ import { sql } from '../db.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { verifyTransaction } from '../paystack.js'
 import { activateFromTransaction, serializeSubscription } from '../billing.js'
+import { requireUser } from '../auth.js'
+import { orgRole } from '../guard.js'
+import { limit, LIMITS } from '../ratelimit.js'
 
 /**
  * Confirms a checkout after the buyer returns from Paystack.
@@ -17,12 +20,25 @@ export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['POST'])) return
 
+    const user = await requireUser(req, res)
+    if (!user) return
+    if (!(await limit(req, res, { name: 'verify', key: user.id, ...LIMITS.write }))) return
+
     const { reference } = req.body || {}
     if (!reference) return send(res, 400, { error: 'reference is required' })
 
     const local = await sql`SELECT * FROM transactions WHERE reference = ${reference}`
     if (local.length === 0) return send(res, 404, { error: 'Unknown transaction reference' })
     const txn = local[0]
+
+    // The reference must be this caller's own — their personal transaction, or
+    // one belonging to a workspace they are in. Without this, a reference is a
+    // bearer token: anyone holding one could read back the resulting
+    // subscription, and guessing at them enumerated which references exist.
+    const ownsIt =
+      txn.user_id === user.id ||
+      (txn.organization_id ? Boolean(await orgRole(user.id, txn.organization_id)) : false)
+    if (!ownsIt) return send(res, 404, { error: 'Unknown transaction reference' })
 
     const data = await verifyTransaction(reference)
 

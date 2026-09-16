@@ -1,9 +1,17 @@
 import { sql } from '../db.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
+import { requireAdmin } from '../auth.js'
 
+/**
+ * Approve or reject a submission. Admin only — this decides what the whole
+ * library shows, and it previously ran with no session check at all.
+ */
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['POST'])) return
+
+    const admin = await requireAdmin(req, res)
+    if (!admin) return
 
     const { id, action, note } = req.body || {}
     if (!id || !['approve', 'reject'].includes(action)) {
