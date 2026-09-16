@@ -11788,36 +11788,44 @@ html {
 
 .app-cursor-shape {
   display: block;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
-  border-radius: 50%;
-  background: var(--app-text, #16161a);
-  transform: rotate(0deg) scale(1);
+  width: 15px;
+  height: 15px;
+  margin: -7.5px 0 0 -7.5px;
+
+  /* Both states are outlines, so the stroke is an inset shadow rather than a
+     border: it tweens cleanly and never affects the box. The two widths differ
+     because the diamond is drawn at 0.886 scale — 1.9 x 0.886 is about 1.7, so
+     the stroke *looks* the same thickness in both shapes. */
+  background: transparent;
+  /* Follows the theme's text colour: black in light, white in dark. */
+  box-shadow: inset 0 0 0 1.9px var(--app-text, #16161a);
+
+  /* Rest is the diamond: a square turned 45 degrees, scaled by sqrt(pi)/2 so it
+     covers the same area as the circle it becomes. */
+  border-radius: 1px;
+  transform: rotate(45deg) scale(0.886);
   transition:
     border-radius 0.3s cubic-bezier(0.34, 1.4, 0.64, 1),
-    transform 0.52s cubic-bezier(0.33, 1.2, 0.5, 1);
+    box-shadow 0.34s cubic-bezier(0.34, 1.3, 0.64, 1),
+    transform 1.15s cubic-bezier(0.25, 1, 0.34, 1);
 }
 
-/* 0.886 is √π/2 — the scale at which the square's area equals the circle's, so
-   the shape changes without the amount of ink changing.
- *
- * 405deg is one full turn plus the 45 that makes a square read as a diamond.
- * The spin is what sells the morph: a circle rotating looks like nothing, so
- * without it the only visible change is the corners sharpening. Corners go all
- * the way to square rather than staying softly rounded, for the same reason.
- * Colour is deliberately unchanged — the shape is the signal. */
+/* Hover unwinds a full turn into the circle. 405 is 360 + the 45 the diamond
+   sits at, so it travels a whole revolution rather than snapping back through
+   the short way. The spin is only visible while the shape is still cornered,
+   which is what makes the change register at 12px. */
 .app-cursor-diamond .app-cursor-shape {
-  border-radius: 1px;
-  transform: rotate(405deg) scale(0.886);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.7px var(--app-text, #16161a);
+  transform: rotate(405deg) scale(1);
 }
 
 .app-cursor-down .app-cursor-shape {
-  transform: rotate(0deg) scale(0.7);
+  transform: rotate(45deg) scale(0.68);
 }
 
 .app-cursor-diamond.app-cursor-down .app-cursor-shape {
-  transform: rotate(405deg) scale(0.62);
+  transform: rotate(405deg) scale(0.8);
 }
 
 /* Hiding the native pointer is done by a class the component adds on mount, so
