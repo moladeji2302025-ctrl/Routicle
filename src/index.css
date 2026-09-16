@@ -12076,3 +12076,275 @@ html {
     animation: none;
   }
 }
+
+
+/* ================================================ comments and reviews === */
+
+.cm {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--app-border, var(--border));
+}
+
+.cm-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.cm-head h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--app-text, var(--text));
+}
+
+.cm-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--app-text-muted, var(--text-muted));
+}
+
+.cm-summary strong {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--app-text, var(--text));
+}
+
+/* ---- stars ---- */
+
+.cm-stars {
+  display: inline-flex;
+  gap: 1px;
+  color: #f5b53f;
+  line-height: 0;
+}
+
+.cm-stars-live button {
+  border: none;
+  background: none;
+  padding: 0 1px;
+  color: inherit;
+  cursor: pointer;
+  line-height: 0;
+  transition: transform 0.12s ease;
+}
+
+.cm-stars-live button:hover {
+  transform: scale(1.18);
+}
+
+/* ---- the composer ---- */
+
+.cm-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.cm-form-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cm-form textarea,
+.cm-edit textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--app-border, var(--border));
+  border-radius: 12px;
+  background: var(--app-bg, var(--surface));
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--app-text, var(--text));
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.cm-form textarea:focus,
+.cm-edit textarea:focus {
+  border-color: var(--brand-purple);
+}
+
+.cm-form-foot,
+.cm-edit-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.cm-rate {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-text-muted, var(--text-muted));
+}
+
+.cm-note {
+  font-size: 12.5px;
+  color: var(--app-text-muted, var(--text-muted));
+}
+
+.cm-post {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 10px;
+  background: var(--brand-violet);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.cm-post:hover:not(:disabled) {
+  transform: scale(1.03);
+}
+
+.cm-post:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---- the thread ---- */
+
+.cm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cm-item {
+  display: flex;
+  gap: 12px;
+}
+
+.cm-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cm-item-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.cm-item-head strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--app-text, var(--text));
+}
+
+.cm-when {
+  font-size: 11.5px;
+  color: var(--app-text-muted, var(--text-muted));
+}
+
+/* `pre-wrap` keeps the author's own line breaks without letting a wall of
+   pasted text push the column wide. */
+.cm-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--app-text, var(--text));
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.cm-item-actions,
+.cm-edit-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.cm-link {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-muted, var(--text-muted));
+  cursor: pointer;
+}
+
+.cm-link:hover {
+  color: var(--app-text, var(--text));
+}
+
+.cm-link-danger:hover {
+  color: #e5484d;
+}
+
+/* ---- avatars ---- */
+
+.cm-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cm-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-hover, var(--surface-2));
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--app-text, var(--text));
+}
+
+/* ---- states ---- */
+
+.cm-empty,
+.cm-signin,
+.cm-foot {
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  color: var(--app-text-muted, var(--text-muted));
+}
+
+.cm-foot {
+  margin: 20px 0 0;
+  font-size: 12.5px;
+}
+
+.cm-signin a {
+  font-weight: 700;
+  color: var(--brand-violet);
+}
+
+.cm-error {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: #e5484d;
+}
+
+@media (max-width: 620px) {
+  .cm-form-foot,
+  .cm-edit-foot {
+    align-items: flex-start;
+  }
+}

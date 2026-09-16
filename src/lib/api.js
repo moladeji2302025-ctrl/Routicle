@@ -392,3 +392,27 @@ export function triggerFileDownload(url, fileName) {
   a.click()
   a.remove()
 }
+
+/* ---------------------------------------------------------------- comments */
+
+export function fetchComments(itemId) {
+  return request(`/library/comments?itemId=${encodeURIComponent(itemId)}`)
+}
+
+export function postComment({ itemId, body, rating }) {
+  return request('/library/comments', {
+    method: 'POST',
+    body: JSON.stringify({ itemId, body, rating: rating || null }),
+  })
+}
+
+export function updateComment({ id, body, rating }) {
+  return request('/library/comments', {
+    method: 'PATCH',
+    body: JSON.stringify({ id, body, rating: rating || null }),
+  })
+}
+
+export function deleteComment(id) {
+  return request(`/library/comments?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+}

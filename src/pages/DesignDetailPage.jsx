@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getCreatorByName } from '../data/creators'
 import { evaluateDownload, effectiveViewer, requiredTier, TIERS } from '../data/pricing'
+import CommentsPanel from '../components/CommentsPanel'
 import { HeartIcon, EyeIcon, PlayIcon } from '../components/icons'
 import { formatCount } from '../utils/format'
 import { requestDownload, triggerFileDownload } from '../lib/api'
@@ -178,6 +179,10 @@ export default function DesignDetailPage() {
         <p className="detail-license">
           Non-exclusive license. This creator keeps every right to their work and may sell or post it elsewhere too.
         </p>
+
+        {/* Threaded against the item's own id. Whether this is your own work
+            is answered by the server, which is the only side that knows. */}
+        <CommentsPanel itemId={item.id} />
       </div>
     </div>
   )
