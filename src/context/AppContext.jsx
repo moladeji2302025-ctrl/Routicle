@@ -34,6 +34,14 @@ function loadInitialSettings() {
   } catch {
     // ignore corrupt/blocked storage
   }
+  // Same rename, different store: a browsing list saved as `mutedDepartments`
+  // would not crash, it would just quietly vanish behind the default empty
+  // array — someone's muted categories silently un-muting themselves.
+  if (stored?.browsing?.mutedDepartments && !stored.browsing.mutedCategories) {
+    stored.browsing.mutedCategories = stored.browsing.mutedDepartments
+    delete stored.browsing.mutedDepartments
+  }
+
   const merged = mergeSettings(DEFAULT_SETTINGS, stored)
 
   // One-time migration from the standalone theme key this replaced, so anyone
@@ -53,10 +61,43 @@ function systemPrefersDark() {
   return typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-color-scheme: dark)').matches
 }
 
+/**
+ * Brings a stored content item up to the current shape.
+ *
+ * Saved state outlives a rename. `department` became `category` and
+ * `sourceObjectKeys` became `sourceFiles`, but every browser that used the app
+ * before those changes still has the old keys sitting in localStorage — and
+ * nothing re-reads them, because the library is served from storage first.
+ * Without this the new field is simply undefined, which is how a design page
+ * ended up calling `.replace` on nothing and taking the whole render down.
+ */
+function migrateItem(item) {
+  if (!item || typeof item !== 'object') return item
+  const next = { ...item }
+  if (next.category === undefined && next.department !== undefined) next.category = next.department
+  if (next.subCategory === undefined && next.subDepartment !== undefined) next.subCategory = next.subDepartment
+  if (next.sourceFiles === undefined && Array.isArray(next.sourceObjectKeys)) {
+    next.sourceFiles = next.sourceObjectKeys.map((f) => ({ label: f?.label }))
+  }
+  delete next.department
+  delete next.subDepartment
+  return next
+}
+
 function loadInitialState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return { profiles: {}, pendingIntentRedirect: null, ...JSON.parse(raw) }
+    if (raw) {
+      const stored = JSON.parse(raw)
+      return {
+        profiles: {},
+        pendingIntentRedirect: null,
+        ...stored,
+        contentItems: Array.isArray(stored.contentItems)
+          ? stored.contentItems.map(migrateItem)
+          : FEED_ITEMS.map((item) => ({ ...item, moderationStatus: 'approved' })),
+      }
+    }
   } catch {
     // ignore corrupt/blocked storage, fall through to defaults
   }

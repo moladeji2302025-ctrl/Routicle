@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getCreatorByName } from '../data/creators'
 import { evaluateDownload, effectiveViewer, requiredTier, TIERS } from '../data/pricing'
+import { categoryLabel } from '../data/categories'
 import CommentsPanel from '../components/CommentsPanel'
 import ErrorBoundary from '../components/ErrorBoundary'
 import { HeartIcon, EyeIcon, PlayIcon } from '../components/icons'
@@ -120,7 +121,7 @@ export default function DesignDetailPage() {
 
       <div className="detail-info">
         <div className="detail-tags-row">
-          <span className="tag tag-category">{item.category.replace('-', ' ')}</span>
+          <span className="tag tag-category">{categoryLabel(item.category)}</span>
           {item.free && <span className="tag tag-free">Free</span>}
           <span className="tag tag-tier">{TIERS[tier].label} tier</span>
         </div>
@@ -136,7 +137,7 @@ export default function DesignDetailPage() {
         </Link>
 
         <p className="detail-description">
-          A {TIERS[tier].label.toLowerCase()}-tier {item.category.replace('-', ' ')} piece
+          A {TIERS[tier].label.toLowerCase()}-tier {categoryLabel(item.category).toLowerCase()} piece
           {item.fileTypes.length > 0 ? ` — includes ${item.fileTypes.join(', ')} source files.` : '.'}
         </p>
 

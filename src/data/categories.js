@@ -6,4 +6,6 @@ export const CATEGORIES = [
   { id: 'ai-video', label: 'AI-Generated Video' },
 ]
 
-export const categoryLabel = (id) => CATEGORIES.find((d) => d.id === id)?.label ?? id
+/** Falls back to the id, then to a blank — never to undefined, which callers
+ *  went on to call string methods on. */
+export const categoryLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label ?? id ?? ''
