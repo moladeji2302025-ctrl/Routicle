@@ -12427,3 +12427,108 @@ html {
   color: var(--brand-violet);
   cursor: pointer;
 }
+
+
+/* ==================================================== one button shape ====
+
+   Every button is a pill. The app had grown three different radii — 7, 8, 9
+   and 10px on various buttons, alongside a lot that were already 999px — so
+   the same action looked like a different component depending on which screen
+   it was on.
+
+   999px rather than a fixed radius: a pill has to stay a pill at any height,
+   and a literal value has to be re-picked every time the padding changes.
+
+   Listed explicitly rather than applied to `button`, because not everything
+   built from a <button> is a button-shaped thing — dropdown rows, nav items
+   and segmented-control containers are handled below or deliberately left. */
+.capabilities-cta,
+.feed-sort-btn,
+.detail-download-btn,
+.auth-intent-btn,
+.auth-oauth-btn,
+.studio-upscale-btn,
+.app-create-btn,
+.app-icon-btn,
+.account-menu-cta,
+.app-cta-btn,
+.settings-btn,
+.settings-avatar-edit-btn,
+.folder-star,
+.folder-menu-btn,
+.folder-view-btn,
+.app-topbar-btn,
+.app-topbar-icon,
+.app-ws-add,
+.app-ws-empty-btn,
+.app-ws-links a,
+.me-reset,
+.me-close,
+.me-icon-btn,
+.me-shape,
+.me-copy,
+.cm-post,
+.eb-btn,
+.fp-cat,
+.btn-solid,
+.btn-hero-primary,
+.btn-hero-secondary,
+.pricing-cta,
+.app-follow-btn,
+.app-ws-new button,
+.cm-link,
+.settings-seg,
+.settings-seg-btn,
+.me-seg,
+.me-seg-btn,
+.cinematic-discover-btn,
+.cinematic-secondary-btn,
+.cinematic-nav-signup,
+.creator-teaser-cta,
+.hero-deck-btn-primary,
+.hero-deck-btn-secondary,
+.hero-mini-cta,
+.showcase-tour-link,
+.team-plan-btn,
+.account-demo-btn,
+.filter-btn,
+.feed-icon-btn,
+.explore-filter-btn,
+.explore-sort-btn,
+.pricing-segment,
+.pricing-segment-btn {
+  border-radius: 999px;
+}
+
+/* A transparent wrapper round a circular avatar: shaped so its focus ring is a
+   circle too, instead of a square box around a round picture. */
+.app-avatar-link {
+  border-radius: 999px;
+}
+
+/* The split export control keeps its seam: two halves that together read as
+   one pill, so only the outer corners round. */
+.me-export {
+  border-radius: 999px 0 0 999px;
+}
+
+.me-export-more {
+  border-radius: 0 999px 999px 0;
+}
+
+/* Square-ish icon buttons become circles at this radius, which is what a pill
+   collapses to — so they need equal width and height to avoid an oval. */
+.app-topbar-icon,
+.app-icon-btn,
+.app-ws-add,
+.me-close {
+  aspect-ratio: 1;
+}
+
+/* Deliberately not pills:
+     · dropdown and menu rows (.me-export-menu button, .folder-menu button,
+       .settings-avatar-menu button, .account-menu-item) — full-width list
+       rows, where a pill reads as a stray tag rather than a row;
+     · .app-nav-item — sidebar navigation, not an action;
+     · .fp-trigger — a full-width select, which belongs with the inputs it
+       sits among rather than with the buttons. */
