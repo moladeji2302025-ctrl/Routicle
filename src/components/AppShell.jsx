@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import AccountMenu from './AccountMenu'
+import AppTopBar from './AppTopBar'
 import {
   HomeIcon,
   SearchIcon,
@@ -19,6 +20,7 @@ import {
   HelpIcon,
   PenIcon,
   ShieldIcon,
+  BellIcon,
 } from './icons'
 
 /**
@@ -65,7 +67,7 @@ const NAV_GROUPS = [
   {
     label: 'More',
     items: [
-      { label: "What's new", to: '/updates', icon: SparkleIcon },
+      { label: "What's new", to: '/updates', icon: BellIcon },
       { label: 'Resources', to: '/resources', icon: HelpIcon },
       { label: 'Pricing', to: '/pricing', icon: CardIcon },
       { label: 'Settings', to: '/settings', icon: SettingsIcon },
@@ -80,10 +82,34 @@ const NAV_GROUPS = [
   },
 ]
 
+const COLLAPSE_KEY = 'routicle_sidebar_collapsed'
+
 export default function AppShell() {
   const { currentUser, isPlatformAdmin } = useApp()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Remembered per browser: someone who works collapsed should not have to
+  // collapse it again on every visit.
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(COLLAPSE_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
+
+  function toggleSidebar() {
+    setCollapsed((v) => {
+      const next = !v
+      try {
+        localStorage.setItem(COLLAPSE_KEY, next ? '1' : '0')
+      } catch {
+        // storage blocked — the choice just won't persist
+      }
+      return next
+    })
+  }
   const navContext = { ...currentUser, isPlatformAdmin }
 
   // Default match is prefix-based, so /design/12 doesn't light up Explore but
@@ -94,16 +120,21 @@ export default function AppShell() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={collapsed ? 'app-shell app-shell-collapsed' : 'app-shell'}>
       <aside className="app-sidebar">
-        <Link to="/" className="app-logo">
+        <Link to="/" className="app-logo" title="Routicle">
           <img src="/brand/routicle-mark-black.svg" alt="" className="app-logo-icon" />
-          Routicle
+          <span className="app-rail-label">Routicle</span>
         </Link>
 
-        <button type="button" className="app-create-btn" onClick={() => navigate('/studio/image')}>
+        <button
+          type="button"
+          className="app-create-btn"
+          onClick={() => navigate('/studio/image')}
+          title="Create"
+        >
           <PlusIcon size={16} color="currentColor" />
-          Create
+          <span className="app-rail-label">Create</span>
         </button>
 
         <nav className="app-nav">
@@ -114,6 +145,9 @@ export default function AppShell() {
             return (
               <div key={group.label} className="app-nav-group">
                 <p className="app-nav-label">{group.label}</p>
+                {/* Stands in for the group label once collapsed, so the rail
+                    keeps its grouping without room for words. */}
+                <span className="app-nav-rule" aria-hidden="true" />
                 {items.map((item) => {
                   const Icon = item.icon
                   return (
@@ -121,9 +155,10 @@ export default function AppShell() {
                       key={item.label}
                       to={item.to}
                       className={isActive(item) ? 'app-nav-item app-nav-item-active' : 'app-nav-item'}
+                      title={item.label}
                     >
                       <Icon size={16} color="currentColor" />
-                      {item.label}
+                      <span className="app-rail-label">{item.label}</span>
                     </Link>
                   )
                 })}
@@ -132,14 +167,14 @@ export default function AppShell() {
           })}
         </nav>
 
-        <div className="app-sidebar-bottom">
-          <AccountMenu />
-        </div>
       </aside>
 
-      <main className="app-main">
-        <Outlet />
-      </main>
+      <div className="app-main-col">
+        <AppTopBar collapsed={collapsed} onToggleSidebar={toggleSidebar} />
+        <main className="app-main">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

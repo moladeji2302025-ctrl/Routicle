@@ -62,7 +62,8 @@ export function PenIcon({ size = 18, color = 'currentColor' }) {
 export function SparkleIcon({ size = 18, color = 'currentColor' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-      <path d="M12 2l1.8 5.7L19.5 9l-5.7 1.8L12 16.5l-1.8-5.7L4.5 9l5.7-1.3L12 2z" />
+      <path d="M11.4 2.4c.4 4.6 3.6 7.8 8.2 8.2.5.1.5.7 0 .8-4.6.4-7.8 3.6-8.2 8.2-.1.5-.7.5-.8 0-.4-4.6-3.6-7.8-8.2-8.2-.5-.1-.5-.7 0-.8 4.6-.4 7.8-3.6 8.2-8.2.1-.5.7-.5.8 0z" />
+      <path d="M18.6 14.6c.2 1.9 1.1 2.8 3 3 .3 0 .3.4 0 .4-1.9.2-2.8 1.1-3 3 0 .3-.4.3-.4 0-.2-1.9-1.1-2.8-3-3-.3 0-.3-.4 0-.4 1.9-.2 2.8-1.1 3-3 0-.3.4-.3.4 0z" />
     </svg>
   )
 }
@@ -255,6 +256,24 @@ export function ShieldIcon({ size = 18, color = 'currentColor' }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 2.8 4.5 6v5.4c0 4.5 3 8.2 7.5 9.8 4.5-1.6 7.5-5.3 7.5-9.8V6Z" />
       <path d="m9.2 12 2 2 3.6-3.8" />
+    </svg>
+  )
+}
+
+export function BellIcon({ size = 18, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8a6 6 0 0 0-12 0c0 6-2.5 7-2.5 7h17S18 14 18 8" />
+      <path d="M13.7 20a2 2 0 0 1-3.4 0" />
+    </svg>
+  )
+}
+
+export function PanelIcon({ size = 18, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="16" rx="2.5" />
+      <path d="M9.5 4v16" />
     </svg>
   )
 }

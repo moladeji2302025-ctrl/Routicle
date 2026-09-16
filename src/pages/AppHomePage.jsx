@@ -269,7 +269,8 @@ export default function AppHomePage() {
         </section>
       )}
 
-      <div className="app-panel-row">
+      <div className="app-split">
+        <div className="app-split-side">
         <div className="app-panel">
           <div className="app-panel-head">
             <h3>Your plan</h3>
@@ -372,8 +373,9 @@ export default function AppHomePage() {
             <p className="app-panel-note">Nothing saved yet — tap the bookmark on any design.</p>
           )}
         </div>
-      </div>
+        </div>
 
+        <div className="app-split-main">
       <section className="app-section">
         <div className="app-section-head">
           <h2>Fresh in the library</h2>
@@ -392,8 +394,10 @@ export default function AppHomePage() {
           ))}
         </div>
       </section>
+        </div>
+      </div>
 
-      <section className="app-section">
+      <section className="app-section app-section-wide">
         <div className="app-section-head">
           <h2>Browse by department</h2>
           <Link to="/departments">See all <ChevronRightIcon size={13} color="currentColor" /></Link>
@@ -409,8 +413,9 @@ export default function AppHomePage() {
         </div>
       </section>
 
+      <div className="app-split app-split-flip">
       {suggestedCreators.length > 0 && (
-        <section className="app-section">
+        <section className="app-section app-split-main">
           <div className="app-section-head">
             <h2>Creators to follow</h2>
           </div>
@@ -433,7 +438,7 @@ export default function AppHomePage() {
         </section>
       )}
 
-      <div className="app-panel app-cta-panel app-cta-wide">
+      <div className="app-panel app-cta-panel app-split-side">
         <div className="app-panel-head">
           <h3>{currentUser?.isCreator ? 'Your earnings' : 'Sell your work'}</h3>
         </div>
@@ -445,6 +450,7 @@ export default function AppHomePage() {
         <Link to={currentUser?.isCreator ? '/dashboard' : '/become-creator'} className="app-cta-btn">
           {currentUser?.isCreator ? 'Open dashboard' : 'Become a Creator'}
         </Link>
+      </div>
       </div>
     </div>
   )

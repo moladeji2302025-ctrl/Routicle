@@ -10241,3 +10241,431 @@ a.admin-stat:hover {
   flex-shrink: 0;
   margin-top: 1px;
 }
+
+/* ============================================================
+   One button family
+   ============================================================ */
+
+/* Buttons had drifted to four corner radii (8, 9, 10 and full pill) and three
+   weights across the app. Size still varies by context — a landing-page CTA
+   should be bigger than a toolbar button — but the shape, weight and hover
+   should not, so they read as the same control everywhere.
+   Deliberately excluded: .suite-subtab, .admin-tab, .explore-chip and the
+   settings chips, which are tabs and chips rather than buttons and are
+   supposed to be pills. */
+.btn-solid,
+.btn-hero-primary,
+.btn-hero-secondary,
+.hero-deck-btn-primary,
+.hero-deck-btn-secondary,
+.pricing-cta,
+.app-create-btn,
+.settings-btn,
+.account-menu-cta,
+.capabilities-cta,
+.detail-download-btn,
+.cinematic-discover-btn,
+.cinematic-secondary-btn,
+.team-member-remove,
+.hero-mini-cta {
+  border-radius: 10px;
+  font-weight: 600;
+  transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease,
+    border-color 0.15s ease, color 0.15s ease;
+}
+
+/* A single hover gesture, rather than some buttons scaling, some dimming and
+   some swapping colour. :not(:disabled) so a dead button doesn't invite a click. */
+.btn-solid:hover:not(:disabled),
+.btn-hero-primary:hover:not(:disabled),
+.btn-hero-secondary:hover:not(:disabled),
+.hero-deck-btn-primary:hover:not(:disabled),
+.hero-deck-btn-secondary:hover:not(:disabled),
+.pricing-cta:hover:not(:disabled),
+.app-create-btn:hover:not(:disabled),
+.settings-btn:hover:not(:disabled),
+.account-menu-cta:hover:not(:disabled),
+.capabilities-cta:hover:not(:disabled),
+.detail-download-btn:hover:not(:disabled) {
+  transform: scale(1.03);
+  opacity: 1;
+}
+
+/* Marketing CTAs keep their larger size — consistency of shape, not of scale. */
+.btn-hero-primary,
+.btn-hero-secondary,
+.hero-deck-btn-primary,
+.hero-deck-btn-secondary {
+  padding: 14px 26px;
+  font-size: 15px;
+}
+
+.pricing-cta {
+  padding: 13px 20px;
+  font-size: 14px;
+}
+
+.btn-solid,
+.settings-btn,
+.account-menu-cta,
+.capabilities-cta,
+.detail-download-btn,
+.app-create-btn {
+  font-size: 13.5px;
+}
+
+/* ============================================================
+   App top bar
+   ============================================================ */
+
+/* The shell is a row of sidebar + a column of (top bar, page), so the bar spans
+   the content area and the sidebar keeps its own full height. */
+.app-main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The search is positioned against the bar itself rather than laid out between
+   its neighbours, so it is pinned to the true centre on every page. Sharing a
+   row with the breadcrumb — as a flex child or even as a grid column — let a
+   long crumb or an extra button nudge it, and it visibly shifted on navigation. */
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 420px) 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 20px;
+  background: var(--app-bg);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.app-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  justify-self: start;
+  overflow: hidden;
+}
+
+.app-topbar-icon {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-topbar-icon:hover {
+  background: var(--app-hover);
+  color: var(--app-text);
+}
+
+/* Unread marker on the bell — only shown when something published is newer
+   than what was last read. */
+.app-topbar-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand-violet);
+  border: 2px solid var(--app-bg);
+}
+
+/* ---- breadcrumbs ---- */
+
+.app-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.app-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  color: var(--app-text-muted);
+}
+
+.app-crumb a {
+  color: var(--app-text-muted);
+  padding: 2px 4px;
+  border-radius: 6px;
+}
+
+.app-crumb a:hover {
+  color: var(--app-text);
+  background: var(--app-hover);
+}
+
+.app-crumb-current {
+  font-weight: 600;
+  color: var(--app-text);
+  padding: 2px 4px;
+}
+
+/* ---- search ---- */
+
+.app-topbar-search {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, calc(100% - 520px));
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-card-bg);
+  color: var(--app-text-muted);
+  transition: border-color 0.15s ease;
+}
+
+.app-topbar-search:focus-within {
+  border-color: var(--brand-purple);
+}
+
+.app-topbar-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--app-text);
+}
+
+.app-topbar-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.app-topbar-search kbd {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--app-border);
+  color: var(--app-text-muted);
+}
+
+/* ---- right side ---- */
+
+/* Pinned to the third column explicitly. The search is absolutely positioned
+   and so occupies no grid cell — without this the right-hand controls fall into
+   the middle column and land on top of it. */
+.app-topbar-right {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  justify-self: end;
+  min-width: 0;
+}
+
+.app-topbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.app-topbar-btn:hover {
+  transform: scale(1.03);
+  border-color: var(--brand-purple);
+}
+
+/* ---- collapsed sidebar ---- */
+
+/* Collapsed narrows to an icon rail rather than disappearing: navigation stays
+   one click away, and every item carries a title so the icon still names
+   itself on hover. */
+.app-nav-rule {
+  display: none;
+}
+
+.app-shell-collapsed .app-sidebar {
+  flex-basis: 62px;
+  padding: 22px 11px;
+  gap: 16px;
+  align-items: center;
+}
+
+/* One rule hides every label in the rail — logo, Create, and each nav item. */
+.app-shell-collapsed .app-rail-label,
+.app-shell-collapsed .app-nav-label {
+  display: none;
+}
+
+.app-shell-collapsed .app-logo {
+  padding: 0;
+  justify-content: center;
+}
+
+.app-shell-collapsed .app-create-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.app-shell-collapsed .app-nav {
+  width: 100%;
+  align-items: center;
+}
+
+.app-shell-collapsed .app-nav-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.app-shell-collapsed .app-nav-item {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+}
+
+/* The hairline replaces the group heading, so the rail still reads as sections
+   instead of one undifferentiated column of icons. */
+.app-shell-collapsed .app-nav-rule {
+  display: block;
+  width: 22px;
+  height: 1px;
+  margin: 7px 0;
+  background: var(--app-border);
+}
+
+.app-shell-collapsed .app-nav-group:first-child .app-nav-rule {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .app-topbar-btn,
+  .app-topbar-search kbd {
+    display: none;
+  }
+
+  /* Below this there isn't room to hold a true centre without crushing the
+     breadcrumb, so the search gives up its fixed column and just flexes. */
+  .app-topbar {
+    display: flex;
+    padding: 10px 14px;
+    gap: 10px;
+  }
+
+  .app-topbar-search {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* The account menu was built for the sidebar's bottom corner, so it opens
+   upward and left-aligned. From the top bar that would drop it off the top of
+   the window and past the right edge. */
+.app-topbar .account-menu-panel {
+  top: calc(100% + 10px);
+  bottom: auto;
+  left: auto;
+  right: 0;
+}
+
+/* Reserve the scrollbar gutter whether or not the page overflows. Without it a
+   short page has no scrollbar and a long one does, so the content area changes
+   width by ~10px between routes — which shifted the centred search bar and
+   nudged the whole layout sideways on every navigation. */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* ============================================================
+   Dashboard layout bands
+   ============================================================ */
+
+/* The dashboard was one column of equally wide stacked rows, which gave every
+   block the same weight and made the page read as a list. These bands pair a
+   wide column with a narrow one so status panels sit beside content instead of
+   each claiming a full row. */
+.app-split {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 44px;
+}
+
+/* Creators beside the pitch: wide first, narrow second. */
+.app-split-flip {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.app-split-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.app-split-main {
+  min-width: 0;
+}
+
+/* Sections inside a band already sit in a spaced grid. */
+.app-split .app-section {
+  margin-bottom: 0;
+}
+
+.app-split-side .app-panel {
+  margin: 0;
+}
+
+/* The department strip spans the full width between the two bands, so the page
+   alternates rather than settling into one rhythm. */
+.app-section-wide {
+  margin-bottom: 44px;
+}
+
+@media (max-width: 1080px) {
+  .app-split,
+  .app-split-flip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Stacked, content first — the status panels are reference, not the point. */
+  .app-split-side {
+    order: 2;
+  }
+
+  .app-split-main {
+    order: 1;
+  }
+}
