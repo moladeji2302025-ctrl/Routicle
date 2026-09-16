@@ -18,7 +18,7 @@ export default function AppearanceSettings() {
       >
         <Row
           title="Colour mode"
-          description={a.themeMode === 'system' ? `Following your OS — currently ${theme}.` : 'Fixed regardless of your OS setting.'}
+          description={a.themeMode === 'system' ? `Matches your device (currently ${theme}).` : 'Fixed regardless of your OS setting.'}
         >
           <Segmented
             name="Colour mode"

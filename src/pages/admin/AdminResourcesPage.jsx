@@ -66,8 +66,7 @@ export default function AdminResourcesPage() {
       <section className="admin-section">
         <h2>{editingId ? 'Edit resource' : 'Add a resource'}</h2>
         <p className="settings-section-desc">
-          These appear on the Resources page alongside the built-in entries — no deploy needed.
-          Links can be internal routes (<code>/help</code>) or full URLs.
+          These show up on the Resources page next to the built-in entries, and you don't need to redeploy. Links can be internal routes (<code>/help</code>) or full URLs.
         </p>
 
         <form className="admin-form" onSubmit={submit}>
@@ -164,7 +163,7 @@ export default function AdminResourcesPage() {
         {resources === null ? (
           <p className="explore-empty">Loading…</p>
         ) : resources.length === 0 ? (
-          <p className="explore-empty">Nothing added yet — the Resources page shows only its built-in entries.</p>
+          <p className="explore-empty">Nothing added yet, so the Resources page only shows its built-in entries.</p>
         ) : (
           <div className="download-list">
             {resources.map((r) => (

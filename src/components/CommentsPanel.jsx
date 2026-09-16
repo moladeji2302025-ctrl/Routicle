@@ -224,7 +224,7 @@ export default function CommentsPanel({ itemId }) {
           {loading ? (
             <p className="cm-empty">Loading…</p>
           ) : comments.length === 0 ? (
-            <p className="cm-empty">No comments yet — be the first to say something.</p>
+            <p className="cm-empty">No comments yet. Be the first to say something.</p>
           ) : (
             <ul className="cm-list">
               {comments.map((c) => (

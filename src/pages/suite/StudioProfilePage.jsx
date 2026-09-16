@@ -98,8 +98,7 @@ export default function StudioProfilePage() {
         <div>
           <h2>Studio profile</h2>
           <p className="settings-section-desc">
-            Filled in once. Every proposal, contract and invoice is built from this — it is what makes the
-            documents yours rather than a template carrying someone else&apos;s identity.
+            You only fill this in once. Every proposal, contract and invoice uses it, which is what makes the documents feel like yours instead of a generic template.
           </p>
         </div>
       </div>

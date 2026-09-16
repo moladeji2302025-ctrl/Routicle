@@ -176,7 +176,7 @@ export default function FontPicker({ value, onChange, label = 'Typeface' }) {
             </button>
           )}
           {localAsked && local.length === 0 && (
-            <p className="fp-foot">No local fonts available — permission was declined or none were found.</p>
+            <p className="fp-foot">No local fonts found. Either permission was declined or there weren't any to show.</p>
           )}
         </div>
       )}

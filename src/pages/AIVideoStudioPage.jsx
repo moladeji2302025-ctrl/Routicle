@@ -76,7 +76,7 @@ export default function AIVideoStudioPage() {
       <h3 className="studio-history-title">Generation history</h3>
       <div className="studio-history-grid">
         {currentUser.generationHistory.video.length === 0 && (
-          <p className="explore-empty">Nothing generated yet — try a prompt above.</p>
+          <p className="explore-empty">Nothing generated yet. Try a prompt above.</p>
         )}
         {currentUser.generationHistory.video.map((gen) => (
           <div key={gen.id} className="studio-result">

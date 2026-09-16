@@ -53,7 +53,7 @@ export default function BillingCallbackPage() {
         <>
           <div className="billing-spinner" aria-hidden="true" />
           <h1>Confirming your payment…</h1>
-          <p>Hang on a moment — we're checking with the payment provider.</p>
+          <p>Hang on a moment while we check with the payment provider.</p>
         </>
       )}
 
@@ -81,8 +81,7 @@ export default function BillingCallbackPage() {
         <>
           <h1>Payment still processing</h1>
           <p>
-            The provider hasn't finalised this charge yet. If it goes through, your plan activates
-            automatically — you don't need to pay again.
+            The payment provider hasn't finished processing this charge. If it goes through, your plan will activate on its own, so you don't need to pay again.
           </p>
           <Link to="/account" className="hero-deck-btn-secondary">Check billing status</Link>
         </>
@@ -92,7 +91,7 @@ export default function BillingCallbackPage() {
         <>
           <h1>We couldn't confirm that payment</h1>
           <p className="billing-callback-error">{error}</p>
-          <p>If you were charged, it'll be reconciled automatically — nothing is lost.</p>
+          <p>If you were charged, we'll sort it out automatically and you won't lose anything.</p>
           <Link to="/pricing" className="hero-deck-btn-secondary">Back to pricing</Link>
         </>
       )}

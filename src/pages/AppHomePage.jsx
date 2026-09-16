@@ -401,7 +401,7 @@ export default function AppHomePage() {
               ))}
             </div>
           ) : (
-            <p className="app-panel-note">Nothing saved yet — tap the bookmark on any design.</p>
+            <p className="app-panel-note">Nothing saved yet. Tap the bookmark on any design to save it.</p>
           )}
         </div>
         </div>
@@ -593,7 +593,7 @@ export default function AppHomePage() {
         <p className="app-cta-desc">
           {currentUser?.isCreator
             ? `$${(currentUser.earningsThisMonth || 0).toFixed(2)} this month · $${(currentUser.allTimeEarnings || 0).toFixed(2)} all time. Half of every subscription dollar is pooled and split across creators each month.`
-            : 'Upload finished designs and video you never got to use. Subscribers download the files, you get paid every month — non-exclusive, no strings attached.'}
+            : 'Upload finished designs and videos you never got to use. When subscribers download them, you get paid every month, and you keep all your rights.'}
         </p>
         <Link to={currentUser?.isCreator ? '/dashboard' : '/become-creator'} className="app-cta-btn">
           {currentUser?.isCreator ? 'Open dashboard' : 'Become a Creator'}

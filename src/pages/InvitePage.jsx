@@ -80,7 +80,7 @@ export default function InvitePage() {
       {status === 'done' && (
         <>
           <h1>You're in</h1>
-          <p>This workspace is now your active one — its collection, folders and plan are shared with you.</p>
+          <p>This is now your active workspace, and its collection, folders and plan are shared with you.</p>
           <div className="settings-inline-actions">
             <button type="button" className="btn-hero-primary" onClick={() => navigate('/team')}>
               Open the workspace

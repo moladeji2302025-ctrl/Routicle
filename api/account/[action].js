@@ -246,7 +246,7 @@ async function deleteAccount(req, res) {
       // charged is far worse than a deletion the user has to retry.
       return send(res, 502, {
         error:
-          'Could not stop your subscription with the payment provider. Nothing has been deleted — please try again.',
+          "We couldn't cancel your subscription with the payment provider, so nothing has been deleted. Please try again.",
       })
     }
   }

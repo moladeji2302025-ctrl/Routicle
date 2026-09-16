@@ -117,7 +117,7 @@ export default function ProjectsPage() {
         <div className="project-group">
           <h2 className="project-group-title">Live</h2>
           {live.length === 0 ? (
-            <p className="explore-empty">Nothing live yet — your first approved upload shows up here.</p>
+            <p className="explore-empty">Nothing live yet. Your first approved upload will show up here.</p>
           ) : (
             live.map((item) => (
               <div key={item.id} className="project-row">

@@ -69,7 +69,7 @@ export default function CreatorUploadPage() {
       })
       setSubmitted(true)
     } catch (err) {
-      setError(err.message || 'Upload failed — try again.')
+      setError(err.message || 'Upload failed. Please try again.')
     } finally {
       setSubmitting(false)
     }
@@ -92,8 +92,7 @@ export default function CreatorUploadPage() {
       <div className="upload-page upload-gate">
         <h1>Submitted for review</h1>
         <p>
-          Your files are safely stored — an admin will review this submission before it goes live. You'll see it in
-          your dashboard once approved.
+          Your files are saved. An admin will review your submission before it goes live, and you'll see it in your dashboard once it's approved.
         </p>
         <button type="button" className="btn-hero-primary" onClick={() => navigate('/dashboard')}>
           Go to your dashboard
@@ -105,7 +104,7 @@ export default function CreatorUploadPage() {
   return (
     <div className="upload-page">
       <h1>Upload work</h1>
-      <p className="upload-subtitle">Bundle every format this piece includes — tier is derived automatically.</p>
+      <p className="upload-subtitle">Add every format this piece comes in. We'll work out the tier for you.</p>
 
       <form className="upload-form" onSubmit={handleSubmit}>
         <div className="upload-section">
@@ -120,7 +119,7 @@ export default function CreatorUploadPage() {
           </div>
           {formats.map((format) => (
             <div key={format} className="upload-slot">
-              <span>{format} file {sourceFiles[format] ? `— ${sourceFiles[format].name}` : '(required)'}</span>
+              <span>{format} file {sourceFiles[format] ? `(${sourceFiles[format].name})` : '(required)'}</span>
               <input type="file" onChange={(e) => setSourceFile(format, e.target.files[0] || null)} />
             </div>
           ))}
@@ -134,13 +133,13 @@ export default function CreatorUploadPage() {
         <div className="upload-section">
           <h3>2. Thumbnail {needsVideoPreview && '& MP4 preview'}</h3>
           <div className="upload-slot">
-            <span>Thumbnail (JPEG/PNG) — required{thumbnailFile ? ` — ${thumbnailFile.name}` : ''}</span>
+            <span>Thumbnail (JPEG or PNG, required){thumbnailFile ? `: ${thumbnailFile.name}` : ''}</span>
             <input type="file" accept="image/*" onChange={(e) => setThumbnailFile(e.target.files[0] || null)} />
           </div>
           {needsVideoPreview && (
             <div className="upload-slot">
               <span>
-                MP4 preview clip — required for video formats{previewVideoFile ? ` — ${previewVideoFile.name}` : ''}
+                MP4 preview clip (required for video){previewVideoFile ? `: ${previewVideoFile.name}` : ''}
               </span>
               <input type="file" accept="video/mp4" onChange={(e) => setPreviewVideoFile(e.target.files[0] || null)} />
             </div>
@@ -166,7 +165,7 @@ export default function CreatorUploadPage() {
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} required />
           </label>
           <label className="auth-field">
-            Behind the Design (optional) — what were you going for? What does this piece mean to you?
+            Behind the Design (optional). What were you going for, and what does this piece mean to you?
             <textarea value={behindTheDesign} onChange={(e) => setBehindTheDesign(e.target.value)} rows={3} />
           </label>
         </div>

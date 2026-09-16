@@ -21,7 +21,7 @@ export default function AdminModerationPage() {
   return (
     <div className="dashboard-page">
       <h1>Moderation queue</h1>
-      <p className="dashboard-subtitle">Platform-wide visibility — admin only.</p>
+      <p className="dashboard-subtitle">Everything across the platform. Only admins can see this.</p>
 
       <div className="dashboard-panel">
         <h3>Pending submissions ({pendingSubmissions.length})</h3>

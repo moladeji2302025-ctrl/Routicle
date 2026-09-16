@@ -40,7 +40,7 @@ export default function SignUpPage() {
     <div className="auth-page">
       <div className="auth-card">
         <h1 className="auth-title">Join Routicle</h1>
-        <p className="auth-subtitle">A light-touch start — tell us why you're here.</p>
+        <p className="auth-subtitle">Just one quick question to start. What brings you here?</p>
 
         <div className="auth-intent-row">
           <button

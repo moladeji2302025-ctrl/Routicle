@@ -16,16 +16,11 @@ export default function Intro() {
             </div>
 
             <p {...reveal(shown, 1, 'intro-deck-lead')}>
-              Most finished creative work only ever gets used once — then it sits on a drive,
-              earning nothing.
+              Most finished creative work gets used once, then sits on a hard drive earning nothing.
             </p>
 
             <p {...reveal(shown, 2, 'intro-deck-body')}>
-              Routicle is a subscriber-share marketplace: creators upload real, finished design and
-              video files they never got to reuse. Subscribers pay to download the source files
-              behind them — not stock, not a flattened export, the real editable project. Half of
-              every subscription dollar is pooled and paid out to creators every month,
-              non-exclusively, with no rights given up.
+              Routicle is a marketplace where creators upload finished design and video files they never got to reuse. Subscribers pay to download the actual editable project files, not flattened exports. Half of every subscription dollar goes into a pool that's paid out to creators each month, and creators keep all the rights to their work.
             </p>
           </div>
         </>

@@ -83,7 +83,7 @@ export default function PlanSettings() {
             title={subscription.status === 'canceled' ? 'Access ends' : 'Renews'}
             description={
               subscription.status === 'active' && !subscription.isRecurring
-                ? 'One-off payment — this will not auto-renew.'
+                ? "One-off payment. This won't renew automatically."
                 : undefined
             }
           >
@@ -107,7 +107,7 @@ export default function PlanSettings() {
           title="Download billing"
           description={
             mode === 'payPerDownload'
-              ? `Each file is charged separately — ${money(STANDARD_PRICE)} for Standard-tier work, ${money(EXPRESS_PRICE)} for Express.`
+              ? `Each file is charged separately: ${money(STANDARD_PRICE)} for Standard-tier work, ${money(EXPRESS_PRICE)} for Express.`
               : 'Files included in your plan download at no extra cost.'
           }
         >

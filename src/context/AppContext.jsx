@@ -612,7 +612,7 @@ export function AppProvider({ children }) {
       /** Completes the change, using the token from that email as the proof. */
       async resetPasswordWithToken({ token, newPassword }) {
         const result = await orgClient.resetPassword({ token, newPassword })
-        if (result?.error) throw new Error(result.error.message || 'That link has expired — ask for a new one')
+        if (result?.error) throw new Error(result.error.message || 'That link has expired. Ask for a new one.')
         // Anything still signed in with the old password should not stay signed in.
         await orgClient.revokeOtherSessions().catch(() => {})
         return true

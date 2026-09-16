@@ -90,7 +90,7 @@ export default function ProjectPage() {
    */
   async function generate(kind) {
     if (!profile) {
-      setError('Set up your studio profile first — the documents are built from it.')
+      setError('Set up your studio profile first, since the documents are built from it.')
       return
     }
     const latest = data.submissions[0]
@@ -173,7 +173,7 @@ export default function ProjectPage() {
             <div>
               <strong>{selectedIds.length} question{selectedIds.length === 1 ? '' : 's'} selected</strong>
               <span className="settings-row-desc">
-                Pick only what's relevant to this project — the bank is deliberately larger than any one form should be.
+                Only pick what's relevant to this project. There are more questions here than any one form needs.
               </span>
             </div>
             <div className="settings-inline-actions">
@@ -329,8 +329,7 @@ export default function ProjectPage() {
       {tab === 'schedule' && recurring && (
         <>
           <p className="settings-section-desc" style={{ marginBottom: 18 }}>
-            Pick what goes out each month. A retainer rarely needs a new proposal every cycle — usually it's an
-            invoice, sometimes a brief.
+            Pick what goes out each month. A retainer rarely needs a new proposal every month. Usually it's an invoice, and sometimes a brief.
           </p>
           <div className="suite-months">
             {monthsFrom(project.startDate).map((period) => {

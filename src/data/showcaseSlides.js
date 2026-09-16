@@ -1,7 +1,7 @@
 export const SHOWCASE_SLIDES = [
   {
     image: '/images/t9.jpg',
-    title: 'Brand Deck — Rivers & Wells',
+    title: 'Brand Deck: Rivers & Wells',
     creator: 'Yemi S.',
     avatar: '/images/a4.jpg',
     appreciations: 190,
@@ -10,7 +10,7 @@ export const SHOWCASE_SLIDES = [
   },
   {
     image: '/images/t1.jpg',
-    title: 'Quarterly Ministry Report — Cover Series',
+    title: 'Quarterly Ministry Report: Cover Series',
     creator: 'Tunde A.',
     avatar: '/images/a1.jpg',
     appreciations: 128,
@@ -28,7 +28,7 @@ export const SHOWCASE_SLIDES = [
   },
   {
     image: '/images/t7.jpg',
-    title: 'Loop Study — Ember Field',
+    title: 'Loop Study: Ember Field',
     creator: 'Chidi E.',
     avatar: '/images/a2.jpg',
     appreciations: 156,
@@ -37,7 +37,7 @@ export const SHOWCASE_SLIDES = [
   },
   {
     image: '/images/t3.jpg',
-    title: 'Desert Bloom — Prompted Concept Art',
+    title: 'Desert Bloom: Prompted Concept Art',
     creator: 'Kayode M.',
     avatar: '/images/a3.jpg',
     appreciations: 302,

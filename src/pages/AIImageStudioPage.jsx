@@ -34,7 +34,7 @@ export default function AIImageStudioPage() {
   function handleGenerate(event) {
     event.preventDefault()
     if (!prompt.trim()) return
-    generateImage(`${prompt} — ${style}, ${aspect}`)
+    generateImage(`${prompt}, ${style}, ${aspect}`)
     setPrompt('')
   }
 
@@ -90,7 +90,7 @@ export default function AIImageStudioPage() {
       <h3 className="studio-history-title">Generation history</h3>
       <div className="studio-history-grid">
         {currentUser.generationHistory.image.length === 0 && (
-          <p className="explore-empty">Nothing generated yet — try a prompt above.</p>
+          <p className="explore-empty">Nothing generated yet. Try a prompt above.</p>
         )}
         {currentUser.generationHistory.image.map((gen, i) => (
           <div key={gen.id} className="studio-result">

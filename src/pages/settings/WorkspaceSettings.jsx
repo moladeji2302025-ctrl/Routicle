@@ -55,7 +55,7 @@ export default function WorkspaceSettings() {
           <UserIcon size={16} color="currentColor" />
           <div className="settings-row-text">
             <span className="settings-row-title">Personal</span>
-            <span className="settings-row-desc">Just you — your own plan and collections.</span>
+            <span className="settings-row-desc">Just you, with your own plan and collections.</span>
           </div>
           {!activeTeamId && <span className="settings-pill">Active</span>}
         </button>
@@ -110,7 +110,7 @@ export default function WorkspaceSettings() {
 
       {activeTeam && (
         <>
-          <Section title={`${activeTeam.name} — plan`}>
+          <Section title={`${activeTeam.name} plan`}>
             <Row title="Shared tier" description={`You're ${ROLE_LABEL[activeTeam.role] || 'a member'} of this team.`}>
               <div className="settings-seg">
                 {Object.values(TIERS).map((t) => (
@@ -130,7 +130,7 @@ export default function WorkspaceSettings() {
             </Row>
           </Section>
 
-          <Section title={`${activeTeam.name} — members`} actions={ <Link to="/team" className="settings-btn settings-btn-ghost"> Full team page </Link> }>
+          <Section title={`${activeTeam.name} members`} actions={ <Link to="/team" className="settings-btn settings-btn-ghost"> Full team page </Link> }>
             {teamMembers.map((m) => (
               <div key={m.id} className="settings-list-row">
                 {m.user?.image ? (

@@ -83,8 +83,7 @@ export default function NotificationSettings() {
       </Section>
 
       <p className="settings-footnote">
-        These preferences are saved to your account now. Email delivery itself goes live with the
-        notification service — nothing is sent until then, whatever is switched on here.
+        Your preferences are saved to your account. We haven't switched on email delivery yet, so nothing will be sent until we do, even if it's turned on here.
       </p>
     </>
   )

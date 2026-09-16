@@ -97,7 +97,7 @@ export default function DesignDetailPage() {
       case 'upgrade-required':
         return `Upgrade to ${TIERS[decision.tier].label}`
       case 'pay-per-download':
-        return `Download — $${decision.price.toFixed(2)}`
+        return `Download for $${decision.price.toFixed(2)}`
       case 'owned':
         return 'Download again'
       case 'free-download':
@@ -138,7 +138,7 @@ export default function DesignDetailPage() {
 
         <p className="detail-description">
           A {TIERS[tier].label.toLowerCase()}-tier {categoryLabel(item.category).toLowerCase()} piece
-          {item.fileTypes.length > 0 ? ` — includes ${item.fileTypes.join(', ')} source files.` : '.'}
+          {item.fileTypes.length > 0 ? ` with ${item.fileTypes.join(', ')} source files.` : '.'}
         </p>
 
         {item.behindTheDesign && (

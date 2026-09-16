@@ -14,9 +14,7 @@ export default function Hero() {
           <span className="hero-behance-accent">Finally Earns.</span>
         </h1>
         <p className="hero-behance-subtitle">
-          A comprehensive marketplace for creators to turn finished-but-unused designs and video
-          into a real, recurring income — and for subscribers to download the source files behind
-          them.
+          A marketplace where creators earn a monthly income from designs and videos they never got to use, and subscribers download the source files behind them.
         </p>
         <div className="hero-behance-cta-row">
           <Link to="/explore" className="hero-deck-btn-primary">Browse the library</Link>

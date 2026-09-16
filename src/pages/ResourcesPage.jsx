@@ -24,17 +24,17 @@ const GROUPS = [
     title: 'Getting started',
     items: [
       { to: '/help', label: 'Help centre', desc: 'Answers to the questions people actually ask.', icon: HelpIcon, more: { blurb: "Search by keyword, or browse by the part of the app you're stuck in.", points: ["Downloads and file formats", "Billing and cancellations", "Why a submission was rejected"] } },
-      { to: '/categories', label: 'The five categories', desc: 'How the library is organised and what belongs where.', icon: FolderIcon, more: { blurb: "Five categories, each with its own sub-categories. Where a piece sits decides who finds it.", points: ["Graphic Design \u00b7 Motion \u00b7 Illustration", "AI-Generated Images and Video", "Sub-categories narrow it further"] } },
-      { to: '/pricing', label: 'Plans & what each unlocks', desc: 'Free, Standard and Express side by side.', icon: CardIcon, more: { blurb: "Browsing is free forever. A plan is what unlocks the editable files and the Studios.", points: ["Standard \u2014 PSD, AI and Canva files", "Express \u2014 adds After Effects and Premiere", "Annual billing saves 25%"] } },
+      { to: '/categories', label: 'The five categories', desc: 'How the library is organised and what belongs where.', icon: FolderIcon, more: { blurb: "Five categories, each with its own sub-categories, so people can find the right work.", points: ["Graphic Design \u00b7 Motion \u00b7 Illustration", "AI-Generated Images and Video", "Sub-categories narrow it further"] } },
+      { to: '/pricing', label: 'Plans & what each unlocks', desc: 'Free, Standard and Express side by side.', icon: CardIcon, more: { blurb: "Browsing is always free. You need a plan for the editable files and the Studios.", points: ["Standard: PSD, AI and Canva files", "Express: adds After Effects and Premiere", "Annual billing saves 25%"] } },
     ],
   },
   {
     title: 'For creators',
     items: [
       { to: '/become-creator', label: 'Become a Creator', desc: 'Upload guidelines, the payout split, and the rights you keep.', icon: UploadIcon, hideWhenCreator: true, more: { blurb: "You keep the copyright. Routicle only gets a non-exclusive licence to distribute the files.", points: ["Half of subscription revenue is pooled", "Paid out monthly, pro rata by downloads", "Upload work you already finished"] } },
-      { to: '/upload', label: 'Upload work', desc: 'Submit a finished piece with its real source files.', icon: UploadIcon, creatorOnly: true, more: { blurb: "A submission needs the real working file, not just an export.", points: ["Thumbnail plus an optional MP4 preview", "Category and sub-category", "An optional Behind the Design note"] } },
+      { to: '/upload', label: 'Upload work', desc: 'Submit a finished piece with its real source files.', icon: UploadIcon, creatorOnly: true, more: { blurb: "Upload the working file itself, not an export.", points: ["Thumbnail plus an optional MP4 preview", "Category and sub-category", "An optional Behind the Design note"] } },
       { to: '/projects', label: 'Your projects', desc: 'What you have live, and what is still in review.', icon: PenIcon, creatorOnly: true, more: { blurb: "Everything you've submitted, in one list, with its current moderation state.", points: ["Live, in review, or needs changes", "Per-piece download counts", "Edit and resubmit in place"] } },
-      { to: '/dashboard', label: 'Earnings & referrals', desc: 'Your share of the monthly pool, and your referral link.', icon: ChartIcon, creatorOnly: true, more: { blurb: "Your own numbers only \u2014 never platform-wide totals.", points: ["This month's share of the pool", "All-time earnings and payout history", "Your referral link and its count"] } },
+      { to: '/dashboard', label: 'Earnings & referrals', desc: 'Your share of the monthly pool, and your referral link.', icon: ChartIcon, creatorOnly: true, more: { blurb: "Only your own numbers, never platform-wide totals.", points: ["This month's share of the pool", "All-time earnings and payout history", "Your referral link and its count"] } },
     ],
   },
   {
@@ -42,16 +42,16 @@ const GROUPS = [
     items: [
       { to: '/workspaces', label: 'Workspaces', desc: 'Share a plan, collections and downloads with your team.', icon: UsersIcon, more: { blurb: "A workspace owns its own plan, collections and download history.", points: ["Switching changes what you see everywhere", "One bill covers every member", "Personal stays separate from team"] } },
       { to: '/team', label: 'Team members & roles', desc: 'Invite people, set roles, manage the shared plan.', icon: UsersIcon, more: { blurb: "Owners can invite, remove and set roles; members can't.", points: ["Invites go out by email", "Owner, admin and member roles", "Only the owner can delete a workspace"] } },
-      { to: '/studio/image', label: 'AI Studio', desc: 'Generate images and video from inside your plan.', icon: SparkleIcon, more: { blurb: "Generations come out of your plan's monthly allowance, not a separate wallet.", points: ["Standard \u2014 50 images a month", "Express \u2014 adds 60s of AI video", "Upscaling included on both"] } },
+      { to: '/studio/image', label: 'AI Studio', desc: 'Generate images and video from inside your plan.', icon: SparkleIcon, more: { blurb: "Generations come out of your plan's monthly allowance, not a separate wallet.", points: ["Standard: 50 images a month", "Express: adds 60 seconds of AI video", "Upscaling included on both"] } },
     ],
   },
   {
     title: 'About Routicle',
     items: [
-      { to: '/about', label: 'About', desc: 'Why this exists and who it is for.', icon: StarIcon, more: { blurb: "Why finished-but-unused work is worth publishing at all.", points: ["Where the idea came from", "Who it's built for", "How creators actually get paid"] } },
+      { to: '/about', label: 'About', desc: 'Why this exists and who it is for.', icon: StarIcon, more: { blurb: "Why it's worth publishing work you never used.", points: ["Where the idea came from", "Who it's built for", "How creators actually get paid"] } },
       { to: '/blog', label: 'Blog', desc: 'Product notes and creator features.', icon: PenIcon, more: { blurb: "Release notes and the people behind the work in the library.", points: ["What shipped, and when", "Creator features", "How the pool performed"] } },
       { to: '/brand', label: 'Brand assets', desc: 'Logo, colours and how to refer to us.', icon: StarIcon, more: { blurb: "Everything you need to refer to Routicle correctly.", points: ["Logo files, light and dark", "Colour values", "Naming and spelling"] } },
-      { to: '/careers', label: 'Careers', desc: 'Open roles.', icon: UsersIcon, more: { blurb: "Small team. Roles open when we genuinely need them.", points: ["What we're hiring for now", "How the process runs"] } },
+      { to: '/careers', label: 'Careers', desc: 'Open roles.', icon: UsersIcon, more: { blurb: "We're a small team, so we only open roles when we need them.", points: ["What we're hiring for now", "How the process runs"] } },
       { to: '/contact', label: 'Contact', desc: 'Reach a human.', icon: HelpIcon, more: { blurb: "A real inbox, not a ticket maze.", points: ["Support and account questions", "Press and partnerships", "Rights and takedowns"] } },
     ],
   },

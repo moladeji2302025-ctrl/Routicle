@@ -197,7 +197,7 @@ export default function TeamPage() {
         </Link>
         <div className="team-stat">
           <FolderIcon size={15} color="currentColor" />
-          <span className="team-stat-value">{folders === null ? '—' : folders.length}</span>
+          <span className="team-stat-value">{folders === null ? '…' : folders.length}</span>
           <span className="team-stat-label">Folder{folders?.length === 1 ? '' : 's'} · {totalFoldered} item{totalFoldered === 1 ? '' : 's'}</span>
         </div>
         <Link to="/downloads" className="team-stat">

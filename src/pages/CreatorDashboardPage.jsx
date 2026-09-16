@@ -32,7 +32,7 @@ export default function CreatorDashboardPage() {
   return (
     <div className="dashboard-page">
       <h1>Creator dashboard</h1>
-      <p className="dashboard-subtitle">Your own numbers only — never platform totals.</p>
+      <p className="dashboard-subtitle">These are your numbers only, not platform totals.</p>
 
       <div className="dashboard-stats-row">
         <div className="dashboard-stat">
@@ -56,7 +56,7 @@ export default function CreatorDashboardPage() {
       <div className="dashboard-grid">
         <div className="dashboard-panel">
           <h3>Your pieces</h3>
-          {myPieces.length === 0 && <p className="explore-empty">Nothing live yet — upload your first piece.</p>}
+          {myPieces.length === 0 && <p className="explore-empty">Nothing live yet. Upload your first piece to get started.</p>}
           {myPieces.map((item) => (
             <div key={item.id} className="dashboard-piece-row">
               <img src={item.image} alt={item.title} />
@@ -75,7 +75,7 @@ export default function CreatorDashboardPage() {
 
         <div className="dashboard-panel">
           <h3>Referral</h3>
-          <p>Share your link — earn a one-time $15 bonus once a referred signup's first payment clears.</p>
+          <p>Share your link and earn a one-time $15 bonus when someone you refer makes their first payment.</p>
           <div className="dashboard-referral-code">routicle.app/r/{currentUser.referralCode}</div>
           <p className="dashboard-note">{currentUser.referralCount} referrals · ${currentUser.referralEarnings.toFixed(2)} earned</p>
 
@@ -84,7 +84,7 @@ export default function CreatorDashboardPage() {
 
           <h3 className="dashboard-panel-spacer">Payout history</h3>
           {currentUser.payoutHistory.length === 0 ? (
-            <p className="explore-empty">No payouts yet — accrues once your balance crosses $50.</p>
+            <p className="explore-empty">No payouts yet. You'll get paid once your balance passes $50.</p>
           ) : (
             currentUser.payoutHistory.map((p, i) => <p key={i} className="dashboard-note">{p}</p>)
           )}

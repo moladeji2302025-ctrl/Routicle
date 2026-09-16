@@ -167,7 +167,7 @@ export default function AppTopBar({ collapsed, onToggleSidebar }) {
         <Link
           to="/updates"
           className="app-topbar-icon"
-          aria-label={unseen ? "What's new — unread" : "What's new"}
+          aria-label={unseen ? "What's new, unread" : "What's new"}
           title="What's new"
         >
           <BellIcon size={16} color="currentColor" />

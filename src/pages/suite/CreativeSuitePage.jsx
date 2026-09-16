@@ -40,7 +40,7 @@ export default function CreativeSuitePage() {
         detail: opts.detail !== undefined ? opts.detail : detail,
       })
       if (!result.pathData) {
-        setError('Nothing traced. Try inverting, or nudge the threshold — the image may be too low contrast.')
+        setError('Nothing was traced. The image may be too low in contrast, so try inverting it or adjusting the threshold.')
         setTrace(null)
       } else {
         setTrace(result)
@@ -57,7 +57,7 @@ export default function CreativeSuitePage() {
     e.target.value = ''
     if (!file) return
     if (!file.type.startsWith('image/')) {
-      setError('Pick an image file — a photo of a sketch, a PNG, or a JPEG.')
+      setError('Pick an image file, like a photo of a sketch, a PNG or a JPEG.')
       return
     }
     setLastFile(file)
@@ -95,8 +95,7 @@ export default function CreativeSuitePage() {
         <div>
           <h2>Creative Suite</h2>
           <p className="settings-section-desc">
-            Upload a sketch or a flat raster logo. It gets vectorised, then turned into a full pack —
-            primary, secondary and tertiary lockups, the mark, the wordmark and the palette.
+            Upload a sketch or a flat logo image. We'll turn it into vectors, then build a full pack with primary, secondary and tertiary lockups, the mark, the wordmark and the palette.
           </p>
         </div>
       </div>

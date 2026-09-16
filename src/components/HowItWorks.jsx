@@ -5,7 +5,7 @@ const STEPS = [
   {
     icon: UploadIcon,
     label: 'Upload',
-    desc: 'Bundle every format a piece includes — PSD, AI, Canva, After Effects, Premiere, Figma. Tier is derived automatically.',
+    desc: 'Add every format the piece comes in: PSD, AI, Canva, After Effects, Premiere or Figma. We work out the tier for you.',
   },
   {
     icon: SparkleIcon,
@@ -15,7 +15,7 @@ const STEPS = [
   {
     icon: HeartIcon,
     label: 'Get Paid',
-    desc: 'Half of every subscription dollar is pooled and split among creators, every month, non-exclusively.',
+    desc: 'Every month, half of all subscription money is split between creators, and they keep the rights to their work.',
   },
 ]
 

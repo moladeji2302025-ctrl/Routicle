@@ -35,7 +35,7 @@ export default function SuiteLayout() {
           <SparkleIcon size={20} color="var(--brand-violet)" />
           AI Suite
         </h1>
-        <p>Two tools for two different jobs — running the client relationship, and making the work.</p>
+        <p>Two tools for two different jobs: managing your clients and making the work.</p>
       </header>
 
       <nav className="suite-tabs">

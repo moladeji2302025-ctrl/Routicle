@@ -24,7 +24,7 @@ export default function DeveloperSettings() {
           title="Tier"
           description={
             subscription
-              ? `A real ${subscription.tier} subscription is active — it will overwrite this on the next refresh.`
+              ? `A real ${subscription.tier} subscription is active, so it will replace this on the next refresh.`
               : 'No server-side subscription, so this sticks until you change it.'
           }
         >

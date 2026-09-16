@@ -53,8 +53,7 @@ export default function LiveShowcase() {
             </span>
 
             <p {...reveal(shown, 2, 'showcase-deck-desc')}>
-              A rotating look at real, finished work from the library — sign in to view any project
-              in full and download the source files behind it.
+              A rotating selection of finished work from the library. Sign in to see any project in full and download its source files.
             </p>
 
             <div {...reveal(shown, 3, 'showcase-deck-cta-row')}>

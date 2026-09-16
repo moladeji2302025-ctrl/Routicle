@@ -26,7 +26,7 @@ const PLANS = [
   {
     id: 'express',
     name: 'Express',
-    blurb: 'For motion work — video projects and the Video Studio.',
+    blurb: 'For motion work, with video projects and the Video Studio.',
     monthly: TIERS.express.monthly,
     annual: TIERS.express.annual,
     cta: 'Get Express',
@@ -161,8 +161,7 @@ export default function PricingPage() {
       <header className="pricing-hero">
         <h1 className="pricing-hero-title">Pick how you want to work</h1>
         <p className="pricing-hero-sub">
-          Browsing is free forever. Pay only when you want the editable files behind the work — or
-          the Studios to make your own.
+          Browsing is always free. You only pay when you want the editable files, or the Studios to make your own.
         </p>
       </header>
 
@@ -208,7 +207,7 @@ export default function PricingPage() {
       {scope === 'team' && (
         <p className="pricing-scope-note">
           {activeTeam
-            ? `Billed once for ${activeTeam.name} — every member gets the tier, shared collections, and shared download history.`
+            ? `Billed once for ${activeTeam.name}. Every member gets the tier, shared collections and shared download history.`
             : 'A team plan covers everyone in the workspace on one bill. Create a team first, then pick a tier.'}
         </p>
       )}
@@ -285,8 +284,7 @@ export default function PricingPage() {
       </div>
 
       <p className="pricing-foot">
-        Prices in USD, charged securely via Paystack. Cancel anytime — access runs to the end of the
-        period you've paid for. Half of every subscription dollar goes into the creator pool.
+        Prices are in USD and charged securely through Paystack. You can cancel anytime and keep access until the end of the period you've paid for. Half of every subscription dollar goes to creators.
       </p>
     </div>
   )

@@ -216,7 +216,7 @@ export default function AdminUpdatesPage() {
                   <span className="download-meta">
                     {u.isPublished
                       ? `Published ${new Date(u.publishedAt || u.createdAt).toLocaleDateString()}`
-                      : 'Draft — not visible to users'}
+                      : 'Draft (hidden from users)'}
                   </span>
                 </div>
                 <button

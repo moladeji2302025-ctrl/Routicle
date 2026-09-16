@@ -73,7 +73,7 @@ function buildBrief({ studio, project, a }) {
   const client = project.clientCompany || project.clientName || project.name
   return {
     kind: 'brief',
-    title: `Design brief — ${client}`,
+    title: `Design brief for ${client}`,
     sections: [
       {
         id: 'overview',
@@ -150,7 +150,7 @@ function buildProposal({ studio, project, a, packages = [], budgetLines = [], ti
 
   return {
     kind: 'proposal',
-    title: `Project proposal — ${client}`,
+    title: `Project proposal for ${client}`,
     sections: [
       {
         id: 'cover',
@@ -185,7 +185,7 @@ function buildProposal({ studio, project, a, packages = [], budgetLines = [], ti
         id: 'staff',
         heading: 'Our staff',
         blocks: [
-          text('Our collective experience and dedication drive our success in delivering exceptional solutions to our clients.'),
+          text("We've worked with a lot of clients, and we care about getting the details right."),
           ...(studio.staff || []).map((m) =>
             fields([
               ['Name', m.name],
@@ -201,11 +201,11 @@ function buildProposal({ studio, project, a, packages = [], budgetLines = [], ti
         heading: 'Our service strategy',
         blocks: [
           list([
-            'Discovery Session: Our journey begins with you. Through open communication and shared vision, we embark on a creative partnership that goes beyond conventional agency-client relationships.',
-            "Proposal Submission: Following the discovery session, we translate our insights into a detailed proposal that outlines a strategic roadmap for your brand's visual identity.",
-            'Contract Submission: Upon your approval of the proposal, we formalise our partnership with a contract, conveying our commitment to transparency and professionalism.',
-            'Concept Development: With the groundwork laid, the designer dives into visionary ideation, translating insights from the discovery session into tangible design concepts.',
-            'Iterative Feedback and Refinement: Your feedback is invaluable. Through regular communication and feedback sessions, we refine and tailor the designs to align with your vision.',
+            'Discovery Session: We start by getting to know you, your business and what you want this project to do.',
+            "Proposal: After that conversation, we send a proposal setting out what we'll make, how long it will take and what it will cost.",
+            "Contract: Once you approve the proposal, we put the agreement in writing so we're both clear on the terms.",
+            'Concept Development: Then we start designing, using what we learned in the discovery session to shape the first concepts.',
+            "Feedback and Refinement: You tell us what's working and what isn't, and we keep refining the designs until they're right.",
           ]),
         ],
       },
@@ -223,7 +223,7 @@ function buildProposal({ studio, project, a, packages = [], budgetLines = [], ti
         heading: 'Our offer',
         blocks: [
           text(
-            `It was enlightening speaking with ${project.clientName || 'you'} and learning about the needs of ${client}. Below you'll find your estimated investment to complete this project.`
+            `It was great speaking with ${project.clientName || 'you'} and hearing what ${client} needs. Here's what the project will cost.`
           ),
           ...(packages.length
             ? packages.map((p) =>
@@ -245,11 +245,11 @@ function buildProposal({ studio, project, a, packages = [], budgetLines = [], ti
         heading: 'Project phases',
         blocks: [
           list([
-            '01 Discovery Phase — thorough research to understand the business, target audience, industry landscape, competition and objectives.',
-            '02 Proposal Submission Phase — a detailed proposal outlining scope, timeline, deliverables and cost estimates based on the insights gathered.',
-            '03 Contract Submission Phase — terms and conditions, payment terms, milestones and intellectual property rights, formalising the agreement.',
-            '04 Content Strategy Development Phase — key brand messages, tone of voice and visual elements, guiding the creation of brand collateral.',
-            '05 Iterative Feedback and Refinement Phase — client feedback on concepts and prototypes, refined until the identity aligns with the vision.',
+            '01 Discovery Phase: research into the business, target audience, industry, competition and objectives.',
+            '02 Proposal Phase: a detailed proposal covering scope, timeline, deliverables and cost, based on what we learned.',
+            '03 Contract Phase: terms and conditions, payment terms, milestones and intellectual property rights, formalising the agreement.',
+            '04 Content Strategy Phase: key brand messages, tone of voice and visual elements that guide the brand collateral.',
+            '05 Feedback and Refinement Phase: client feedback on concepts and prototypes, refined until the identity matches the vision.',
           ]),
         ],
       },
@@ -269,7 +269,7 @@ function buildProposal({ studio, project, a, packages = [], budgetLines = [], ti
         heading: 'Project timeline',
         blocks: [
           text(
-            'This is an approximate timeline for when we anticipate the project will reach completion. These dates are reference points rather than strict deadlines.'
+            'This is a rough timeline for when we expect to finish the project. Treat the dates as a guide rather than strict deadlines.'
           ),
           timeline.length
             ? { type: 'table', columns: ['Milestone', 'Date'], rows: timeline.map((t) => [t.label, shortDate(t.date)]) }
@@ -293,7 +293,7 @@ function buildContract({ studio, project, packages = [] }) {
 
   return {
     kind: 'contract',
-    title: `Design services contract — ${client}`,
+    title: `Design services contract with ${client}`,
     sections: [
       {
         id: 'parties',
@@ -320,9 +320,9 @@ function buildContract({ studio, project, packages = [] }) {
         id: 'scope',
         heading: '2. Project scope',
         blocks: [
-          text('2.1 Project Description — The Client agrees to hire the Designer to provide design services as described below:'),
+          text('2.1 Project Description. The Client agrees to hire the Designer to provide the design services described below:'),
           text(project.description || 'Scope to be confirmed.'),
-          text('2.2 Project Process — The Parties agree to follow the following project process:'),
+          text('2.2 Project Process. The Parties agree to follow this project process:'),
           list(['Discovery Meeting', 'Acceptance of Quote', 'Signing of the Design Service Contract', 'Rendering of every service required of the Designer']),
         ],
       },
@@ -330,9 +330,9 @@ function buildContract({ studio, project, packages = [] }) {
         id: 'deliverables',
         heading: '3. Deliverables',
         blocks: [
-          text('3.1 Expected Deliverables — The Designer agrees to deliver the following design materials:'),
+          text('3.1 Expected Deliverables. The Designer agrees to deliver the following design materials:'),
           list(chosen?.items?.length ? chosen.items : ['Deliverables to be confirmed.']),
-          text('3.2 Approval Process — The Client shall review the deliverables promptly upon receipt and provide feedback within 3 days. Revisions, if necessary, will be made by the Designer.'),
+          text('3.2 Approval Process. The Client shall review the deliverables promptly and give feedback within 3 days. Any necessary revisions will be made by the Designer.'),
         ],
       },
       {
@@ -343,7 +343,7 @@ function buildContract({ studio, project, packages = [] }) {
             ['Start date', shortDate(project.startDate)],
             ['End date', shortDate(project.endDate)],
           ]),
-          text('The provided timeline is approximate. These dates are not meant to pressure or rush the process; they serve as reference points rather than strict deadlines.'),
+          text('This timeline is approximate. The dates are there as a guide, not as strict deadlines.'),
         ],
       },
       {
@@ -352,10 +352,10 @@ function buildContract({ studio, project, packages = [] }) {
         blocks: [
           text(
             fee
-              ? `5.1 Payment Amount — Client shall pay Designer a sum of ${money(fee, cur)} for the services performed under this contract.`
-              : '5.1 Payment Amount — Fee to be confirmed from the accepted proposal option.'
+              ? `5.1 Payment Amount. The Client shall pay the Designer a sum of ${money(fee, cur)} for the services performed under this contract.`
+              : '5.1 Payment Amount. The fee will be confirmed from the accepted proposal option.'
           ),
-          text('5.2 Payment Method — Payments shall be made into:'),
+          text('5.2 Payment Method. Payments shall be made into:'),
           fields([
             ['Account name', studio.accountName],
             ['Account number', studio.accountNumber],
@@ -367,8 +367,8 @@ function buildContract({ studio, project, packages = [] }) {
         id: 'rights',
         heading: '6. Ownership and rights',
         blocks: [
-          text('6.1 Transfer of Rights — Upon full payment of the compensation set forth in this contract, Client shall be the exclusive owner of all intellectual property rights, including but not limited to copyrights and trademarks, in and to the work product produced by Designer in connection with this contract. All sketches designed during this project which are not used by the Client will remain the property of the Designer.'),
-          text('6.2 Portfolio Usage — The Designer is granted the right to use the completed design materials for portfolio and self-promotion purposes.'),
+          text('6.1 Transfer of Rights. Upon full payment of the compensation set out in this contract, the Client shall be the exclusive owner of all intellectual property rights, including but not limited to copyrights and trademarks, in the work produced by the Designer under this contract. Any sketches made during this project that the Client does not use will remain the property of the Designer.'),
+          text('6.2 Portfolio Usage. The Designer may use the completed design materials in their portfolio and for self-promotion.'),
         ],
       },
       {
@@ -453,7 +453,7 @@ function buildInvoice({ studio, project, lines = [], invoiceNumber, period, taxR
 
   return {
     kind: 'invoice',
-    title: `Invoice ${invoiceNumber || '0001'}${period ? ` — ${period}` : ''}`,
+    title: `Invoice ${invoiceNumber || '0001'}${period ? ` (${period})` : ''}`,
     sections: [
       {
         id: 'header',

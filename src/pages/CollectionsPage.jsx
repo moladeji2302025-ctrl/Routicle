@@ -23,11 +23,11 @@ export default function CollectionsPage() {
       <div className="deck-accent" aria-hidden="true" />
       <p className="explore-count" style={{ marginTop: 18 }}>
         {activeTeam
-          ? 'Shared with everyone on this team — anyone can save or remove an item here.'
+          ? 'Shared with everyone on this team. Anyone can save or remove items here.'
           : 'Only visible to you.'}
       </p>
       {saved.length === 0 ? (
-        <p className="explore-empty">Nothing saved yet — tap the bookmark icon on any design to add it here.</p>
+        <p className="explore-empty">Nothing saved yet. Tap the bookmark icon on any design to add it here.</p>
       ) : (
         <FeedGrid items={saved} />
       )}

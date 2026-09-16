@@ -36,7 +36,7 @@ async function request(path, options = {}) {
       typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
         ? " Run `npx vercel dev` instead of `npm run dev` to serve /api locally."
         : ''
-    throw new Error(`${path} did not return JSON (status ${res.status}) — the API isn't reachable here.${localHint}`)
+    throw new Error(`${path} did not return JSON (status ${res.status}). The API isn't reachable here.${localHint}`)
   }
   const body = await res.json()
   if (!res.ok) {

@@ -48,7 +48,7 @@ export default function PackagesEditor({ packages, lines, currency, onChange, sa
         </div>
 
         {local.packages.length === 0 ? (
-          <p className="explore-empty">No options yet — the proposal will say so until you add one.</p>
+          <p className="explore-empty">No options yet. The proposal will mention this until you add one.</p>
         ) : (
           local.packages.map((p, i) => (
             <div key={i} className="suite-package">

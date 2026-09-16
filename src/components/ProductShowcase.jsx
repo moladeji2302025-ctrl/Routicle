@@ -8,7 +8,7 @@ const FEATURES = [
     id: 'graphic-design',
     label: 'Graphic Design',
     icon: ImageIcon,
-    desc: 'Templates, decks, and social graphics — ready to open in Canva, Illustrator, or Photoshop.',
+    desc: 'Templates, decks and social graphics you can open straight in Canva, Illustrator or Photoshop.',
     to: '/explore?category=graphic-design',
     active: true,
   },
@@ -38,8 +38,7 @@ export default function ProductShowcase() {
       <div className="showcase-intro">
         <h2 className="showcase-title">Everything creative, in one subscription</h2>
         <p className="showcase-subtitle">
-          Browse real, finished work from real creatives — or generate something new yourself,
-          right inside Routicle.
+          Browse finished work from real creatives, or make something new yourself inside Routicle.
         </p>
       </div>
 
@@ -47,8 +46,7 @@ export default function ProductShowcase() {
         <div className="showcase-panel-left">
           <h3 className="showcase-panel-title">Real work, ready to use</h3>
           <p className="showcase-panel-desc">
-            Explore a growing library of finished design and video work — real files from real
-            creators. Need something exact instead? Generate it yourself in the built-in AI Studio.
+            Explore a growing library of finished design and video work from real creators. If you need something specific, you can make it yourself in the AI Studio.
           </p>
           <Link to="/explore" className="showcase-tour-link">
             Take a tour <span aria-hidden="true">→</span>

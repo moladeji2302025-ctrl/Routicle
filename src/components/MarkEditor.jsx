@@ -172,7 +172,7 @@ export default function MarkEditor({ trace, name = 'mark', onClose }) {
       <header className="me-head">
         <div>
           <h3>Mark editor</h3>
-          <p>Every change re-renders the vector itself, so what you export is exactly this.</p>
+          <p>What you see here is what you'll export.</p>
         </div>
         <div className="me-head-actions">
           {dirty && (

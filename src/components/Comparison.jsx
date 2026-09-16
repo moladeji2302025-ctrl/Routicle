@@ -23,8 +23,8 @@ const ROWS = [
   },
   {
     label: 'Licensing',
-    before: 'Often exclusive — you lose usage rights',
-    after: 'Non-exclusive — keep every right you already have',
+    before: 'Often exclusive, so you lose usage rights',
+    after: 'Non-exclusive, so you keep all your rights',
   },
 ]
 

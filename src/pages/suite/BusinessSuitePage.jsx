@@ -5,7 +5,7 @@ import { FolderIcon, PlusIcon, UsersIcon, ChevronRightIcon } from '../../compone
 
 const BILLING = [
   { id: 'one_time', label: 'One-time', blurb: 'A single project with a start and an end.' },
-  { id: 'recurring', label: 'Recurring', blurb: 'A retainer — you pick what goes out each month.' },
+  { id: 'recurring', label: 'Recurring', blurb: 'A retainer where you choose what goes out each month.' },
 ]
 
 const EMPTY = { name: '', clientName: '', clientCompany: '', clientEmail: '', billingType: 'one_time' }
@@ -65,8 +65,7 @@ export default function BusinessSuitePage() {
           <div>
             <strong>Set up your studio profile first</strong>
             <span>
-              Your proposals and contracts are built from it — studio name, contact details, bank account,
-              and the vision, staff and case study that appear in every proposal.
+              Your proposals and contracts use it. It holds your studio name, contact details and bank account, plus the vision, team and case study that go into every proposal.
             </span>
           </div>
           <Link to="/suite/business/studio" className="settings-btn settings-btn-primary">Set it up</Link>

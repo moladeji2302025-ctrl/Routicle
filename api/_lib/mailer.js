@@ -130,7 +130,7 @@ export function explainMailError(err) {
     const { pass } = smtpCredentials()
     return pass.length === 16
       ? 'Gmail rejected the sign-in. Check SMTP_USER is the exact address that generated the App Password, and that it has not been revoked.'
-      : `Gmail rejected the sign-in. SMTP_PASS is ${pass.length} characters, but a Gmail App Password is 16 — generate one at myaccount.google.com/apppasswords.`
+      : `Gmail rejected the sign-in. SMTP_PASS is ${pass.length} characters, but a Gmail App Password is 16. Generate one at myaccount.google.com/apppasswords.`
   }
   if (/ETIMEDOUT|ECONNREFUSED|ENOTFOUND/i.test(raw)) {
     return `Could not reach the mail server (${process.env.SMTP_HOST || 'smtp.gmail.com'}). Check SMTP_HOST and SMTP_PORT.`

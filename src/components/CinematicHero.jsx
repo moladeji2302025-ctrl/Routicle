@@ -48,8 +48,7 @@ export default function CinematicHero() {
             Ready to Reuse
           </h1>
           <p className="cinematic-subtitle">
-            Every file here is a finished project from a real creator — not stock, not AI filler.
-            Subscribe once, download the source files behind work like this.
+            Every file here is a finished project made by a real creator. Subscribe once and download the source files behind work like this.
           </p>
         </div>
 

@@ -13,7 +13,7 @@ export default function Capabilities() {
             Unlock more when you're ready
           </h2>
           <p className="capabilities-subtitle">
-            From casual browsing to full source files and AI generation — go at your own pace.
+            Start by browsing, then move on to source files and AI generation when you're ready.
           </p>
         </div>
         <Link to="/explore" className="capabilities-cta">
@@ -25,8 +25,7 @@ export default function Capabilities() {
         <Reveal className="bento-card bento-wide" delay={0}>
           <h3 className="bento-title">Every upload has a name behind it</h3>
           <p className="bento-desc">
-            Not anonymous stock. Every file carries its creator's story — browse by category, or
-            follow the people making it.
+            This isn't anonymous stock. Every file comes with the story of the person who made it, so you can browse by category or follow the creators you like.
           </p>
 
           <div className="bento-network">
@@ -44,8 +43,7 @@ export default function Capabilities() {
         <Reveal className="bento-card bento-maroon" delay={90}>
           <h3 className="bento-title">One library, every category</h3>
           <p className="bento-desc">
-            Graphic design, motion, illustration, and AI-generated work — organized, not scattered
-            across folders.
+            Graphic design, motion, illustration and AI-generated work, all sorted in one place.
           </p>
           <div className="bento-pair">
             <div className="bento-pair-tile">
@@ -62,7 +60,7 @@ export default function Capabilities() {
         <Reveal className="bento-card bento-teal" delay={160}>
           <h3 className="bento-title">Download in one click</h3>
           <p className="bento-desc">
-            Found the file you need? Pull the whole bundle — PSD, AI, Canva — in a single click.
+            Found what you need? Download the whole bundle (PSD, AI and Canva) in one click.
           </p>
           <div className="bento-download-visual">
             <img src="/images/t7.jpg" alt="" />

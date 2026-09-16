@@ -46,8 +46,7 @@ export default class ErrorBoundary extends Component {
       <div className="eb">
         <h1>Something broke on this page</h1>
         <p>
-          The rest of Routicle is fine — this page hit an error while rendering. Reloading usually
-          clears it.
+          Something went wrong while loading this page. The rest of Routicle is fine, and reloading usually fixes it.
         </p>
         <pre className="eb-detail">{String(error?.message || error)}</pre>
         <div className="eb-actions">

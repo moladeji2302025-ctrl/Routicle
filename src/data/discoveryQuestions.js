@@ -61,7 +61,7 @@ export const QUESTION_GROUPS = [
   {
     id: 'urgency',
     label: 'Urgency-Driven',
-    blurb: 'Why now — and what it costs them to wait.',
+    blurb: 'Why now, and what does waiting cost them?',
     questions: [
       { id: 'q22', text: 'Why is now the right time to move forward with this project? What has changed in your business or market to make it a priority?', type: 'long', maps: 'whyNow' },
       { id: 'q23', text: "If this project doesn't move forward, what opportunities do you think you might miss out on?", type: 'long', maps: 'missedOpportunity' },
@@ -71,7 +71,7 @@ export const QUESTION_GROUPS = [
       { id: 'q27', text: 'What has prevented you from tackling this project sooner, and what has changed to make it a priority now?', type: 'long', maps: 'blockers' },
       { id: 'q28', text: "How does this project align with your overall business goals or vision? What happens if it doesn't get executed?", type: 'long', maps: 'alignment' },
       { id: 'q29', text: 'What would success in this project mean for you, your team, and your customers? What does failure to act mean?', type: 'long', maps: 'stakes' },
-      { id: 'q30', text: 'Imagine your competitor successfully implemented something similar — how would that affect your position in the market?', type: 'long', maps: 'competitiveRisk' },
+      { id: 'q30', text: 'If a competitor launched something similar first, how would that affect your position in the market?', type: 'long', maps: 'competitiveRisk' },
     ],
   },
 ]

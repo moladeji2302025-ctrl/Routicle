@@ -137,9 +137,9 @@ export function buildLogoPack({ trace, name, tagline, palette, font = 'satoshi' 
   )
 
   return [
-    { id: 'primary', label: 'Primary logo', svg: primary, blurb: 'Mark and name side by side — the default lockup.' },
+    { id: 'primary', label: 'Primary logo', svg: primary, blurb: "Mark and name side by side. This is the one you'll use most." },
     { id: 'secondary', label: 'Secondary logo', svg: secondary, blurb: 'Stacked, for square and narrow placements.' },
-    { id: 'tertiary', label: 'Tertiary logo', svg: tertiary, blurb: 'Reversed in a tile — avatars, favicons, app icons.' },
+    { id: 'tertiary', label: 'Tertiary logo', svg: tertiary, blurb: 'Reversed in a tile, for avatars, favicons and app icons.' },
     { id: 'mark', label: 'Brand mark', svg: mark, blurb: 'The symbol on its own.' },
     { id: 'wordmark', label: 'Wordmark', svg: wordmark, blurb: 'The name on its own, no symbol.' },
     { id: 'palette', label: 'Colour palette', svg: paletteSvg, blurb: 'The palette as a shareable image.' },

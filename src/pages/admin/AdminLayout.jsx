@@ -55,7 +55,7 @@ export default function AdminLayout() {
       <header className="admin-console-head">
         <div>
           <h1>Admin</h1>
-          <p>Signed in as {currentUser.email} — changes here affect everyone.</p>
+          <p>Signed in as {currentUser.email} . Changes here affect everyone.</p>
         </div>
       </header>
 
