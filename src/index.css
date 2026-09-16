@@ -11795,18 +11795,21 @@ html {
   background: var(--app-text, #16161a);
   transform: rotate(0deg) scale(1);
   transition:
-    border-radius 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
-    transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
-    background 0.2s ease;
+    border-radius 0.3s cubic-bezier(0.34, 1.4, 0.64, 1),
+    transform 0.52s cubic-bezier(0.33, 1.2, 0.5, 1);
 }
 
 /* 0.886 is √π/2 — the scale at which the square's area equals the circle's, so
-   the shape changes without the amount of ink changing. The overshoot in the
-   easing above is what makes it land with a little bounce. */
+   the shape changes without the amount of ink changing.
+ *
+ * 405deg is one full turn plus the 45 that makes a square read as a diamond.
+ * The spin is what sells the morph: a circle rotating looks like nothing, so
+ * without it the only visible change is the corners sharpening. Corners go all
+ * the way to square rather than staying softly rounded, for the same reason.
+ * Colour is deliberately unchanged — the shape is the signal. */
 .app-cursor-diamond .app-cursor-shape {
-  border-radius: 2px;
-  transform: rotate(45deg) scale(0.886);
-  background: var(--brand-violet, #6750de);
+  border-radius: 1px;
+  transform: rotate(405deg) scale(0.886);
 }
 
 .app-cursor-down .app-cursor-shape {
@@ -11814,7 +11817,7 @@ html {
 }
 
 .app-cursor-diamond.app-cursor-down .app-cursor-shape {
-  transform: rotate(45deg) scale(0.62);
+  transform: rotate(405deg) scale(0.62);
 }
 
 /* Hiding the native pointer is done by a class the component adds on mount, so
