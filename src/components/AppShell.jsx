@@ -15,7 +15,7 @@ import {
   GridIcon,
   ImageIcon,
   VideoIcon,
-  HeartIcon,
+  BookmarkIcon,
   CardIcon,
   HelpIcon,
   PenIcon,
@@ -41,7 +41,7 @@ const NAV_GROUPS = [
   {
     label: 'Library',
     items: [
-      { label: 'Collections', to: '/collections', icon: HeartIcon },
+      { label: 'Collections', to: '/collections', icon: BookmarkIcon },
       { label: 'Downloads', to: '/downloads', icon: FolderIcon },
     ],
   },

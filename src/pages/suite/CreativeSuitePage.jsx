@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { vectorize } from '../../lib/vectorize'
 import { buildLogoPack, svgToRaster, downloadBlob, PALETTE_PRESETS, isDark } from '../../lib/logoPack'
 import { PenIcon, UploadIcon } from '../../components/icons'
+import MarkEditor from '../../components/MarkEditor'
 
 const FONTS = [
   { id: 'satoshi', label: 'Satoshi' },
@@ -246,6 +247,11 @@ export default function CreativeSuitePage() {
           </div>
         </div>
       </div>
+
+      {/* The mark editor works on the traced path directly, so what it shows
+          is the artwork that gets exported — there is no render step between
+          the two that could drift. */}
+      {trace && <MarkEditor trace={trace} name={slug(name)} />}
 
       {/* ----------------------------------------------------- the pack */}
       <div className="suite-section-head" style={{ marginTop: 10 }}>

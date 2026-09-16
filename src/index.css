@@ -11173,3 +11173,541 @@ html {
 [data-theme='dark'] .app-shell .app-cta-panel .app-cta-btn:hover {
   color: var(--brand-violet);
 }
+
+/* ==================================================== mark editor ==========
+
+   A live vector editor: the preview is the exported artwork itself, not a
+   picture of it, so there is no separate render step and nothing can drift
+   between what is on screen and what lands in the file. */
+
+.me {
+  margin-top: 16px;
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  background: var(--app-card-bg);
+  overflow: hidden;
+}
+
+.me-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.me-head h3 {
+  margin: 0 0 3px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.me-head p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--app-text-muted);
+}
+
+.me-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.me-reset,
+.me-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.me-reset {
+  padding: 7px 14px;
+}
+
+.me-close {
+  width: 32px;
+  height: 32px;
+}
+
+.me-reset:hover,
+.me-close:hover {
+  transform: scale(1.04);
+  border-color: var(--brand-purple);
+}
+
+/* ---- body: preview beside controls ---- */
+
+.me-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  align-items: start;
+}
+
+.me-stage-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px;
+  border-right: 1px solid var(--app-border);
+}
+
+/* The artwork sits in a fixed-aspect well, so changing icon size reads as the
+   mark growing rather than as the panel resizing around it. */
+.me-stage {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* A dot grid shows transparency without fighting the artwork the way a
+   checkerboard does. */
+.me-stage-grid {
+  background-color: var(--app-bg);
+  background-image: radial-gradient(var(--app-border) 1px, transparent 1px);
+  background-size: 14px 14px;
+  background-position: -1px -1px;
+}
+
+.me-stage-light {
+  background: #ffffff;
+}
+
+.me-stage-dark {
+  background: #111114;
+}
+
+.me-art {
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.me-art svg {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+}
+
+.me-stage-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.me-seg {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--app-hover);
+}
+
+.me-seg-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.me-seg-btn-on {
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.14);
+}
+
+.me-dims {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--app-text);
+}
+
+.me-dims em {
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--app-text-muted);
+}
+
+/* ---- controls ---- */
+
+.me-controls {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.me-group {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.me-group:last-child {
+  border-bottom: none;
+}
+
+.me-group-title {
+  margin: 0 0 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.me-row {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+}
+
+.me-row + .me-row {
+  margin-top: 6px;
+}
+
+.me-row-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-text);
+}
+
+/* A value chip beside every slider, so the number is never a guess. */
+.me-chip {
+  min-width: 48px;
+  padding: 4px 8px;
+  border-radius: 7px;
+  background: var(--app-hover);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--app-text);
+}
+
+.me-slider {
+  width: 100%;
+  height: 4px;
+  appearance: none;
+  border-radius: 999px;
+  background: var(--app-border);
+  outline: none;
+  cursor: pointer;
+}
+
+.me-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border: none;
+  border-radius: 50%;
+  background: var(--brand-violet);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+  transition: transform 0.12s ease;
+}
+
+.me-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+}
+
+.me-slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border: none;
+  border-radius: 50%;
+  background: var(--brand-violet);
+}
+
+.me-slider:focus-visible {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 4px;
+}
+
+/* ---- icon button rows ---- */
+
+.me-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  grid-column: 2 / -1;
+}
+
+.me-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 32px;
+  border: 1px solid var(--app-border);
+  border-radius: 9px;
+  background: none;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.me-icon-btn:hover {
+  background: var(--app-hover);
+  color: var(--app-text);
+}
+
+.me-icon-btn-on {
+  border-color: var(--brand-violet);
+  background: color-mix(in oklab, var(--brand-violet) 14%, transparent);
+  color: var(--app-text);
+}
+
+/* ---- colour rows ---- */
+
+.me-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  grid-column: 2 / -1;
+  min-width: 0;
+}
+
+.me-color-dot {
+  position: relative;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* The native swatch is the hit area but never the visual — the square is. */
+.me-color-dot input {
+  position: absolute;
+  inset: -4px;
+  width: 140%;
+  height: 140%;
+  border: none;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.me-color-hex {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-bg);
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--app-text);
+  outline: none;
+}
+
+.me-color-hex:focus {
+  border-color: var(--brand-purple);
+}
+
+/* ---- shape picker ---- */
+
+.me-shapes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.me-shape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 40px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: none;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.me-shape:hover {
+  transform: scale(1.05);
+  color: var(--app-text);
+}
+
+.me-shape-on {
+  border-color: var(--brand-violet);
+  background: color-mix(in oklab, var(--brand-violet) 14%, transparent);
+  color: var(--app-text);
+}
+
+.me-shapes + .me-row {
+  margin-top: 12px;
+}
+
+/* ---- footer actions ---- */
+
+.me-foot {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-bg);
+}
+
+.me-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-card-bg);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-text);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.me-copy:hover {
+  transform: scale(1.02);
+  border-color: var(--brand-purple);
+}
+
+.me-export-wrap {
+  position: relative;
+  display: flex;
+}
+
+.me-export {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px 0 0 10px;
+  background: var(--brand-violet);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.me-export-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  border: none;
+  border-left: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 0 10px 10px 0;
+  background: var(--brand-violet);
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.me-export:hover,
+.me-export-more:hover {
+  opacity: 0.9;
+}
+
+.me-export:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.me-export-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 20;
+  min-width: 230px;
+  padding: 6px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-card-bg);
+  box-shadow: 0 20px 48px -14px rgb(0 0 0 / 0.5);
+}
+
+.me-export-menu button {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  padding: 9px 11px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.me-export-menu button:hover {
+  background: var(--app-hover);
+}
+
+.me-export-menu strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.me-export-menu span {
+  font-size: 11.5px;
+  color: var(--app-text-muted);
+}
+
+@media (max-width: 1080px) {
+  .me-body {
+    grid-template-columns: 1fr;
+  }
+
+  .me-stage-col {
+    border-right: none;
+    border-bottom: 1px solid var(--app-border);
+  }
+
+  .me-foot {
+    grid-template-columns: 1fr;
+  }
+}

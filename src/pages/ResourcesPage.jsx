@@ -111,7 +111,7 @@ export default function ResourcesPage() {
         overlay,
       })
       requestAnimationFrame(() => setShown(true))
-    }, 1500)
+    }, 500)
   }
 
   function disarmPanel() {

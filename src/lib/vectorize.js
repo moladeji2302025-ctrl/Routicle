@@ -46,7 +46,17 @@ async function toImageData(file, maxEdge = MAX_EDGE) {
   }
 }
 
-/** Mean luminance, used when the caller wants the threshold chosen for them. */
+/**
+ * Otsu's method: the cut that maximises between-class variance.
+ *
+ * Returns the middle of the winning plateau rather than its first value. On
+ * flat art — a logo with exactly two luminance values, which is most of what
+ * this tool is given — every `t` from the dark value up to just below the light
+ * one separates the classes identically, so the variance is flat across that
+ * whole range. Taking the first of them returns the dark value itself, and
+ * since `binarise` cuts on a strict `gray < cut` that excludes the entire dark
+ * class and traces nothing at all.
+ */
 function otsuThreshold(gray) {
   const hist = new Array(256).fill(0)
   for (let i = 0; i < gray.length; i += 1) hist[gray[i]] += 1
@@ -57,7 +67,8 @@ function otsuThreshold(gray) {
 
   let sumB = 0
   let wB = 0
-  let best = 0
+  let lo = 0
+  let hi = 0
   let bestVar = -1
 
   for (let t = 0; t < 256; t += 1) {
@@ -69,12 +80,17 @@ function otsuThreshold(gray) {
     const mB = sumB / wB
     const mF = (sum - sumB) / wF
     const between = wB * wF * (mB - mF) * (mB - mF)
-    if (between > bestVar) {
+    // A relative epsilon rather than `===`: the plateau's values are equal by
+    // construction, but they are floats and large.
+    if (between > bestVar * (1 + 1e-12)) {
       bestVar = between
-      best = t
+      lo = t
+      hi = t
+    } else if (between >= bestVar * (1 - 1e-12)) {
+      hi = t
     }
   }
-  return best
+  return Math.round((lo + hi) / 2)
 }
 
 function binarise(imageData, { threshold, invert }) {
