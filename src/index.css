@@ -12542,3 +12542,47 @@ html {
      · .app-nav-item — sidebar navigation, not an action;
      · .fp-trigger — a full-width select, which belongs with the inputs it
        sits among rather than with the buttons. */
+
+
+/* ---------------------------------------------- email-verified confirmation */
+
+.settings-verify {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 0;
+}
+
+.settings-verify-lead {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--app-text-muted);
+}
+
+.settings-verify-lead strong {
+  color: var(--app-text);
+}
+
+.settings-verify-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 240px;
+}
+
+/* Wide tracking and tabular figures so the six digits read as a code, not a
+   number, and don't shift as they're typed. */
+.settings-code-input {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.settings-verify-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

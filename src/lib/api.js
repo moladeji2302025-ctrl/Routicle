@@ -247,8 +247,14 @@ export function inviteMemberRemote({ organizationId, email, role }) {
 }
 
 /** Irreversible. The server re-checks `confirmEmail` against the session's own address. */
-export function deleteAccountRemote(confirmEmail) {
-  return request('/account/delete', { method: 'POST', body: JSON.stringify({ confirmEmail }) })
+/** Emails a one-time code to the account's own address. */
+export function requestAccountDeletionRemote() {
+  return request('/account/delete-request', { method: 'POST', body: '{}' })
+}
+
+/** Deletes the account, but only with the code from that email. */
+export function deleteAccountRemote(code) {
+  return request('/account/delete', { method: 'POST', body: JSON.stringify({ code }) })
 }
 
 /* ---- Admin (session-verified server-side) ---- */

@@ -639,8 +639,13 @@ export function AppProvider({ children }) {
        * row, and refuses outright while this account still owns a workspace that
        * other people are in.
        */
-      async deleteAccount(confirmEmail) {
-        await api.deleteAccountRemote(confirmEmail)
+      /** Sends the one-time code. Resolves to { sentTo, minutes }. */
+      async requestAccountDeletion() {
+        return api.requestAccountDeletionRemote()
+      },
+
+      async deleteAccount(code) {
+        await api.deleteAccountRemote(code)
         api.clearAuthToken()
         // Drop the locally cached profile too, or signing in as someone else on
         // this browser would inherit the deleted account's saved items.

@@ -10,7 +10,15 @@ function formatWhen(value) {
 }
 
 export default function SecuritySettings() {
-  const { currentUser, requestPasswordReset, listSessions, revokeOtherSessions, deleteAccount, signOut } = useApp()
+  const {
+    currentUser,
+    requestPasswordReset,
+    listSessions,
+    revokeOtherSessions,
+    requestAccountDeletion,
+    deleteAccount,
+    signOut,
+  } = useApp()
   const navigate = useNavigate()
 
   const [pwOpen, setPwOpen] = useState(false)
@@ -22,8 +30,13 @@ export default function SecuritySettings() {
   const [sessionError, setSessionError] = useState('')
   const [revoking, setRevoking] = useState(false)
 
-  const [confirmDelete, setConfirmDelete] = useState('')
-  const [deleting, setDeleting] = useState(false)
+  // idle -> sent (code emailed) -> deleting
+  const [deleteStep, setDeleteStep] = useState('idle')
+  const [deleteSentTo, setDeleteSentTo] = useState('')
+  const [deleteCode, setDeleteCode] = useState('')
+  const [sendingCode, setSendingCode] = useState(false)
+  const [resendIn, setResendIn] = useState(0)
+  const deleting = deleteStep === 'deleting'
   const [deleteError, setDeleteError] = useState('')
 
   useEffect(() => {
@@ -35,6 +48,14 @@ export default function SecuritySettings() {
       cancelled = true
     }
   }, [listSessions])
+
+  // A short cooldown on resending, so a double click can't send a pile of
+  // emails. The server rate-limits too; this just stops it being tempting.
+  useEffect(() => {
+    if (resendIn <= 0) return
+    const t = setTimeout(() => setResendIn((n) => n - 1), 1000)
+    return () => clearTimeout(t)
+  }, [resendIn])
 
   async function handlePassword() {
     setPwError('')
@@ -66,16 +87,41 @@ export default function SecuritySettings() {
     }
   }
 
-  async function handleDelete() {
+  async function sendDeleteCode() {
     setDeleteError('')
-    setDeleting(true)
+    setSendingCode(true)
     try {
-      await deleteAccount(confirmDelete.trim())
+      const { sentTo } = await requestAccountDeletion()
+      setDeleteSentTo(sentTo)
+      setDeleteCode('')
+      setDeleteStep('sent')
+      setResendIn(45)
+    } catch (err) {
+      setDeleteError(err.message)
+    } finally {
+      setSendingCode(false)
+    }
+  }
+
+  async function handleDelete(e) {
+    e?.preventDefault()
+    if (deleteCode.length !== 6 || deleting) return
+    setDeleteError('')
+    setDeleteStep('deleting')
+    try {
+      await deleteAccount(deleteCode)
       navigate('/')
     } catch (err) {
       setDeleteError(err.message)
-      setDeleting(false)
+      setDeleteStep('sent')
+      setDeleteCode('')
     }
+  }
+
+  function cancelDelete() {
+    setDeleteStep('idle')
+    setDeleteCode('')
+    setDeleteError('')
   }
 
   return (
@@ -180,35 +226,68 @@ export default function SecuritySettings() {
       </Section>
 
       <DangerZone title="Delete account">
-        <Row
-          title="This can't be undone"
-          description={`Type ${currentUser.email} to confirm.`}
-          stacked
-        >
-          <div className="settings-delete-row">
-            <input
-              type="email"
-              className="settings-input"
-              value={confirmDelete}
-              placeholder={currentUser.email}
-              autoComplete="off"
-              onChange={(e) => setConfirmDelete(e.target.value)}
-            />
+        {deleteStep === 'idle' ? (
+          <Row
+            title="Delete your account"
+            description="This removes your account, saved items and any workspace only you are in. We'll email you a code to confirm it's you."
+          >
             <button
               type="button"
               className="settings-btn settings-btn-danger"
-              // The server checks this again against the session's own address;
-              // matching here only saves a pointless round trip.
-              disabled={
-                confirmDelete.trim().toLowerCase() !== currentUser.email.toLowerCase() || deleting
-              }
-              onClick={handleDelete}
+              onClick={sendDeleteCode}
+              disabled={sendingCode}
             >
-              {deleting ? 'Deleting…' : 'Delete my account'}
+              {sendingCode ? 'Sending code…' : 'Delete my account'}
             </button>
-          </div>
-        </Row>
-        <Feedback error={deleteError} />
+          </Row>
+        ) : (
+          <form className="settings-verify" onSubmit={handleDelete}>
+            <p className="settings-verify-lead">
+              We sent a 6-digit code to <strong>{deleteSentTo}</strong>. Enter it below to permanently
+              delete your account. The code expires in 10 minutes.
+            </p>
+
+            <label className="settings-verify-field">
+              <span className="settings-stack-label">Verification code</span>
+              <input
+                className="settings-input settings-code-input"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                value={deleteCode}
+                placeholder="000000"
+                autoFocus
+                onChange={(e) => setDeleteCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                aria-label="6-digit verification code"
+              />
+            </label>
+
+            <Feedback error={deleteError} />
+
+            <div className="settings-verify-actions">
+              <button
+                type="submit"
+                className="settings-btn settings-btn-danger"
+                disabled={deleteCode.length !== 6 || deleting}
+              >
+                {deleting ? 'Deleting…' : 'Permanently delete account'}
+              </button>
+              <button
+                type="button"
+                className="settings-btn settings-btn-ghost"
+                onClick={sendDeleteCode}
+                disabled={resendIn > 0 || sendingCode || deleting}
+              >
+                {sendingCode ? 'Sending…' : resendIn > 0 ? `Resend in ${resendIn}s` : 'Send a new code'}
+              </button>
+              <button type="button" className="settings-btn settings-btn-ghost" onClick={cancelDelete} disabled={deleting}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+        {deleteStep === 'idle' && <Feedback error={deleteError} />}
       </DangerZone>
     </>
   )

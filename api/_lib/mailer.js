@@ -148,6 +148,43 @@ function escapeHtml(s) {
  * body scores badly with spam filters, and the link has to survive a client
  * that strips markup.
  */
+/** The code that confirms an account deletion. Plain about what it does. */
+export function deletionCodeEmail({ code, minutes }) {
+  const text = [
+    'Someone asked to delete your Routicle account.',
+    '',
+    `Your code: ${code}`,
+    '',
+    `It expires in ${minutes} minutes and works once. Entering it deletes your account, your saved items and any workspace only you are in. This can't be undone.`,
+    '',
+    "If this wasn't you, don't share the code with anyone. Your account stays as it is, and it would be worth changing your password.",
+  ].join('\n')
+
+  const html = `
+<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#16161a">
+  <p style="margin:0 0 24px;font-size:18px;font-weight:700;letter-spacing:-0.01em">Routicle</p>
+  <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;font-weight:700;letter-spacing:-0.02em">
+    Your account deletion code
+  </h1>
+  <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#5a5a63">
+    Someone asked to delete your Routicle account. Enter this code to confirm.
+  </p>
+  <p style="margin:0 0 20px;padding:16px 0;border-radius:14px;background:#f2f1fb;text-align:center;font-size:32px;font-weight:700;letter-spacing:0.3em;color:#16161a">
+    ${escapeHtml(code)}
+  </p>
+  <p style="margin:0 0 12px;font-size:13px;line-height:1.6;color:#5a5a63">
+    It expires in ${minutes} minutes and works once. Entering it deletes your account, your saved
+    items and any workspace only you are in. This can't be undone.
+  </p>
+  <p style="margin:0;font-size:12px;line-height:1.6;color:#8a8a94">
+    If this wasn't you, don't share the code with anyone. Your account stays as it is, and it would be
+    worth changing your password.
+  </p>
+</div>`.trim()
+
+  return { text, html }
+}
+
 export function inviteEmail({ teamName, inviterName, acceptUrl, role }) {
   const team = escapeHtml(teamName)
   const inviter = escapeHtml(inviterName || 'A teammate')

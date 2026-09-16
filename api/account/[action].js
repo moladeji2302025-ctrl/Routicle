@@ -1,7 +1,9 @@
 import { sql } from '../_lib/db.js'
 import { requireUser } from '../_lib/auth.js'
 import { disableSubscription } from '../_lib/paystack.js'
-import { sendMail, inviteEmail, mailerConfigured, explainMailError } from '../_lib/mailer.js'
+import { sendMail, inviteEmail, deletionCodeEmail, mailerConfigured, explainMailError } from '../_lib/mailer.js'
+import { issueCode, consumeCode, maskEmail } from '../_lib/verifyCodes.js'
+import { limit, LIMITS } from '../_lib/ratelimit.js'
 import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
 
 const INVITE_DAYS = 7
@@ -11,7 +13,8 @@ const INVITE_DAYS = 7
  *
  * GET  /api/account/teams    this account's workspaces, with its role in each
  * GET  /api/account/members  ?organizationId= — one workspace's members
- * POST /api/account/delete   { confirmEmail }
+ * POST /api/account/delete-request           emails a one-time code
+ * POST /api/account/delete   { code }         deletes, once the code checks out
  *
  * Members lives here rather than under a team route purely for Vercel's
  * twelve-function budget; it is still scoped to workspaces the caller is in.
@@ -22,6 +25,7 @@ export default async function handler(req, res) {
     if (action === 'teams') return listTeams(req, res)
     if (action === 'members') return listMembers(req, res)
     if (action === 'invite') return inviteMember(req, res)
+    if (action === 'delete-request') return requestDeletion(req, res)
     if (action === 'delete') return deleteAccount(req, res)
     return send(res, 404, { error: `Unknown account route: ${action}` })
   })
@@ -183,40 +187,89 @@ async function inviteMember(req, res) {
   send(res, 201, { ok: true, invitationId, email: invitee })
 }
 
-async function deleteAccount(req, res) {
-  if (!methodGuard(req, res, ['POST'])) return
-
-  const user = await requireUser(req, res)
-  if (!user) return
-
-  // Typing the address is a second factor against a stolen token: holding one
-  // is enough to *use* the account, but should not be enough to erase it in a
-  // single unattended request.
-  const confirmEmail = (req.body?.confirmEmail || '').trim().toLowerCase()
-  if (!confirmEmail || confirmEmail !== (user.email || '').toLowerCase()) {
-    return send(res, 400, { error: 'Type your own email address to confirm.' })
-  }
-
-  /* ---- Workspaces this account owns ---- */
-
+/**
+ * Workspaces this account owns, and a refusal message when any of them still
+ * has other people in it. Deleting the owner of a shared workspace would strand
+ * everyone else in a team nobody can administer.
+ */
+async function ownershipBlock(userId) {
   const owned = await sql`
     SELECT o.id, o.name,
            (SELECT COUNT(*)::int FROM neon_auth.member m2 WHERE m2."organizationId" = o.id) AS member_count
     FROM neon_auth.member m
     JOIN neon_auth.organization o ON o.id = m."organizationId"
-    WHERE m."userId" = ${user.id} AND m.role = 'owner'
+    WHERE m."userId" = ${userId} AND m.role = 'owner'
   `
-
-  // Deleting the owner of a shared workspace would strand everyone else in a
-  // team nobody can administer, so that has to be resolved deliberately first.
   const shared = owned.filter((o) => o.member_count > 1)
-  if (shared.length > 0) {
-    return send(res, 409, {
-      error:
-        `You still own ${shared.length === 1 ? 'a workspace' : 'workspaces'} with other members: ` +
-        `${shared.map((o) => o.name).join(', ')}. Transfer ownership or remove the other members first.`,
-    })
+  const error = shared.length
+    ? `You still own ${shared.length === 1 ? 'a workspace' : 'workspaces'} with other members: ` +
+      `${shared.map((o) => o.name).join(', ')}. Transfer ownership or remove the other members first.`
+    : null
+  return { owned, error }
+}
+
+/**
+ * Step one: email a code to the account's own address.
+ *
+ * The ownership check runs here as well as at deletion, so nobody is sent a
+ * code they would then be unable to use.
+ */
+async function requestDeletion(req, res) {
+  if (!methodGuard(req, res, ['POST'])) return
+
+  const user = await requireUser(req, res)
+  if (!user) return
+  // Tight, because every request sends an email.
+  if (!(await limit(req, res, { name: 'delete-code', key: user.id, ...LIMITS.sensitive }))) return
+
+  if (!user.email) return send(res, 400, { error: 'This account has no email address to verify with.' })
+  if (!mailerConfigured()) {
+    return send(res, 503, { error: "Email isn't set up on the server yet, so a verification code can't be sent." })
   }
+
+  const { error } = await ownershipBlock(user.id)
+  if (error) return send(res, 409, { error })
+
+  const { code, minutes } = await issueCode(user.id, 'delete-account')
+  const { text, html } = deletionCodeEmail({ code, minutes })
+
+  try {
+    await sendMail({ to: user.email, subject: 'Your Routicle account deletion code', text, html })
+  } catch (err) {
+    console.error('deletion code email failed', err)
+    return send(res, 502, { error: `We couldn't send the code. ${explainMailError(err)}` })
+  }
+
+  send(res, 200, { ok: true, sentTo: maskEmail(user.email), minutes })
+}
+
+/** Step two: delete, but only with the code that was emailed. */
+async function deleteAccount(req, res) {
+  if (!methodGuard(req, res, ['POST'])) return
+
+  const user = await requireUser(req, res)
+  if (!user) return
+  if (!(await limit(req, res, { name: 'delete-verify', key: user.id, ...LIMITS.sensitive }))) return
+
+  const check = await consumeCode(user.id, 'delete-account', req.body?.code)
+  if (!check.ok) {
+    const messages = {
+      missing: 'Ask for a verification code first.',
+      expired: 'That code has expired. Ask for a new one.',
+      locked: 'Too many wrong attempts. Ask for a new code.',
+      wrong:
+        check.remaining > 0
+          ? `That code isn't right. ${check.remaining} ${check.remaining === 1 ? 'try' : 'tries'} left.`
+          : 'That code isn\'t right, and it has now been cancelled. Ask for a new one.',
+    }
+    return send(res, check.reason === 'locked' ? 429 : 400, { error: messages[check.reason], reason: check.reason })
+  }
+
+  /* ---- Workspaces this account owns ---- */
+
+  // Checked again: membership can change in the ten minutes a code is valid.
+  const { owned, error } = await ownershipBlock(user.id)
+  if (error) return send(res, 409, { error })
 
   const soloIds = owned.map((o) => o.id)
 

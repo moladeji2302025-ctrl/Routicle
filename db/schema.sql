@@ -85,3 +85,18 @@ CREATE INDEX IF NOT EXISTS item_comments_item_idx
 CREATE UNIQUE INDEX IF NOT EXISTS item_comments_one_rating_per_user
   ON item_comments (content_item_id, user_id)
   WHERE rating IS NOT NULL;
+
+-- ---------------------------------------------------------------------------
+-- One-time email codes for actions that cannot be undone (account deletion).
+-- Only an HMAC of the code is stored, keyed with a server secret, so a leaked
+-- row cannot be checked against the million possible six-digit codes offline.
+-- One live code per user per purpose: requesting another replaces it.
+CREATE TABLE IF NOT EXISTS verification_codes (
+  user_id text NOT NULL,
+  purpose text NOT NULL,
+  code_hash text NOT NULL,
+  expires_at timestamptz NOT NULL,
+  attempts integer NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, purpose)
+);
