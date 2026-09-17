@@ -3921,32 +3921,6 @@ a:hover {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
-@media (max-width: 760px) {
-  .app-shell {
-    flex-direction: column;
-  }
-
-  .app-sidebar {
-    position: static;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .app-nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .app-sidebar-bottom {
-    margin-left: auto;
-    border-top: none;
-    padding-top: 0;
-  }
-}
-
 /* App home dashboard */
 
 .app-home {
@@ -13596,5 +13570,661 @@ html {
 
   .pj-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* ==========================================================================
+   MOBILE
+   ==========================================================================
+
+   Everything below is phone and small-tablet layout. It lives in one block at
+   the end of the stylesheet on purpose: these rules have to win over the
+   desktop ones, and several of the desktop rules they override are themselves
+   declared after earlier media queries. That ordering is what broke the public
+   navbar — a `display: none` inside a max-width query sat *above* the
+   `display: flex` that put the links back, so the links never hid and the page
+   overflowed by 480px on a phone.
+   ========================================================================== */
+
+/* Nothing should be able to push the page sideways. A phone has no horizontal
+   room to spare, and a single wide child turns the whole document into a
+   side-scroller. */
+@media (max-width: 900px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* -------------------------------------------------- public site navigation */
+
+.navbar-burger {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .navbar-row {
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  /* The desktop links and the inline search both go; the sheet carries them. */
+  .navbar-links,
+  .navbar-search,
+  .navbar-login {
+    display: none !important;
+  }
+
+  .navbar-right {
+    gap: 10px;
+  }
+
+  .navbar-burger {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: none;
+    cursor: pointer;
+  }
+
+  .navbar-burger-bars {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .navbar-burger-bars i {
+    display: block;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--text);
+    transition: transform 0.22s ease, opacity 0.18s ease;
+  }
+
+  /* The three bars become a cross, so the button reads as a close when open. */
+  .navbar-burger-x i:first-child {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .navbar-burger-x i:nth-child(2) {
+    opacity: 0;
+  }
+
+  .navbar-burger-x i:last-child {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  .navbar-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    border: 0;
+    background: rgb(0 0 0 / 0.4);
+    backdrop-filter: blur(2px);
+    cursor: default;
+  }
+
+  .navbar-sheet {
+    position: fixed;
+    z-index: 31;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: min(320px, 88vw);
+    height: 100dvh;
+    padding: 76px 20px 28px;
+    background: var(--surface-2);
+    border-left: 1px solid var(--border);
+    box-shadow: -18px 0 50px -20px rgb(0 0 0 / 0.35);
+    overflow-y: auto;
+    animation: navbar-sheet-in 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes navbar-sheet-in {
+    from {
+      transform: translateX(14px);
+      opacity: 0;
+    }
+  }
+
+  .navbar-sheet-search {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 15px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-muted);
+  }
+
+  .navbar-sheet-search input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: none;
+    font: inherit;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .navbar-sheet-search input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .navbar-sheet-links {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .navbar-sheet-links a {
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    border-bottom: 1px solid var(--border);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .navbar-sheet-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .navbar-sheet-actions .btn-solid,
+  .navbar-sheet-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .navbar-sheet-login {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text);
+  }
+
+  /* Keep one visible action in the bar itself, so signing up never depends on
+     finding the menu. */
+  .navbar-signup,
+  .navbar-account {
+    padding: 9px 16px;
+    font-size: 14px;
+  }
+}
+
+/* ------------------------------------------------------ app shell: drawer */
+
+.app-scrim {
+  display: none;
+}
+
+.app-tabbar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    display: block;
+  }
+
+  /* Off-canvas rather than a wrapped row. The sidebar used to reflow into a
+     three-column block that ate roughly 470px of the screen before any content
+     and still clipped its own last items. */
+  .app-sidebar {
+    position: fixed;
+    z-index: 60;
+    top: 0;
+    left: 0;
+    flex-basis: auto;
+    width: min(284px, 84vw);
+    height: 100dvh;
+    padding: 18px 14px;
+    gap: 14px;
+    overflow-y: auto;
+    border-right: 1px solid var(--app-border);
+    transform: translateX(-102%);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .app-shell-drawer-open .app-sidebar {
+    transform: translateX(0);
+    box-shadow: 24px 0 60px -24px rgb(0 0 0 / 0.6);
+  }
+
+  /* The rail treatment is desktop-only; in a drawer there is room for words. */
+  .app-shell-collapsed .app-sidebar {
+    flex-basis: auto;
+    width: min(284px, 84vw);
+    padding: 18px 14px;
+    align-items: stretch;
+  }
+
+  .app-shell-collapsed .app-rail-label,
+  .app-shell-collapsed .app-nav-label > span {
+    max-width: 170px;
+    opacity: 1;
+  }
+
+  .app-shell-collapsed .app-nav-label::after {
+    opacity: 0;
+  }
+
+  .app-shell-collapsed .app-nav,
+  .app-shell-collapsed .app-nav-group {
+    align-items: stretch;
+  }
+
+  .app-shell-collapsed .app-nav-item {
+    width: 100%;
+    padding: 0 10px;
+    justify-content: flex-start;
+  }
+
+  .app-shell-collapsed .app-logo {
+    justify-content: flex-start;
+    padding: 0 8px;
+  }
+
+  .app-shell-collapsed .app-create-btn {
+    width: 100%;
+    align-self: stretch;
+    margin-top: 0;
+  }
+
+  /* Taller rows: a 34px target is fine for a mouse and cramped for a thumb. */
+  .app-nav-item {
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .app-create-btn {
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .app-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 59;
+    border: 0;
+    background: rgb(0 0 0 / 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+    cursor: default;
+  }
+
+  .app-shell-drawer-open .app-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ---- content column ---- */
+
+  .app-main-col {
+    min-height: 100dvh;
+  }
+
+  .app-main {
+    padding: 18px 16px 24px;
+  }
+
+  /* Room for the tab bar, plus the home-indicator inset on iOS. */
+  .app-main,
+  .app-home,
+  .up-page,
+  .pj-page,
+  .explore-page,
+  .detail-page,
+  .settings-page,
+  .dashboard-page {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* ---- top bar ---- */
+
+  .app-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .app-topbar-left {
+    min-width: 0;
+    flex: 1;
+  }
+
+  /* The centred search can't be centred when the bar is a flex row of three
+     unequal groups, and at this width it would crowd out the breadcrumb. It
+     moves under the bar as a full-width field instead. */
+  .app-topbar-search {
+    position: static;
+    left: auto;
+    transform: none;
+    width: 100%;
+    order: 10;
+    flex: 0 0 100%;
+    margin-top: 2px;
+  }
+
+  .app-topbar {
+    flex-wrap: wrap;
+  }
+
+  .app-topbar-search kbd {
+    display: none;
+  }
+
+  .app-topbar-btn {
+    display: none;
+  }
+
+  .app-topbar-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .app-avatar-link {
+    width: 40px;
+    height: 40px;
+  }
+
+  .app-crumbs {
+    font-size: 14px;
+  }
+
+  /* ---- bottom tab bar ---- */
+
+  .app-tabbar {
+    position: fixed;
+    z-index: 55;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in oklab, var(--app-bg) 88%, transparent);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--app-border);
+  }
+
+  .app-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 52px;
+    padding: 6px 2px;
+    border: 0;
+    border-radius: 14px;
+    background: none;
+    font: inherit;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--app-text-muted);
+    cursor: pointer;
+  }
+
+  .app-tab span {
+    line-height: 1;
+  }
+
+  .app-tab-on {
+    color: var(--app-text);
+    background: var(--app-hover);
+  }
+
+  /* The create tab is the one action, so it reads as a button rather than a
+     destination. */
+  .app-tab-accent svg {
+    padding: 5px;
+    border-radius: 999px;
+    background: var(--brand-violet);
+    color: #fff;
+    box-sizing: content-box;
+  }
+
+  .app-tab-accent {
+    color: var(--app-text);
+  }
+}
+
+/* --------------------------------------------- page layouts at phone width */
+
+@media (max-width: 900px) {
+  /* Two-column bands become one. */
+  .app-split,
+  .app-split-flip,
+  .app-ws-band,
+  .up-layout,
+  .me-body,
+  .cs-grid,
+  .detail-page {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-ws-band .app-ws-list,
+  .up-aside,
+  .me-controls {
+    position: static;
+  }
+
+  .app-home-greeting {
+    font-size: 26px;
+  }
+
+  .app-home-sub {
+    font-size: 14px;
+  }
+
+  /* One column of cards reads better than two 150px ones. */
+  .pj-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pj-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .up-formats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .me-row {
+    grid-template-columns: 74px minmax(0, 1fr) auto;
+  }
+
+  /* Wide tables can't be made narrow, so they scroll as a unit instead of
+     stretching the page. */
+  .comparison-table-wrap,
+  .admin-table-wrap,
+  .settings-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Long, unbroken strings (object keys, emails, referral links) are a classic
+     cause of a page that scrolls sideways. */
+  .settings-static-value,
+  .download-title,
+  .cm-text,
+  .pj-title,
+  .up-drop-text strong {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ------------------------------------------------------------ tap targets */
+
+@media (max-width: 900px) {
+  .settings-btn,
+  .up-browse,
+  .cm-post,
+  .eb-btn,
+  .pricing-cta,
+  .app-cta-btn,
+  .detail-download-btn,
+  .btn-solid,
+  .btn-hero-primary,
+  .btn-hero-secondary,
+  .hero-deck-btn-primary,
+  .hero-deck-btn-secondary,
+  .pj-filter,
+  .up-cat,
+  .explore-chip,
+  .fp-cat,
+  .me-seg-btn,
+  .settings-seg-btn {
+    min-height: 40px;
+  }
+
+  .app-ws-add,
+  .up-icon-btn,
+  .me-icon-btn,
+  .me-close,
+  .app-icon-btn,
+  .save-badge {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  /* 16px is the smallest a text field can be without iOS Safari zooming the
+     page when it takes focus. */
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='search'],
+  input[type='number'],
+  select,
+  textarea,
+  .settings-input,
+  .up-input,
+  .me-color-hex {
+    font-size: 16px;
+  }
+}
+
+/* ---------------------------------------------------- narrow phones (≤380) */
+
+@media (max-width: 380px) {
+  .app-main {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .pj-stats,
+  .up-formats {
+    grid-template-columns: 1fr;
+  }
+
+  .app-tab {
+    font-size: 10px;
+  }
+}
+
+/* Late additions to the mobile block, after removing the legacy sidebar rules
+   this file used to carry for the same elements. */
+@media (max-width: 900px) {
+  /* The drawer has full width for words, so groups stack. */
+  .app-nav,
+  .app-nav-group {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  /* Centring the nav is a desktop rail affordance; in a scrolling drawer it
+     just pushes the first item down. */
+  .app-nav:not(.app-nav-foot) {
+    justify-content: flex-start;
+  }
+
+  /* The dashboard's own search duplicated the one in the top bar, stacking two
+     identical fields on top of each other. The top bar's is on every page, so
+     that is the one that stays. */
+  .app-home-search {
+    display: none;
+  }
+
+  /* 96px of headroom is a desktop flourish; on a phone it is most of the
+     screen before anything is readable. */
+  .app-home {
+    padding: 20px 16px 96px;
+  }
+
+  .app-home-greeting {
+    margin: 0 0 8px;
+    text-align: left;
+  }
+
+  .app-home-sub {
+    margin: 0 0 24px;
+    text-align: left;
+  }
+
+  /* Text links that act as controls need a thumb-sized row, even though the
+     text itself is small. */
+  .app-section-link,
+  .app-ws-list-title,
+  .app-ws-upgrade,
+  .footer-link,
+  .detail-appreciate,
+  .detail-share,
+  .logo,
+  .app-logo,
+  .cs-palette,
+  .cm-link {
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .pricing-switch {
+    min-width: 52px;
+    min-height: 30px;
+  }
+
+  /* The drawn checkbox is the target; the real input is visually hidden. */
+  .up-rights-box,
+  .creator-apply-rights input {
+    min-width: 22px;
+    min-height: 22px;
+  }
+}
+
+@media (max-width: 900px) {
+  /* The drawer scrolls, and its children are flex items in a column, so the
+     default flex-shrink let them compress: the Create button measured 27px
+     instead of 44px once enough nav rows were present. Rows must keep their
+     height and let the drawer scroll instead. */
+  .app-sidebar > *,
+  .app-create-btn,
+  .app-nav-item,
+  .app-logo {
+    flex-shrink: 0;
   }
 }

@@ -286,3 +286,11 @@ export function LockIcon({ size = 14, color = 'currentColor' }) {
     </svg>
   )
 }
+
+export function MenuIcon({ size = 18, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  )
+}

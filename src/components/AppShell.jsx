@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import AppTopBar from './AppTopBar'
@@ -17,6 +17,7 @@ import {
   ImageIcon,
   VideoIcon,
   BookmarkIcon,
+  MenuIcon,
   CardIcon,
   HelpIcon,
   PenIcon,
@@ -89,6 +90,17 @@ const NAV_GROUPS = [
 
 const COLLAPSE_KEY = 'routicle_sidebar_collapsed'
 
+/**
+ * The bottom bar's destinations on a phone, where a 19-item sidebar cannot
+ * live on screen. Everything else is one tap away in the drawer.
+ */
+const MOBILE_TABS = [
+  { label: 'Home', to: '/', icon: HomeIcon, match: (p) => p === '/' },
+  { label: 'Explore', to: '/explore', icon: SearchIcon },
+  { label: 'Create', to: '/studio/image', icon: PlusIcon, accent: true },
+  { label: 'Saved', to: '/collections', icon: BookmarkIcon },
+]
+
 export default function AppShell() {
   const { currentUser, isPlatformAdmin } = useApp()
   const navigate = useNavigate()
@@ -103,6 +115,41 @@ export default function AppShell() {
       return false
     }
   })
+
+  // Open/closed state of the mobile drawer. Separate from `collapsed`, which is
+  // the desktop rail: on a phone the sidebar is off-canvas either way, so
+  // reusing one flag would mean a desktop preference decided whether the
+  // drawer started open.
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Any navigation closes the drawer, including the back button.
+  useEffect(() => setDrawerOpen(false), [location.pathname])
+
+  useEffect(() => {
+    if (!drawerOpen) return undefined
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    function onKey(e) {
+      if (e.key === 'Escape') setDrawerOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = previous
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [drawerOpen])
+
+  /**
+   * One button, two jobs, decided by which layout is on screen: below the
+   * breakpoint it opens the drawer, above it collapses the rail. Checked at
+   * click time rather than held in state, so a rotation or resize can't leave
+   * it wired to the wrong one.
+   */
+  function handleSidebarButton() {
+    const phone = typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches
+    if (phone) setDrawerOpen((v) => !v)
+    else toggleSidebar()
+  }
 
   function toggleSidebar() {
     setCollapsed((v) => {
@@ -158,9 +205,27 @@ export default function AppShell() {
   }
 
   return (
-    <div className={collapsed ? 'app-shell app-shell-collapsed' : 'app-shell'}>
+    <div
+      className={[
+        'app-shell',
+        collapsed && 'app-shell-collapsed',
+        drawerOpen && 'app-shell-drawer-open',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       {/* In-app only: the signed-out marketing pages keep the system cursor. */}
       <AppCursor />
+
+      {/* Only hit-testable while the drawer is open (CSS), so it never sits over
+          the desktop layout. */}
+      <button
+        type="button"
+        className="app-scrim"
+        aria-label="Close menu"
+        tabIndex={drawerOpen ? 0 : -1}
+        onClick={() => setDrawerOpen(false)}
+      />
 
       <aside className="app-sidebar">
         <Link to="/" className="app-logo" title="Routicle">
@@ -184,10 +249,39 @@ export default function AppShell() {
       </aside>
 
       <div className="app-main-col">
-        <AppTopBar collapsed={collapsed} onToggleSidebar={toggleSidebar} />
+        <AppTopBar collapsed={collapsed} onToggleSidebar={handleSidebarButton} />
         <main className="app-main">
           <Outlet />
         </main>
+
+        {/* Phone-only tab bar. Hidden above the breakpoint by CSS rather than
+            unmounted, so switching layouts never remounts the page. */}
+        <nav className="app-tabbar" aria-label="Primary">
+          {MOBILE_TABS.map((tab) => {
+            const Icon = tab.icon
+            const on = tab.match ? tab.match(location.pathname) : location.pathname.startsWith(tab.to)
+            return (
+              <Link
+                key={tab.label}
+                to={tab.to}
+                className={[
+                  'app-tab',
+                  on && 'app-tab-on',
+                  tab.accent && 'app-tab-accent',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                <Icon size={20} color="currentColor" />
+                <span>{tab.label}</span>
+              </Link>
+            )
+          })}
+          <button type="button" className="app-tab" onClick={() => setDrawerOpen(true)}>
+            <MenuIcon size={20} color="currentColor" />
+            <span>More</span>
+          </button>
+        </nav>
       </div>
     </div>
   )
