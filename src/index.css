@@ -13685,7 +13685,6 @@ html {
     padding: 76px 20px 28px;
     background: var(--surface-2);
     border-left: 1px solid var(--border);
-    box-shadow: -18px 0 50px -20px rgb(0 0 0 / 0.35);
     overflow-y: auto;
     animation: navbar-sheet-in 0.26s cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -13807,7 +13806,6 @@ html {
 
   .app-shell-drawer-open .app-sidebar {
     transform: translateX(0);
-    box-shadow: 24px 0 60px -24px rgb(0 0 0 / 0.6);
   }
 
   /* The rail treatment is desktop-only; in a drawer there is room for words. */
