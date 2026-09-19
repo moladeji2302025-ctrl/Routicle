@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import * as api from '../../lib/api'
 import { QUESTION_GROUPS, findQuestion, STARTER_QUESTION_IDS } from '../../data/discoveryQuestions'
-import { buildDocument, answersByMeaning, DOCUMENT_KINDS } from '../../data/documentTemplates'
+import { buildDocument, answersByMeaning, DOCUMENT_KINDS, readiness } from '../../data/documentTemplates'
+import { findStyle } from '../../data/documentStyles'
 import PackagesEditor from './PackagesEditor'
+import StylePicker, { rememberedStyle } from '../../components/docs/StylePicker'
 import { ChevronRightIcon, PlusIcon } from '../../components/icons'
 
 const TABS = [
@@ -32,6 +34,7 @@ const monthLabel = (period) => {
 
 export default function ProjectPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [profile, setProfile] = useState(null)
   const [tab, setTab] = useState('form')
@@ -88,23 +91,40 @@ export default function ProjectPage() {
    * client's own answers into a fixed template — no model call, so it costs
    * nothing and always produces the same document from the same inputs.
    */
-  async function generate(kind) {
-    if (!profile) {
-      setError('Set up your studio profile first, since the documents are built from it.')
-      return
+  const draft = useCallback(
+    (kind, style, accent) => {
+      const latest = data.submissions[0]
+      const a = latest ? answersByMeaning(latest.answers, data.form?.questions || []) : {}
+      const figures = data.project.figures || { packages: [], lines: [] }
+      return buildDocument(kind, {
+        studio: profile || {},
+        project: data.project,
+        a,
+        packages: figures.packages || [],
+        lines: figures.lines || [],
+        invoiceNumber: String(data.documents.filter((d) => d.kind === 'invoice').length + 1).padStart(4, '0'),
+        style,
+        accent,
+      })
+    },
+    [data, profile]
+  )
+
+  // The document is created and opened in one step: there is nothing to do
+  // with a new proposal except look at it.
+  async function createDocument(kind, style, accent) {
+    setBusy(`gen-${kind}`)
+    setError('')
+    try {
+      const content = draft(kind, style, accent)
+      const client = data.project.clientCompany || data.project.clientName || data.project.name
+      const label = DOCUMENT_KINDS.find((k) => k.id === kind)?.label || kind
+      const { document } = await api.saveDocument({ projectId: id, kind, title: `${label} for ${client}`, content })
+      navigate(`/suite/business/${id}/doc/${document.id}`)
+    } catch (err) {
+      setError(err.message)
+      setBusy('')
     }
-    const latest = data.submissions[0]
-    const a = latest ? answersByMeaning(latest.answers, data.form?.questions || []) : {}
-    const figures = data.project.figures || { packages: [], lines: [] }
-    const content = buildDocument(kind, {
-      studio: profile,
-      project: data.project,
-      a,
-      packages: figures.packages || [],
-      lines: figures.lines || [],
-      invoiceNumber: String(data.documents.filter((d) => d.kind === 'invoice').length + 1).padStart(4, '0'),
-    })
-    await run(`gen-${kind}`, () => api.saveDocument({ projectId: id, kind, title: content.title, content }), `${kind} generated.`)
   }
 
   if (error && !data) return <p className="settings-error">{error}</p>
@@ -281,20 +301,15 @@ export default function ProjectPage() {
       {/* ----------------------------------------------------- documents */}
       {tab === 'documents' && (
         <>
-          <div className="suite-doc-actions">
-            {DOCUMENT_KINDS.map((k) => (
-              <button
-                key={k.id}
-                type="button"
-                className="suite-doc-new"
-                onClick={() => generate(k.id)}
-                disabled={busy === `gen-${k.id}`}
-              >
-                <strong>{busy === `gen-${k.id}` ? 'Generating…' : k.label}</strong>
-                <span>{k.blurb}</span>
-              </button>
-            ))}
-          </div>
+          <NewDocument
+            project={project}
+            profile={profile}
+            submissions={submissions}
+            busy={busy}
+            draft={draft}
+            onCreate={createDocument}
+            onGoTab={setTab}
+          />
 
           {documents.length === 0 ? (
             <p className="explore-empty">Nothing generated yet.</p>
@@ -303,6 +318,13 @@ export default function ProjectPage() {
               {documents.map((d) => (
                 <div key={d.id} className="download-row">
                   <span className={`update-tag update-tag-${d.kind === 'invoice' ? 'fix' : 'feature'}`}>{d.kind}</span>
+                  {d.content?.version === 2 && (
+                    <span
+                      className="doc-row-swatch"
+                      title={findStyle(d.content.style).name}
+                      style={{ background: d.content.accent || findStyle(d.content.style).colors.accent }}
+                    />
+                  )}
                   <div className="download-info">
                     <span className="download-title">{d.title}</span>
                     <span className="download-meta">
@@ -367,5 +389,111 @@ export default function ProjectPage() {
         </>
       )}
     </>
+  )
+}
+
+/**
+ * Choosing what to make and how it should look, before anything is saved.
+ *
+ * The checks say what the document will be missing and link straight to where
+ * to fix it; none of them block. The style thumbnails are real covers built
+ * from this project, so the choice is made by looking rather than by name.
+ */
+function NewDocument({ project, profile, submissions, busy, draft, onCreate, onGoTab }) {
+  const [kind, setKind] = useState('proposal')
+  const [style, setStyle] = useState(rememberedStyle)
+  const [accent, setAccent] = useState(null)
+
+  const preview = useMemo(() => draft(kind, style, accent), [draft, kind, style, accent])
+  const checks = readiness(kind, { profile, project, submissions, figures: project.figures })
+  const missing = checks.filter((c) => !c.ok).length
+  const creating = busy === `gen-${kind}`
+  const label = DOCUMENT_KINDS.find((k) => k.id === kind)?.label
+  const shownAccent = accent || findStyle(style).colors.accent
+
+  return (
+    <section className="doc-new">
+      <div className="doc-new-kinds" role="tablist" aria-label="Document type">
+        {DOCUMENT_KINDS.map((k) => (
+          <button
+            key={k.id}
+            type="button"
+            role="tab"
+            aria-selected={kind === k.id}
+            className={kind === k.id ? 'suite-doc-new suite-doc-new-on' : 'suite-doc-new'}
+            onClick={() => setKind(k.id)}
+          >
+            <strong>{k.label}</strong>
+            <span>{k.blurb}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="doc-new-body">
+        <div className="doc-new-pick">
+          <div className="doc-new-head">
+            <h3>Pick a style</h3>
+            <div className="doc-accent">
+              <label className="doc-accent-swatch" style={{ background: shownAccent }}>
+                <input type="color" value={shownAccent} onChange={(e) => setAccent(e.target.value)} aria-label="Accent colour" />
+              </label>
+              <span>{accent ? 'Your colour' : 'Style colour'}</span>
+              {accent && (
+                <button type="button" className="settings-btn settings-btn-ghost" onClick={() => setAccent(null)}>
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
+          <StylePicker doc={preview} value={style} accent={accent} onChange={setStyle} />
+        </div>
+
+        <aside className="doc-new-side">
+          <h3>Before you create</h3>
+          <ul className="doc-checks">
+            {checks.map((c) => (
+              <li key={c.label} className={c.ok ? 'doc-check doc-check-ok' : 'doc-check'}>
+                <span className="doc-check-dot" aria-hidden="true">{c.ok ? '✓' : '!'}</span>
+                <div>
+                  <strong>{c.label}</strong>
+                  {!c.ok && (
+                    <span>
+                      {c.fix}
+                      {c.to && (
+                        <>
+                          {' '}
+                          <Link to={c.to}>Fix</Link>
+                        </>
+                      )}
+                      {c.tab && (
+                        <>
+                          {' '}
+                          <button type="button" className="doc-check-link" onClick={() => onGoTab(c.tab)}>
+                            Fix
+                          </button>
+                        </>
+                      )}
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="settings-btn settings-btn-primary doc-new-go"
+            disabled={creating}
+            onClick={() => onCreate(kind, style, accent)}
+          >
+            {creating ? 'Creating…' : `Create ${String(label).toLowerCase()}`}
+          </button>
+          <p className="settings-row-desc">
+            {missing === 0
+              ? 'Everything it needs is here.'
+              : 'You can create it now and fill the gaps on the page. Every word is editable.'}
+          </p>
+        </aside>
+      </div>
+    </section>
   )
 }
