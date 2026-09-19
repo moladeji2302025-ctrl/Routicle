@@ -9,6 +9,7 @@ import ErrorBoundary from '../components/ErrorBoundary'
 import { HeartIcon, EyeIcon, PlayIcon } from '../components/icons'
 import { formatCount } from '../utils/format'
 import { requestDownload, triggerFileDownload } from '../lib/api'
+import { trackFirstDownload } from '../lib/analytics'
 import Thumb from '../components/Thumb'
 
 export default function DesignDetailPage() {
@@ -52,7 +53,8 @@ export default function DesignDetailPage() {
   async function deliverRealFiles() {
     if (!item.isLive || !item.sourceFiles?.length) return
     try {
-      const { files } = await requestDownload(item.id, currentUser.email, activeTeam?.id)
+      const { files, isFirst } = await requestDownload(item.id, currentUser.email, activeTeam?.id)
+      if (isFirst) trackFirstDownload(currentUser.id, { itemId: item.id, category: item.category })
       files.forEach((file) => triggerFileDownload(file.url, file.label))
     } catch (err) {
       console.error('download failed', err)

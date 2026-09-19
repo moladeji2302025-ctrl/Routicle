@@ -55,6 +55,11 @@ export default async function handler(req, res) {
     }
 
     const subscription = await activateFromTransaction(reference, data)
-    send(res, 200, { status: 'success', subscription: serializeSubscription(subscription) })
+    send(res, 200, {
+      status: 'success',
+      subscription: serializeSubscription(subscription),
+      // For the analytics purchase event: what was actually charged.
+      payment: { amount: Number(txn.amount_minor) / 100, currency: txn.currency },
+    })
   })
 }

@@ -4,11 +4,13 @@ import { TIERS } from '../data/pricing'
 import { DEFAULT_SETTINGS, mergeSettings } from '../data/settings'
 import { CATEGORIES } from '../data/categories'
 import * as api from '../lib/api'
+import { trackSignUp, trackCreatorApplication } from '../lib/analytics'
 import { authClient } from '../lib/authClient'
 import { orgClient } from '../lib/orgClient'
 
 const STORAGE_KEY = 'routicle_mock_state_v1'
 const PENDING_INTENT_KEY = 'routicle_pending_signup_intent'
+const SIGNUP_METHOD_KEY = 'routicle_signup_method'
 const THEME_KEY = 'routicle_app_theme'
 const SETTINGS_KEY = 'routicle_settings_v1'
 const ACTIVE_TEAM_KEY = 'routicle_active_team_id'
@@ -452,6 +454,14 @@ export function AppProvider({ children }) {
     const pendingIntent = intentOverride || sessionStorage.getItem(PENDING_INTENT_KEY) || null
     sessionStorage.removeItem(PENDING_INTENT_KEY)
 
+    // A Neon Auth account made in the last ten minutes is a sign up, whichever
+    // way it came in. trackSignUp itself makes sure it only counts once.
+    const createdAt = authUser.createdAt ? new Date(authUser.createdAt).getTime() : 0
+    if (createdAt && Date.now() - createdAt < 10 * 60 * 1000) {
+      trackSignUp(authUser.id, sessionStorage.getItem(SIGNUP_METHOD_KEY) || 'email')
+    }
+    sessionStorage.removeItem(SIGNUP_METHOD_KEY)
+
     let isNewProfile = false
     setState((prev) => {
       const existing = prev.profiles[authUser.id]
@@ -495,6 +505,7 @@ export function AppProvider({ children }) {
 
     return {
       async signUpWithEmail({ name, email, password, intent }) {
+        sessionStorage.setItem(SIGNUP_METHOD_KEY, 'email')
         const result = await authClient.signUp.email({ name, email, password })
         if (result.error) throw new Error(result.error.message || 'Sign up failed')
         return hydrateFromSession(intent)
@@ -512,6 +523,7 @@ export function AppProvider({ children }) {
       /** Redirects to Google — the browser navigates away, so there's nothing to await here. */
       async signInWithGoogle(intent) {
         if (intent) sessionStorage.setItem(PENDING_INTENT_KEY, intent)
+        sessionStorage.setItem(SIGNUP_METHOD_KEY, 'google')
         await authClient.signIn.social({ provider: 'google', callbackURL: window.location.origin })
       },
 
@@ -1019,6 +1031,7 @@ export function AppProvider({ children }) {
         const user = stateRef.current.currentUser
         if (!user) return
         await api.upsertCreator({ name: user.name, email: user.email, bio: data.bio, social: data.social })
+        trackCreatorApplication(user.id)
       },
 
       /** Uploads real files to Neon Object Storage and records the submission in Postgres. */

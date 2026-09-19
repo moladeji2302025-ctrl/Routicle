@@ -56,6 +56,7 @@ import ClientFormPage from './pages/ClientFormPage'
 import InvitePage from './pages/InvitePage'
 import OnboardingPage from './pages/OnboardingPage'
 import StaticPage from './pages/StaticPage'
+import AnalyticsConsent from './components/AnalyticsConsent'
 
 export default function App() {
   return (
@@ -63,6 +64,7 @@ export default function App() {
       <ErrorBoundary>
       <BrowserRouter>
         <IntroReveal />
+        <AnalyticsConsent />
         <Routes>
           {/* Outside Layout on purpose: the welcome flow owns the whole screen,
               with no sidebar or marketing chrome around it. */}

@@ -89,12 +89,16 @@ export default async function handler(req, res) {
       }))
     )
 
+    // Whether this is the account's first ever download, for analytics.
+    const email = String(user.email).toLowerCase()
+    const [{ before }] = await sql`SELECT EXISTS (SELECT 1 FROM downloads WHERE lower(user_email) = ${email}) AS before`
+
     await sql`
       INSERT INTO downloads (content_item_id, user_email, organization_id)
       VALUES (${itemId}, ${String(user.email).toLowerCase()}, ${organizationId || null})
     `
     await sql`UPDATE content_items SET download_count = download_count + 1 WHERE id = ${itemId}`
 
-    send(res, 200, { files })
+    send(res, 200, { files, isFirst: !before })
   })
 }

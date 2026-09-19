@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { TIERS } from '../data/pricing'
+import { trackSubscriptionStart } from '../lib/analytics'
 
 /**
  * Where Paystack sends the buyer back to. Verifies the reference server-side,
@@ -33,7 +34,16 @@ export default function BillingCallbackPage() {
       .then((result) => {
         if (result.status === 'success') {
           setSubscription(result.subscription)
-          if (result.subscription?.tier) applyPlanCredits(result.subscription.tier)
+          if (result.subscription?.tier) {
+            applyPlanCredits(result.subscription.tier)
+            trackSubscriptionStart({
+              reference,
+              tier: result.subscription.tier,
+              billingCycle: result.subscription.billingCycle,
+              amount: result.payment?.amount,
+              currency: result.payment?.currency,
+            })
+          }
           setState('success')
         } else {
           setState('pending')

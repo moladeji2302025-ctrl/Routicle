@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { Section, Row, Toggle, Segmented, DangerZone, Feedback } from '../../components/settings/SettingsControls'
+import { analyticsEnabled, consentState, onConsentChange, setConsent } from '../../lib/analytics'
 
 const VISIBILITY = [
   { id: 'public', label: 'Public' },
@@ -20,6 +21,8 @@ export default function PrivacySettings() {
   const p = settings.privacy
   const [notice, setNotice] = useState('')
   const [confirmReset, setConfirmReset] = useState(false)
+  const [analytics, setAnalytics] = useState(consentState)
+  useEffect(() => onConsentChange(setAnalytics), [])
 
   function handleExport() {
     const data = exportAccountData()
@@ -62,6 +65,17 @@ export default function PrivacySettings() {
           />
         </Row>
       </Section>
+
+      {analyticsEnabled && (
+        <Section title="Analytics">
+          <Row
+            title="Usage analytics"
+            description="Google Analytics cookies that tell us which pages get used. Off means nothing is sent."
+          >
+            <Toggle label="Allow usage analytics" checked={analytics === 'granted'} onChange={(on) => setConsent(on)} />
+          </Row>
+        </Section>
+      )}
 
       <Section title="Browsing history">
         <Row
