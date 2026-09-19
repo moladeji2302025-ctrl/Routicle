@@ -55,11 +55,12 @@ const FEATURE_GROUPS = [
     ],
   },
   {
-    title: 'AI Studio',
+    title: 'Creative & Business Suite',
     rows: [
-      { label: 'AI Image Studio', free: false, standard: true, express: true },
-      { label: 'AI Video Studio', free: false, standard: false, express: true },
-      { label: 'Upscaling', free: false, standard: true, express: true },
+      { label: 'Logo packs from your sketch', free: true, standard: true, express: true },
+      { label: 'Proposals, contracts and invoices', free: true, standard: true, express: true },
+      { label: 'Featured brand templates', free: false, standard: true, express: true },
+      { label: 'AI images inside templates', free: false, standard: true, express: true },
     ],
   },
   {

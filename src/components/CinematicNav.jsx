@@ -5,7 +5,7 @@ const LINKS = [
   { label: 'Explore', to: '/explore' },
   { label: 'Categories', to: '/explore' },
   { label: 'Pricing', to: '/pricing' },
-  { label: 'AI Studio', to: '/studio/image' },
+  { label: 'Creative Suite', to: '/suite/creative' },
   { label: 'Become a Creator', to: '/become-creator' },
 ]
 

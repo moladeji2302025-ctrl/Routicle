@@ -10,8 +10,7 @@ import WhatsNew from '../components/WhatsNew'
 import {
   SearchIcon,
   GridIcon,
-  ImageIcon,
-  VideoIcon,
+  BriefcaseIcon,
   UploadIcon,
   FolderIcon,
   StarIcon,
@@ -233,8 +232,8 @@ export default function AppHomePage() {
   const tools = [
     { label: 'Explore', to: '/explore', icon: GridIcon },
     { label: 'Categories', to: '/categories', icon: FolderIcon },
-    { label: 'AI Image', to: '/studio/image', icon: ImageIcon },
-    { label: 'AI Video', to: '/studio/video', icon: VideoIcon },
+    { label: 'Creative Suite', to: '/suite/creative', icon: SparkleIcon },
+    { label: 'Business Suite', to: '/suite/business', icon: BriefcaseIcon },
     { label: 'Collections', to: '/collections', icon: HeartIcon },
     { label: 'Team', to: '/team', icon: UsersIcon },
     ...(currentUser?.isCreator
@@ -383,7 +382,7 @@ export default function AppHomePage() {
             </div>
           ) : (
             <p className="app-panel-note">
-              Subscribe to unlock the source files behind every design, plus the AI Studios.
+              Subscribe to unlock the source files behind every design, plus featured brand templates and AI images.
             </p>
           )}
         </div>

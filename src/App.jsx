@@ -11,8 +11,6 @@ import PricingPage from './pages/PricingPage'
 import SignUpPage from './pages/SignUpPage'
 import SignInPage from './pages/SignInPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
-import AIImageStudioPage from './pages/AIImageStudioPage'
-import AIVideoStudioPage from './pages/AIVideoStudioPage'
 import BecomeCreatorPage from './pages/BecomeCreatorPage'
 import CreatorUploadPage from './pages/CreatorUploadPage'
 import CreatorDashboardPage from './pages/CreatorDashboardPage'
@@ -79,8 +77,9 @@ export default function App() {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/signin" element={<SignInPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/studio/image" element={<AIImageStudioPage />} />
-            <Route path="/studio/video" element={<AIVideoStudioPage />} />
+            {/* The standalone studios were folded into the Creative Suite. Old
+                links and bookmarks land there rather than on a 404. */}
+            <Route path="/studio/*" element={<Navigate to="/suite/creative" replace />} />
             <Route path="/become-creator" element={<BecomeCreatorPage />} />
             <Route path="/upload" element={<CreatorUploadPage />} />
             <Route path="/dashboard" element={<CreatorDashboardPage />} />

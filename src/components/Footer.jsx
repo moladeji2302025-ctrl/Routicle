@@ -7,7 +7,8 @@ const COLUMNS = [
     heading: 'Product',
     links: [
       { label: 'Explore', to: '/explore' },
-      { label: 'AI Studio', to: '/studio/image' },
+      { label: 'Creative Suite', to: '/suite/creative' },
+      { label: 'Business Suite', to: '/suite/business' },
       { label: 'Pricing', to: '/pricing' },
       { label: 'Become a Creator', to: '/become-creator' },
     ],

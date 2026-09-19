@@ -3,7 +3,7 @@ import PinnedSection, { reveal } from './PinnedSection'
 
 const ITEMS = [
   { n: '01', label: 'Browse the Library', to: '/explore', desc: 'Real, finished design and video work from real creators.' },
-  { n: '02', label: 'Generate with AI', to: '/studio/image', desc: 'Image and Video Studio built into every paid plan.' },
+  { n: '02', label: 'Build your brand', to: '/suite/creative', desc: 'Drop your logo into featured templates, and run clients from the Business Suite.' },
   { n: '03', label: 'Become a Creator', to: '/become-creator', desc: 'Upload what you already made. Get paid every month.' },
   { n: '04', label: 'Simple Pricing', to: '/pricing', desc: 'Free to browse. Subscribe or pay per download.' },
 ]

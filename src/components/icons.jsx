@@ -294,3 +294,12 @@ export function MenuIcon({ size = 18, color = 'currentColor' }) {
     </svg>
   )
 }
+
+export function BriefcaseIcon({ size = 18, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="7" width="18" height="13" rx="2" />
+      <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 12.5h18" />
+    </svg>
+  )
+}

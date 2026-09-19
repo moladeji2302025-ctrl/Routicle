@@ -4,7 +4,7 @@ export const STATIC_PAGES = {
     paragraphs: [
       'Routicle is a marketplace for creative work. Creators upload finished design and video work they never got to use, subscribers pay to download the source files, and half of every subscription dollar is paid out to creators each month.',
       'It started with a simple problem. A rejected pitch deck, a motion loop that never got used, a concept a client passed on: most finished creative work ends up on a hard drive after being shown once. Routicle gives that work a second life, and creators keep every right to it.',
-      'Every paid plan also comes with an AI Image and Video Studio, so if you can’t find what you need in the library, you can make it yourself.',
+      'Every plan also comes with the Creative and Business Suite: turn a sketch into a logo pack, drop it into a featured template, and send clients proposals, contracts and invoices.',
       "Routicle is still early. We're bringing on our first founding creators and building the library before we launch publicly.",
     ],
   },

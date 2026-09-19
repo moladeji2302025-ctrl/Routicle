@@ -19,8 +19,6 @@ const LABELS = {
   business: 'Business Suite',
   creative: 'Creative Suite',
   studio: 'Studio',
-  image: 'AI Image',
-  video: 'AI Video',
   upload: 'Upload',
   projects: 'Projects',
   workspaces: 'Workspaces',

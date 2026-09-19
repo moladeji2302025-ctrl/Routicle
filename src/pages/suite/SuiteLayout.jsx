@@ -1,19 +1,19 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
-import { ImageIcon, VideoIcon, FolderIcon, PenIcon, SparkleIcon } from '../../components/icons'
+import { BriefcaseIcon, PenIcon, SparkleIcon } from '../../components/icons'
 
 /**
- * The AI Suite: the two studios and the two suites under one roof.
+ * The AI Suite: the Business Suite and the Creative Suite under one roof.
+ * Image generation isn't a tool of its own any more; it lives inside the
+ * Creative Suite's templates, where the picture actually gets used.
  *
  * Business and Creative are aimed at different jobs — running the client
  * relationship versus producing the asset — so they sit as peers rather than
  * one being buried inside the other.
  */
 const TOOLS = [
-  { to: '/suite/business', label: 'Business Suite', icon: FolderIcon, blurb: 'Client projects, forms and documents' },
-  { to: '/suite/creative', label: 'Creative Suite', icon: PenIcon, blurb: 'Logo and brand asset generation' },
-  { to: '/studio/image', label: 'AI Image', icon: ImageIcon, blurb: 'Generate and upscale stills' },
-  { to: '/studio/video', label: 'AI Video', icon: VideoIcon, blurb: 'Generate short clips' },
+  { to: '/suite/business', label: 'Business Suite', icon: BriefcaseIcon, blurb: 'Client projects, forms and documents' },
+  { to: '/suite/creative', label: 'Creative Suite', icon: PenIcon, blurb: 'Logo packs and featured brand templates' },
 ]
 
 export default function SuiteLayout() {

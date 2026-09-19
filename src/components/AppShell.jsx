@@ -14,8 +14,6 @@ import {
   UsersIcon,
   SettingsIcon,
   GridIcon,
-  ImageIcon,
-  VideoIcon,
   BookmarkIcon,
   MenuIcon,
   CardIcon,
@@ -23,6 +21,7 @@ import {
   PenIcon,
   ShieldIcon,
   BellIcon,
+  BriefcaseIcon,
 } from './icons'
 
 /**
@@ -50,9 +49,8 @@ const NAV_GROUPS = [
   {
     label: 'Create',
     items: [
-      { label: 'AI Suite', to: '/suite', icon: SparkleIcon },
-      { label: 'AI Image', to: '/studio/image', icon: ImageIcon },
-      { label: 'AI Video', to: '/studio/video', icon: VideoIcon },
+      { label: 'Creative Suite', to: '/suite/creative', icon: SparkleIcon },
+      { label: 'Business Suite', to: '/suite/business', icon: BriefcaseIcon },
       { label: 'Upload', to: '/upload', icon: UploadIcon, when: (u) => u?.isCreator },
       { label: 'Projects', to: '/projects', icon: PenIcon, when: (u) => u?.isCreator },
       { label: 'Become a Creator', to: '/become-creator', icon: UploadIcon, when: (u) => !u?.isCreator },
@@ -97,7 +95,7 @@ const COLLAPSE_KEY = 'routicle_sidebar_collapsed'
 const MOBILE_TABS = [
   { label: 'Home', to: '/', icon: HomeIcon, match: (p) => p === '/' },
   { label: 'Explore', to: '/explore', icon: SearchIcon },
-  { label: 'Create', to: '/studio/image', icon: PlusIcon, accent: true },
+  { label: 'Create', to: '/suite/creative', icon: PlusIcon, accent: true },
   { label: 'Saved', to: '/collections', icon: BookmarkIcon },
 ]
 
@@ -236,7 +234,7 @@ export default function AppShell() {
         <button
           type="button"
           className="app-create-btn"
-          onClick={() => navigate('/studio/image')}
+          onClick={() => navigate('/suite/creative')}
           title="Create"
         >
           <PlusIcon size={16} color="currentColor" />

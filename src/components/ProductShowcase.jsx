@@ -26,9 +26,9 @@ const FEATURES = [
   },
   {
     id: 'ai-generation',
-    label: 'AI Image & Video Studio',
+    label: 'Creative & Business Suite',
     icon: SparkleIcon,
-    to: '/studio/image',
+    to: '/suite/creative',
   },
 ]
 

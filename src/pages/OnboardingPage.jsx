@@ -26,7 +26,7 @@ const PATHS = [
     id: 'browse',
     label: 'I want to use work',
     blurb: 'Download real, editable source files from finished projects.',
-    points: ['Source files, not flattened exports', 'AI Image and Video Studio', 'Shared team collections'],
+    points: ['Source files, not flattened exports', 'Creative and Business Suite', 'Shared team collections'],
   },
   {
     id: 'sell',

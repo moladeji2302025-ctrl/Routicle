@@ -42,7 +42,7 @@ const GROUPS = [
     items: [
       { to: '/workspaces', label: 'Workspaces', desc: 'Share a plan, collections and downloads with your team.', icon: UsersIcon, more: { blurb: "A workspace owns its own plan, collections and download history.", points: ["Switching changes what you see everywhere", "One bill covers every member", "Personal stays separate from team"] } },
       { to: '/team', label: 'Team members & roles', desc: 'Invite people, set roles, manage the shared plan.', icon: UsersIcon, more: { blurb: "Owners can invite, remove and set roles; members can't.", points: ["Invites go out by email", "Owner, admin and member roles", "Only the owner can delete a workspace"] } },
-      { to: '/studio/image', label: 'AI Studio', desc: 'Generate images and video from inside your plan.', icon: SparkleIcon, more: { blurb: "Generations come out of your plan's monthly allowance, not a separate wallet.", points: ["Standard: 50 images a month", "Express: adds 60 seconds of AI video", "Upscaling included on both"] } },
+      { to: '/suite/creative', label: 'Creative Suite', desc: 'Logo packs, featured templates and AI images for them.', icon: SparkleIcon, more: { blurb: "AI images are made inside a template, where they get used, and come out of your plan's monthly allowance.", points: ["Standard and Express: 50 images a month", "Using a template pays its creator", "Everything exports as SVG, PNG or PDF"] } },
     ],
   },
   {

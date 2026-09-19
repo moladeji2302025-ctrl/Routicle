@@ -6,7 +6,7 @@ import { SearchIcon } from './icons'
 const NAV_LINKS = [
   { label: 'Explore', to: '/explore' },
   { label: 'Categories', to: '/categories' },
-  { label: 'AI Studio', to: '/studio/image' },
+  { label: 'Creative Suite', to: '/suite/creative' },
   { label: 'Pricing', to: '/pricing' },
   { label: 'Become a Creator', to: '/become-creator' },
 ]
