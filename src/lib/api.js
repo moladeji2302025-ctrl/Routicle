@@ -255,6 +255,28 @@ export function inviteMemberRemote({ organizationId, email, role }) {
 }
 
 /** Irreversible. The server re-checks `confirmEmail` against the session's own address. */
+/**
+ * Checks a password sign-in with Routicle before the browser signs in with
+ * Neon Auth. Throws with the server's message on a wrong password or a lock.
+ * Resolves true when the check passed, false when the API isn't reachable
+ * (local `npm run dev`, which doesn't serve /api).
+ */
+export async function signInCheck(email, password) {
+  const res = await fetch('/api/account/signin-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  if (!res.headers.get('content-type')?.includes('application/json')) return false
+  const body = await res.json()
+  if (!res.ok) {
+    const err = new Error(body?.error || 'Could not sign you in.')
+    err.status = res.status
+    throw err
+  }
+  return true
+}
+
 /** Emails a one-time code to the account's own address. */
 export function requestAccountDeletionRemote() {
   return request('/account/delete-request', { method: 'POST', body: '{}' })

@@ -1,7 +1,8 @@
 import { sql } from '../_lib/db.js'
 import { requireUser } from '../_lib/auth.js'
 import { disableSubscription } from '../_lib/paystack.js'
-import { sendMail, inviteEmail, deletionCodeEmail, mailerConfigured, explainMailError } from '../_lib/mailer.js'
+import { sendMail, inviteEmail, deletionCodeEmail, lockoutEmail, mailerConfigured, explainMailError } from '../_lib/mailer.js'
+import { checkSignIn, LOCK_MINUTES } from '../_lib/loginGuard.js'
 import { issueCode, consumeCode, maskEmail } from '../_lib/verifyCodes.js'
 import { limit, LIMITS } from '../_lib/ratelimit.js'
 import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
@@ -26,6 +27,7 @@ export default withCors(['GET', 'POST'], async function handler(req, res) {
     if (action === 'teams') return listTeams(req, res)
     if (action === 'members') return listMembers(req, res)
     if (action === 'invite') return inviteMember(req, res)
+    if (action === 'signin-check') return signInCheck(req, res)
     if (action === 'delete-request') return requestDeletion(req, res)
     if (action === 'delete') return deleteAccount(req, res)
     return send(res, 404, { error: `Unknown account route: ${action}` })
@@ -186,6 +188,55 @@ async function inviteMember(req, res) {
   }
 
   send(res, 201, { ok: true, invitationId, email: invitee })
+}
+
+/**
+ * The gate every password sign-in passes through before the browser signs in
+ * with Neon Auth. See _lib/loginGuard.js for why the check lives here and the
+ * lock lives in Neon Auth.
+ */
+async function signInCheck(req, res) {
+  if (!methodGuard(req, res, ['POST'])) return
+
+  // Per-IP, on top of the per-account count: without it one address could
+  // lock out any number of accounts by spraying wrong passwords.
+  if (!(await limit(req, res, { name: 'signin-check', limit: 30, windowSeconds: 600 }))) return
+
+  const { email, password } = req.body || {}
+  if (!email || !password) return send(res, 400, { error: 'Enter your email and password.' })
+
+  const result = await checkSignIn(email, password)
+
+  if (result.status === 'ok') return send(res, 200, { ok: true })
+
+  if (result.status === 'wrong') {
+    // One message for a wrong password and an unknown address alike.
+    return send(res, 401, {
+      error:
+        result.remaining <= 2
+          ? `Wrong email or password. ${result.remaining} ${result.remaining === 1 ? 'try' : 'tries'} left before the account is locked for ${LOCK_MINUTES} minutes.`
+          : 'Wrong email or password.',
+      remaining: result.remaining,
+    })
+  }
+
+  // Locked. Notify the owner once, at the moment it locks.
+  if (result.justLocked && result.userId && mailerConfigured()) {
+    const base = (process.env.APP_URL || 'https://routicle.vercel.app').replace(/\/$/, '')
+    const { text, html } = lockoutEmail({ minutes: LOCK_MINUTES, resetUrl: `${base}/signin?reset=1` })
+    try {
+      await sendMail({ to: result.email, subject: 'Your Routicle account was locked', text, html })
+    } catch (err) {
+      // The lock stands whether or not the email goes out.
+      console.error('lockout email failed', err)
+    }
+  }
+
+  const minutesLeft = Math.max(1, Math.ceil((new Date(result.until) - Date.now()) / 60000))
+  return send(res, 423, {
+    error: `Too many wrong passwords. This account is locked for ${minutesLeft} more minute${minutesLeft === 1 ? '' : 's'}.`,
+    lockedUntil: result.until,
+  })
 }
 
 /**

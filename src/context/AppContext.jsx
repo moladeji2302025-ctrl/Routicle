@@ -501,6 +501,9 @@ export function AppProvider({ children }) {
       },
 
       async signInWithEmail({ email, password }) {
+        // Routicle's per-account check first. It throws on a wrong password or
+        // a locked account, so a refused attempt never reaches Neon Auth.
+        await api.signInCheck(email, password)
         const result = await authClient.signIn.email({ email, password })
         if (result.error) throw new Error(result.error.message || 'Sign in failed')
         return hydrateFromSession()

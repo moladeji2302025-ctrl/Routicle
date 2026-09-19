@@ -148,6 +148,38 @@ function escapeHtml(s) {
  * body scores badly with spam filters, and the link has to survive a client
  * that strips markup.
  */
+/** Sent when an account is locked after repeated wrong passwords. */
+export function lockoutEmail({ minutes, resetUrl }) {
+  const text = [
+    'Someone tried to sign in to your Routicle account with the wrong password five times in a row.',
+    '',
+    `To protect it, the account is locked for ${minutes} minutes. After that you can sign in again as normal.`,
+    '',
+    "If this was you, there's nothing else to do. If it wasn't, someone may be guessing your password. Once the lock lifts, change it from Settings, or reset it here:",
+    resetUrl,
+  ].join('\n')
+
+  const html = `
+<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#16161a">
+  <p style="margin:0 0 24px;font-size:18px;font-weight:700;letter-spacing:-0.01em">Routicle</p>
+  <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;font-weight:700;letter-spacing:-0.02em">
+    Your account was locked for ${minutes} minutes
+  </h1>
+  <p style="margin:0 0 14px;font-size:14px;line-height:1.6;color:#5a5a63">
+    Someone tried to sign in to your Routicle account with the wrong password five times in a row, so
+    we've locked it for ${minutes} minutes. After that you can sign in as normal.
+  </p>
+  <p style="margin:0 0 22px;font-size:14px;line-height:1.6;color:#5a5a63">
+    If this was you, there's nothing else to do. If it wasn't, someone may be guessing your password.
+  </p>
+  <a href="${escapeHtml(resetUrl)}" style="display:inline-block;padding:12px 22px;border-radius:999px;background:#6750de;color:#fff;font-size:14px;font-weight:600;text-decoration:none">
+    Reset my password
+  </a>
+</div>`.trim()
+
+  return { text, html }
+}
+
 /** The code that confirms an account deletion. Plain about what it does. */
 export function deletionCodeEmail({ code, minutes }) {
   const text = [

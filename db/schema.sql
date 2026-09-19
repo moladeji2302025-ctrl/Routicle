@@ -100,3 +100,15 @@ CREATE TABLE IF NOT EXISTS verification_codes (
   created_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (user_id, purpose)
 );
+
+-- ---------------------------------------------------------------------------
+-- Per-account failed sign-in count (see api/_lib/loginGuard.js). Keyed by
+-- email, including addresses with no account, so the response can't reveal
+-- which addresses exist. The lock itself is enforced by Neon Auth through
+-- neon_auth."user".banned / "banExpires"; this table only counts.
+CREATE TABLE IF NOT EXISTS login_attempts (
+  email text PRIMARY KEY,
+  failures integer NOT NULL DEFAULT 0,
+  last_failed_at timestamptz,
+  locked_until timestamptz
+);
