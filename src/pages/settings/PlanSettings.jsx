@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { TIERS, payPerDownloadPrice } from '../../data/pricing'
 import { Section, Row, Toggle, Segmented, Feedback } from '../../components/settings/SettingsControls'
+import Thumb from '../../components/Thumb'
 
 const CYCLE_LABEL = { monthly: 'billed monthly', annual: 'billed annually' }
 const STATUS_LABEL = {
@@ -124,7 +125,7 @@ export default function PlanSettings() {
         ) : (
           purchases.map((item) => (
             <div key={item.id} className="settings-list-row">
-              <img src={item.image} alt="" className="settings-list-thumb" />
+              <Thumb item={item} alt="" className="settings-list-thumb" />
               <div className="settings-row-text">
                 <span className="settings-row-title">{item.title}</span>
                 <span className="settings-row-desc">{item.creator}</span>

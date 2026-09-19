@@ -13,6 +13,7 @@ import {
   EyeIcon,
   PlusIcon,
 } from '../components/icons'
+import Thumb from '../components/Thumb'
 
 const SORTS = [
   { id: 'added', label: 'Recently added' },
@@ -225,7 +226,7 @@ export default function FolderPage() {
             <div className="folder-picker-grid">
               {addable.map((item) => (
                 <button key={item.id} type="button" className="folder-picker-item" onClick={() => add(item.id)}>
-                  <img src={item.image} alt="" />
+                  <Thumb item={item} alt="" />
                   <span>{item.title}</span>
                 </button>
               ))}
@@ -256,7 +257,7 @@ export default function FolderPage() {
           {visible.map((item) => (
             <div key={item.id} className="folder-item">
               <Link to={`/design/${item.id}`} className="folder-item-media">
-                <img src={item.image} alt={item.title} />
+                <Thumb item={item} alt={item.title} />
               </Link>
               <div className="folder-item-foot">
                 <Link to={`/design/${item.id}`} className="folder-item-title">{item.title}</Link>
@@ -274,7 +275,7 @@ export default function FolderPage() {
         <div className="download-list">
           {visible.map((item) => (
             <div key={item.id} className="download-row">
-              <img src={item.image} alt="" className="download-thumb" />
+              <Thumb item={item} alt="" className="download-thumb" />
               <div className="download-info">
                 <span className="download-title">{item.title}</span>
                 <span className="download-meta">

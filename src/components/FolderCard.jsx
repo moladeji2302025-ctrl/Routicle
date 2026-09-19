@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { StarIcon, FolderIcon } from './icons'
+import Thumb from './Thumb'
 
 function timeAgo(value) {
   const d = new Date(value)
@@ -93,7 +94,7 @@ export default function FolderCard({ folder, items, canManage, onStar, onRename,
         ) : (
           <span className={`folder-card-tiles folder-card-tiles-${Math.min(covers.length, 4)}`}>
             {covers.map((item) => (
-              <img key={item.id} src={item.image} alt="" />
+              <Thumb key={item.id} item={item} alt="" />
             ))}
           </span>
         )}

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { formatCount } from '../utils/format'
+import Thumb from '../components/Thumb'
 
 export default function CreatorDashboardPage() {
   const { currentUser, contentItems } = useApp()
@@ -59,7 +60,7 @@ export default function CreatorDashboardPage() {
           {myPieces.length === 0 && <p className="explore-empty">Nothing live yet. Upload your first piece to get started.</p>}
           {myPieces.map((item) => (
             <div key={item.id} className="dashboard-piece-row">
-              <img src={item.image} alt={item.title} />
+              <Thumb item={item} alt={item.title} />
               <div>
                 <div className="dashboard-piece-title">{item.title}</div>
                 <div className="dashboard-piece-meta">

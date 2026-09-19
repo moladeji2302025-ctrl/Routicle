@@ -83,6 +83,31 @@ async function presignUpload({ file, kind, format }) {
  * Uploads a thumbnail, an optional preview video, and every source-format file straight to
  * Neon Object Storage via presigned URLs, then records the submission in Postgres.
  */
+/**
+ * A WebP copy of the thumbnail, made in the browser before upload.
+ *
+ * Capped at 1600px wide, which is more than the feed or the detail view ever
+ * shows. Resolves to null when the browser can't encode WebP — Safari's canvas
+ * silently hands back a PNG instead — so no variant is uploaded rather than a
+ * mislabelled one. The server checks the bytes either way.
+ */
+async function toWebp(file, { maxWidth = 1600, quality = 0.82 } = {}) {
+  try {
+    const bitmap = await createImageBitmap(file)
+    const scale = Math.min(1, maxWidth / bitmap.width)
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(bitmap.width * scale)
+    canvas.height = Math.round(bitmap.height * scale)
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    bitmap.close?.()
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', quality))
+    if (!blob || blob.type !== 'image/webp') return null
+    return new File([blob], 'thumbnail.webp', { type: 'image/webp' })
+  } catch {
+    return null
+  }
+}
+
 export async function submitRealUpload({
   creatorEmail,
   title,
@@ -96,6 +121,17 @@ export async function submitRealUpload({
   sourceFiles, // [{ label, file }]
 }) {
   const thumbnail = await presignUpload({ file: thumbnailFile, kind: 'thumbnail' })
+
+  // Best effort: a failure here only means the feed shows the original.
+  let thumbnailWebpKey = null
+  const webp = await toWebp(thumbnailFile)
+  if (webp) {
+    try {
+      thumbnailWebpKey = (await presignUpload({ file: webp, kind: 'thumbnail-webp' })).objectKey
+    } catch {
+      thumbnailWebpKey = null
+    }
+  }
 
   let previewVideoKey = null
   if (previewVideoFile) {
@@ -122,6 +158,7 @@ export async function submitRealUpload({
       behindTheDesign,
       isAiGenerated,
       thumbnailKey: thumbnail.objectKey,
+      thumbnailWebpKey,
       previewVideoKey,
       sourceObjectKeys,
     }),

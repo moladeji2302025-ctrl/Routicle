@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext'
 import { categoryLabel } from '../data/categories'
 import { fetchDownloads } from '../lib/api'
 import { FolderIcon } from '../components/icons'
+import Thumb from '../components/Thumb'
 
 function when(value) {
   const d = new Date(value)
@@ -77,7 +78,7 @@ export default function DownloadsPage() {
             const item = contentItems.find((c) => String(c.id) === String(row.content_item_id))
             return (
               <div key={`${row.content_item_id}-${i}`} className="download-row">
-                {item?.image && <img src={item.image} alt="" className="download-thumb" />}
+                {item?.image && <Thumb item={item} alt="" className="download-thumb" />}
                 <div className="download-info">
                   <span className="download-title">{item?.title || row.title}</span>
                   <span className="download-meta">

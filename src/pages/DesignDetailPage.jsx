@@ -9,6 +9,7 @@ import ErrorBoundary from '../components/ErrorBoundary'
 import { HeartIcon, EyeIcon, PlayIcon } from '../components/icons'
 import { formatCount } from '../utils/format'
 import { requestDownload, triggerFileDownload } from '../lib/api'
+import Thumb from '../components/Thumb'
 
 export default function DesignDetailPage() {
   const { id } = useParams()
@@ -110,7 +111,7 @@ export default function DesignDetailPage() {
   return (
     <div className="detail-page">
       <div className="detail-preview">
-        <img src={item.image} alt={item.title} className="detail-preview-image" />
+        <Thumb item={item} alt={item.title} className="detail-preview-image" loading="eager" />
         {!item.free && <div className="detail-watermark" />}
         {item.hasVideo && (
           <div className="detail-play-badge">

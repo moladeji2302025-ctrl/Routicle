@@ -26,6 +26,7 @@ import {
   UserIcon,
   LockIcon,
 } from '../components/icons'
+import Thumb from '../components/Thumb'
 
 /* A stable colour per workspace, so the dot next to a name means the same thing
    every time you look at it rather than shuffling on re-render. */
@@ -326,7 +327,7 @@ export default function AppHomePage() {
           <div className="app-rail">
             {recentItems.map((item) => (
               <Link key={item.id} to={`/design/${item.id}`} className="app-rail-card">
-                <img src={item.image} alt="" />
+                <Thumb item={item} alt="" />
                 <span className="app-rail-title">{item.title}</span>
                 <span className="app-rail-sub">{item.creator}</span>
               </Link>
@@ -396,7 +397,7 @@ export default function AppHomePage() {
             <div className="app-saved-strip">
               {savedItems.map((item) => (
                 <Link key={item.id} to={`/design/${item.id}`} title={item.title}>
-                  <img src={item.image} alt={item.title} />
+                  <Thumb item={item} alt={item.title} />
                 </Link>
               ))}
             </div>
@@ -415,7 +416,7 @@ export default function AppHomePage() {
         <div className="app-rail">
           {freshItems.map((item) => (
             <Link key={item.id} to={`/design/${item.id}`} className="app-rail-card">
-              <img src={item.image} alt="" />
+              <Thumb item={item} alt="" />
               <span className="app-rail-title">{item.title}</span>
               <span className="app-rail-sub">
                 <HeartIcon size={11} color="currentColor" /> {formatCount(item.appreciations)}

@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
       const rows = await sql`
         SELECT id, title, department, file_types, description, is_free, moderation_status,
-               moderation_note, thumbnail_key, preview_video_key, appreciation_count,
+               moderation_note, thumbnail_key, thumbnail_webp_key, preview_video_key, appreciation_count,
                download_count, created_at, updated_at
         FROM content_items
         WHERE creator_id = ${creator.id}
@@ -49,6 +49,7 @@ export default async function handler(req, res) {
           status: r.moderation_status,
           note: r.moderation_note || '',
           image: r.thumbnail_key ? publicPreviewUrl(r.thumbnail_key) : null,
+          imageWebp: r.thumbnail_webp_key ? publicPreviewUrl(r.thumbnail_webp_key) : null,
           hasVideo: Boolean(r.preview_video_key),
           appreciations: r.appreciation_count,
           downloads: r.download_count,
@@ -184,11 +185,12 @@ export default async function handler(req, res) {
     const rows = await sql`
       INSERT INTO content_items (
         creator_id, title, department, sub_department, file_types, description,
-        behind_the_design, is_ai_generated, thumbnail_key, preview_video_key, source_object_keys,
-        total_bytes
+        behind_the_design, is_ai_generated, thumbnail_key, thumbnail_webp_key, preview_video_key,
+        source_object_keys, total_bytes
       ) VALUES (
         ${creatorId}, ${title}, ${category}, ${subCategory || null}, ${storedSources.map((f) => f.label)}, ${description || null},
-        ${behindTheDesign || null}, ${Boolean(isAiGenerated)}, ${thumbnailKey}, ${previewVideoKey || null}, ${JSON.stringify(storedSources)},
+        ${behindTheDesign || null}, ${Boolean(isAiGenerated)}, ${thumbnailKey}, ${req.body?.thumbnailWebpKey || null}, ${previewVideoKey || null},
+        ${JSON.stringify(storedSources)},
         ${totalBytes}
       )
       RETURNING *

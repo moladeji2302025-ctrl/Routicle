@@ -7,6 +7,9 @@ function toFeedShape(row) {
   return {
     id: row.id,
     image: publicPreviewUrl(row.thumbnail_key),
+    // A smaller WebP copy for display only, when the uploader's browser could
+    // make one. The download is always the original source.
+    imageWebp: row.thumbnail_webp_key ? publicPreviewUrl(row.thumbnail_webp_key) : null,
     avatar: '/images/a1.jpg',
     title: row.title,
     creator: row.creator_name,

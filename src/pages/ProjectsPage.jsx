@@ -5,6 +5,7 @@ import { categoryLabel } from '../data/categories'
 import { formatCount } from '../utils/format'
 import { fetchMySubmissions } from '../lib/api'
 import { HeartIcon, UploadIcon, PlusIcon } from '../components/icons'
+import Thumb from '../components/Thumb'
 
 const STATUS = {
   approved: { label: 'Live', tone: 'live' },
@@ -243,7 +244,7 @@ export default function ProjectsPage() {
               <>
                 <div className="pj-art">
                   {item.image ? (
-                    <img src={item.image} alt="" loading="lazy" />
+                    <Thumb item={item} alt="" loading="lazy" />
                   ) : (
                     <span className="pj-art-empty">{(item.title || '?').charAt(0).toUpperCase()}</span>
                   )}

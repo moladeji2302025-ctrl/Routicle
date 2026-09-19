@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import PinnedSection, { reveal } from './PinnedSection'
 import { categoryLabel } from '../data/categories'
+import Thumb from './Thumb'
 
 const INTERVAL_MS = 6000
 const GRID_SIZE = 4
@@ -73,7 +74,7 @@ export default function LiveShowcase() {
                   className={`showcase-grid-tile showcase-grid-tile-${i}`}
                   onClick={() => openProject(item)}
                 >
-                  <img src={item.image} alt={item.title} />
+                  <Thumb item={item} alt={item.title} />
                   <span className="showcase-grid-dept">{categoryLabel(item.category)}</span>
                   <span className="showcase-grid-credit">
                     <img src={item.avatar} alt="" className="showcase-grid-avatar" />

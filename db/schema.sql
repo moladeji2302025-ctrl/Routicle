@@ -112,3 +112,7 @@ CREATE TABLE IF NOT EXISTS login_attempts (
   last_failed_at timestamptz,
   locked_until timestamptz
 );
+
+-- A display-only WebP copy of the thumbnail, made in the uploader's browser.
+-- The gated download is always the original source file.
+ALTER TABLE content_items ADD COLUMN IF NOT EXISTS thumbnail_webp_key text;

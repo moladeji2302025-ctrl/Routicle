@@ -14226,3 +14226,10 @@ html {
     flex-shrink: 0;
   }
 }
+
+
+/* The <picture> wrapper around a thumbnail generates no box of its own, so the
+   <img> inside lays out exactly as it did before the WebP variant existed. */
+.thumb-picture {
+  display: contents;
+}
