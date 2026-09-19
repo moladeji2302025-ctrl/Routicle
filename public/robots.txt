@@ -1,0 +1,22 @@
+# Public pages are open to crawlers. Account, settings, admin and API routes
+# are not: they either need a session or have nothing to index.
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /settings
+Disallow: /account
+Disallow: /upload
+Disallow: /dashboard
+Disallow: /projects
+Disallow: /collections
+Disallow: /downloads
+Disallow: /workspaces
+Disallow: /team
+Disallow: /suite
+Disallow: /billing/
+Disallow: /invite/
+Disallow: /reset-password
+Disallow: /f/
+
+Sitemap: https://routicle.vercel.app/sitemap.xml
