@@ -104,6 +104,21 @@ export async function sendMail({ to, subject, text, html, replyTo }) {
   return tx.sendMail({ from: defaultFrom(), to, subject, text, html, ...(replyTo ? { replyTo } : {}) })
 }
 
+/**
+ * What a *user* is told when an email fails.
+ *
+ * The detailed explanation below names server configuration — env var names,
+ * the mail host, and for Gmail even the length of the SMTP password — and its
+ * last resort passes the provider's raw error straight through. That is useful
+ * to whoever runs the platform and nobody else, so the detail is logged server
+ * side and shown only to a platform admin. Everyone else gets a plain sentence.
+ */
+export function mailErrorFor(err, { isAdmin = false } = {}) {
+  const detail = explainMailError(err)
+  console.error('mail send failed:', detail)
+  return isAdmin ? detail : "The email couldn't be sent right now. Please try again in a few minutes."
+}
+
 /** Turns a provider's terse failure into something the person clicking Invite can act on. */
 export function explainMailError(err) {
   const raw = err?.message || String(err)

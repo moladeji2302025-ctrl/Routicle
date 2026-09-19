@@ -1,7 +1,7 @@
 import { sql } from '../_lib/db.js'
-import { requireUser } from '../_lib/auth.js'
+import { requireUser, isAdminUser } from '../_lib/auth.js'
 import { disableSubscription } from '../_lib/paystack.js'
-import { sendMail, inviteEmail, deletionCodeEmail, lockoutEmail, mailerConfigured, explainMailError } from '../_lib/mailer.js'
+import { sendMail, inviteEmail, deletionCodeEmail, lockoutEmail, mailerConfigured, mailErrorFor } from '../_lib/mailer.js'
 import { checkSignIn, LOCK_MINUTES } from '../_lib/loginGuard.js'
 import { issueCode, consumeCode, maskEmail } from '../_lib/verifyCodes.js'
 import { limit, LIMITS } from '../_lib/ratelimit.js'
@@ -184,7 +184,7 @@ async function inviteMember(req, res) {
     console.error('invite email failed', err)
     // Don't leave a live invitation behind for a mail that never went out.
     await sql`UPDATE neon_auth.invitation SET status = 'canceled' WHERE id = ${invitationId}`
-    return send(res, 502, { error: `The invite could not be emailed. ${explainMailError(err)}` })
+    return send(res, 502, { error: `The invite could not be emailed. ${mailErrorFor(err, { isAdmin: await isAdminUser(user) })}` })
   }
 
   send(res, 201, { ok: true, invitationId, email: invitee })
@@ -289,7 +289,7 @@ async function requestDeletion(req, res) {
     await sendMail({ to: user.email, subject: 'Your Routicle account deletion code', text, html })
   } catch (err) {
     console.error('deletion code email failed', err)
-    return send(res, 502, { error: `We couldn't send the code. ${explainMailError(err)}` })
+    return send(res, 502, { error: `We couldn't send the code. ${mailErrorFor(err, { isAdmin: await isAdminUser(user) })}` })
   }
 
   send(res, 200, { ok: true, sentTo: maskEmail(user.email), minutes })
