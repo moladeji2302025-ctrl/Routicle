@@ -1,0 +1,21 @@
+# Dependabot keeps dependencies current and opens a pull request when a
+# vulnerability is published for one we already use, so problems surface on
+# their own rather than only at the next manual audit.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    # Security fixes are opened immediately regardless of this schedule; the
+    # weekly run handles ordinary version bumps, grouped so they arrive as one
+    # reviewable PR instead of a dozen.
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
