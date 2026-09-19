@@ -1,5 +1,6 @@
 import list from './_lib/handlers/foldersList.js'
 import items from './_lib/handlers/folderItems.js'
+import { withCors } from './_lib/cors.js'
 
 /**
  * /api/folders               -> the team's folders
@@ -9,6 +10,6 @@ import items from './_lib/handlers/folderItems.js'
  * /api directory does not route a bare /api/folders to an optional catch-all
  * the way Next.js does, so the folder list 404'd.
  */
-export default async function handler(req, res) {
+export default withCors(['GET', 'POST', 'PATCH', 'DELETE'], async function handler(req, res) {
   return req.query?.scope === 'items' ? items(req, res) : list(req, res)
-}
+})

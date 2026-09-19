@@ -1,6 +1,7 @@
 import { sql } from '../_lib/db.js'
 import { requireUser } from '../_lib/auth.js'
 import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
+import { withCors } from '../_lib/cors.js'
 
 /**
  * The Business Suite API, behind one Vercel function.
@@ -21,7 +22,7 @@ import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
  *
  * Everything except the public route is scoped to the signed-in owner.
  */
-export default async function handler(req, res) {
+export default withCors(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], async function handler(req, res) {
   await withErrorHandling(res, async () => {
     const resource = req.query?.resource
     const id = req.query?.id
@@ -48,7 +49,7 @@ export default async function handler(req, res) {
         return send(res, 404, { error: `Unknown suite route: ${resource || '(none)'}` })
     }
   })
-}
+})
 
 /* ------------------------------------------------------------- ownership */
 

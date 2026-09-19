@@ -6,6 +6,7 @@ import resources from '../_lib/handlers/adminResources.js'
 import users from '../_lib/handlers/adminUsers.js'
 import content from '../_lib/handlers/adminContent.js'
 import moderation from '../_lib/handlers/adminModeration.js'
+import { withCors } from '../_lib/cors.js'
 
 /**
  * One serverless function for the whole admin API.
@@ -20,11 +21,11 @@ import moderation from '../_lib/handlers/adminModeration.js'
  */
 const ROUTES = { session, overview, updates, resources, users, content, moderation }
 
-export default async function handler(req, res) {
+export default withCors(['GET', 'POST', 'PATCH', 'DELETE'], async function handler(req, res) {
   const action = req.query?.action
   const route = ROUTES[action]
   if (!route) {
     return send(res, 404, { error: `Unknown admin route: ${action}` })
   }
   return route(req, res)
-}
+})

@@ -2,6 +2,7 @@ import { send } from '../_lib/http.js'
 import checkout from '../_lib/handlers/billingCheckout.js'
 import verify from '../_lib/handlers/billingVerify.js'
 import subscription from '../_lib/handlers/billingSubscription.js'
+import { withCors } from '../_lib/cors.js'
 
 /**
  * Checkout, verify and subscription behind one function (see the note in
@@ -14,11 +15,11 @@ import subscription from '../_lib/handlers/billingSubscription.js'
  */
 const ROUTES = { checkout, verify, subscription }
 
-export default async function handler(req, res) {
+export default withCors(['GET', 'POST', 'DELETE'], async function handler(req, res) {
   const action = req.query?.action
   const route = ROUTES[action]
   if (!route) {
     return send(res, 404, { error: `Unknown billing route: ${action}` })
   }
   return route(req, res)
-}
+})

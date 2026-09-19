@@ -5,6 +5,7 @@ import { sendMail, inviteEmail, deletionCodeEmail, mailerConfigured, explainMail
 import { issueCode, consumeCode, maskEmail } from '../_lib/verifyCodes.js'
 import { limit, LIMITS } from '../_lib/ratelimit.js'
 import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
+import { withCors } from '../_lib/cors.js'
 
 const INVITE_DAYS = 7
 
@@ -19,7 +20,7 @@ const INVITE_DAYS = 7
  * Members lives here rather than under a team route purely for Vercel's
  * twelve-function budget; it is still scoped to workspaces the caller is in.
  */
-export default async function handler(req, res) {
+export default withCors(['GET', 'POST'], async function handler(req, res) {
   await withErrorHandling(res, async () => {
     const action = req.query?.action
     if (action === 'teams') return listTeams(req, res)
@@ -29,7 +30,7 @@ export default async function handler(req, res) {
     if (action === 'delete') return deleteAccount(req, res)
     return send(res, 404, { error: `Unknown account route: ${action}` })
   })
-}
+})
 
 /** Shaped to match what the team UI already renders: id, userId, role, user{}. */
 async function listMembers(req, res) {

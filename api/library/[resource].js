@@ -2,6 +2,7 @@ import { send } from '../_lib/http.js'
 import collections from '../_lib/handlers/collections.js'
 import downloads from '../_lib/handlers/downloads.js'
 import comments from '../_lib/handlers/comments.js'
+import { withCors } from '../_lib/cors.js'
 
 /**
  * Saved items, download history and comments behind one function. Vercel counts every
@@ -10,8 +11,8 @@ import comments from '../_lib/handlers/comments.js'
  */
 const ROUTES = { collections, downloads, comments }
 
-export default async function handler(req, res) {
+export default withCors(['GET', 'POST', 'PATCH', 'DELETE'], async function handler(req, res) {
   const route = ROUTES[req.query?.resource]
   if (!route) return send(res, 404, { error: `Unknown library route: ${req.query?.resource}` })
   return route(req, res)
-}
+})

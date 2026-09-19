@@ -2,6 +2,7 @@ import { sql } from '../_lib/db.js'
 import { send, withErrorHandling } from '../_lib/http.js'
 import { isValidWebhookSignature } from '../_lib/paystack.js'
 import { activateFromTransaction } from '../_lib/billing.js'
+import { withCors } from '../_lib/cors.js'
 
 // Signature verification needs the exact bytes Paystack signed, so the
 // framework must not parse (and re-serialize) the body first.
@@ -23,7 +24,7 @@ function readRawBody(req) {
  *
  * Point your Paystack dashboard's webhook URL at /api/billing/webhook.
  */
-export default async function handler(req, res) {
+export default withCors(['POST'], async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (req.method !== 'POST') return send(res, 405, { error: 'Method not allowed' })
 
@@ -85,4 +86,4 @@ export default async function handler(req, res) {
     // Always 200 on a verified event — anything else makes Paystack retry.
     send(res, 200, { received: true })
   })
-}
+})
