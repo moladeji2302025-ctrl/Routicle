@@ -13,6 +13,7 @@ import { maxFileBytes, maxSubmissionBytes, formatBytes } from '../limits.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { requireUser, requireAdmin } from '../auth.js'
 import { requireCreator } from '../guard.js'
+import { inspectTemplate, TEMPLATE_KINDS } from '../templateSvg.js'
 
 const STATUSES = ['pending', 'approved', 'rejected', 'changes-requested']
 
@@ -31,7 +32,7 @@ export default async function handler(req, res) {
       const rows = await sql`
         SELECT id, title, department, file_types, description, is_free, moderation_status,
                moderation_note, thumbnail_key, thumbnail_webp_key, preview_video_key, appreciation_count,
-               download_count, created_at, updated_at
+               download_count, created_at, updated_at, is_template, template_kind, is_featured
         FROM content_items
         WHERE creator_id = ${creator.id}
         ORDER BY created_at DESC
@@ -53,6 +54,9 @@ export default async function handler(req, res) {
           hasVideo: Boolean(r.preview_video_key),
           appreciations: r.appreciation_count,
           downloads: r.download_count,
+          isTemplate: r.is_template,
+          templateKind: r.template_kind,
+          featured: r.is_featured,
           submittedAt: r.created_at,
           updatedAt: r.updated_at,
         })),
@@ -92,6 +96,8 @@ export default async function handler(req, res) {
       thumbnailKey,
       previewVideoKey,
       sourceObjectKeys,
+      isTemplate,
+      templateKind,
     } = req.body || {}
 
     if (!title || !category || !thumbnailKey) {
@@ -107,6 +113,16 @@ export default async function handler(req, res) {
     /* ---- Every file, checked from its own bytes ---- */
 
     const sources = Array.isArray(sourceObjectKeys) ? sourceObjectKeys : []
+
+    // A template is only SVG pages; SVG pages are only ever a template.
+    if (isTemplate) {
+      if (!TEMPLATE_KINDS.includes(templateKind)) return send(res, 400, { error: 'Pick what kind of template this is.' })
+      if (!sources.length || sources.some((f) => f?.label !== 'SVG')) {
+        return send(res, 400, { error: 'A template is uploaded as SVG pages.' })
+      }
+    } else if (sources.some((f) => f?.label === 'SVG')) {
+      return send(res, 400, { error: 'SVG files are uploaded as a Creative Suite template.' })
+    }
     const files = [
       { kind: 'thumbnail', bucket: PREVIEW_BUCKET, key: thumbnailKey },
       ...(req.body?.thumbnailWebpKey
@@ -176,6 +192,20 @@ export default async function handler(req, res) {
       return refuse(413, `This submission is ${formatBytes(totalBytes)}. The limit is ${formatBytes(maxSubmissionBytes())}.`)
     }
 
+    // Every template page is read in full and must have real, named slots:
+    // at least a logo slot and a colour slot across the deck.
+    let templateManifest = null
+    if (isTemplate) {
+      const pages = []
+      for (const f of files.filter((x) => x.kind === 'source')) {
+        const bytes = await readObjectStart({ bucket: f.bucket, key: f.key, bytes: f.size })
+        pages.push(new TextDecoder('utf-8', { fatal: false }).decode(bytes))
+      }
+      const checked = inspectTemplate(pages)
+      if (!checked.ok) return refuse(422, checked.error)
+      templateManifest = checked.manifest
+    }
+
     // What's stored per source file: the key, and the creator's own filename
     // kept apart from it as a display name, with the size and verified type.
     const storedSources = files
@@ -186,12 +216,13 @@ export default async function handler(req, res) {
       INSERT INTO content_items (
         creator_id, title, department, sub_department, file_types, description,
         behind_the_design, is_ai_generated, thumbnail_key, thumbnail_webp_key, preview_video_key,
-        source_object_keys, total_bytes
+        source_object_keys, total_bytes, is_template, template_kind, template_slots
       ) VALUES (
         ${creatorId}, ${title}, ${category}, ${subCategory || null}, ${storedSources.map((f) => f.label)}, ${description || null},
         ${behindTheDesign || null}, ${Boolean(isAiGenerated)}, ${thumbnailKey}, ${req.body?.thumbnailWebpKey || null}, ${previewVideoKey || null},
         ${JSON.stringify(storedSources)},
-        ${totalBytes}
+        ${totalBytes}, ${Boolean(isTemplate)}, ${isTemplate ? templateKind : null},
+        ${templateManifest ? JSON.stringify(templateManifest) : null}
       )
       RETURNING *
     `

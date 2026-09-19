@@ -2,6 +2,7 @@ import { sql } from '../_lib/db.js'
 import { requireUser } from '../_lib/auth.js'
 import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
 import { withCors } from '../_lib/cors.js'
+import generateImage from '../_lib/handlers/generateImage.js'
 
 /**
  * The Business Suite API, behind one Vercel function.
@@ -14,6 +15,7 @@ import { withCors } from '../_lib/cors.js'
  *   PATCH/DELETE /api/suite/documents?id=        edit / remove
  *   PUT       /api/suite/schedule?id=<projectId> recurring month plan
  *   GET/POST  /api/suite/public?id=<slug>        public form (no auth)
+ *   GET/POST  /api/suite/generate-image          AI image for a template slot
  *
  * One dynamic segment plus an `id` query param, NOT an optional catch-all:
  * Vercel's plain /api directory does not route these the way Next.js does, so
@@ -45,6 +47,8 @@ export default withCors(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], async functio
         return documents(req, res, user, id)
       case 'schedule':
         return schedule(req, res, user, id)
+      case 'generate-image':
+        return generateImage(req, res, user)
       default:
         return send(res, 404, { error: `Unknown suite route: ${resource || '(none)'}` })
     }

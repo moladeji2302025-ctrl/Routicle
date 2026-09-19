@@ -119,6 +119,8 @@ export async function submitRealUpload({
   thumbnailFile,
   previewVideoFile,
   sourceFiles, // [{ label, file }]
+  isTemplate = false,
+  templateKind = null,
 }) {
   const thumbnail = await presignUpload({ file: thumbnailFile, kind: 'thumbnail' })
 
@@ -161,6 +163,8 @@ export async function submitRealUpload({
       thumbnailWebpKey,
       previewVideoKey,
       sourceObjectKeys,
+      isTemplate,
+      templateKind,
     }),
   })
 }
@@ -171,6 +175,32 @@ export function moderateSubmission(id, action, note) {
 
 export function markItemFreeRemote(id, isFree) {
   return request(`/content?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ isFree }) })
+}
+
+/* ------------------------------------------------ Creative Suite templates */
+
+/** The templates Routicle features, with whether this account can use each. */
+export function fetchFeaturedTemplates(organizationId) {
+  const q = organizationId ? `?organizationId=${encodeURIComponent(organizationId)}` : ''
+  return request(`/library/templates${q}`)
+}
+
+/** Uses a template: returns its SVG pages, and counts as a download for its creator. */
+export function useTemplate(itemId, organizationId) {
+  return request('/library/templates', { method: 'POST', body: JSON.stringify({ itemId, organizationId }) })
+}
+
+export function fetchImageAllowance() {
+  return request('/suite/generate-image')
+}
+
+/** An AI image for a template's photo slot, as a data URL. */
+export function generateTemplateImage({ prompt, aspect }) {
+  return request('/suite/generate-image', { method: 'POST', body: JSON.stringify({ prompt, aspect }) })
+}
+
+export function patchAdminTemplateFeature(id, isFeatured) {
+  return request('/admin/content', { method: 'PATCH', body: JSON.stringify({ id, isFeatured }) })
 }
 
 /** Newsletter signup for logged-out visitors. `website` is the honeypot field. */
@@ -383,9 +413,10 @@ export function revokeAdmin(userId) {
   return request(`/admin/users?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
 }
 
-export function fetchAdminContent({ status, q } = {}) {
+export function fetchAdminContent({ status, q, templates } = {}) {
   const params = new URLSearchParams()
   if (status) params.set('status', status)
+  if (templates) params.set('templates', '1')
   if (q) params.set('q', q)
   const query = params.toString()
   return request(`/admin/content${query ? `?${query}` : ''}`)

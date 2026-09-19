@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { CATEGORIES } from '../data/categories'
 import { TIERS } from '../data/pricing'
+import { TEMPLATE_KINDS, inspectPage } from '../lib/templateFill'
 
 const FORMATS = [
   { id: 'PSD', name: 'Photoshop', accept: '.psd,.psb' },
@@ -14,6 +15,20 @@ const FORMATS = [
 ]
 const VIDEO_FORMATS = ['AEP', 'PPRO']
 const DESCRIPTION_MAX = 600
+const MAX_TEMPLATE_PAGES = 12
+
+/**
+ * What a template page has to carry. Illustrator and Figma both export a
+ * layer's name as the element's id, so naming the layers is all a creator has
+ * to do — but it is not optional: a design with no named slots can't be filled
+ * with anyone's brand, so it isn't a template.
+ */
+const SLOT_HELP = [
+  { id: 'logo', label: 'logo', required: true, note: 'Where the logo goes. Add logo-light or logo-dark for a white or dark version.' },
+  { id: 'colors', label: 'color-primary', required: true, note: 'Shapes that take the brand colour. Also -secondary, -accent, -background.' },
+  { id: 'text', label: 'brand-name', required: false, note: 'Text replaced with the brand name. Also tagline and website.' },
+  { id: 'image', label: 'image', required: false, note: 'A box filled with a photo, uploaded or generated.' },
+]
 
 function formatBytes(bytes) {
   if (!bytes && bytes !== 0) return ''
@@ -140,6 +155,13 @@ function useObjectUrl(file) {
 export default function CreatorUploadPage() {
   const { currentUser, submitUpload } = useApp()
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+
+  // "Finished work" or "template": a template is a blank frame for someone
+  // else's brand, so it is uploaded, checked and sold differently.
+  const [mode, setMode] = useState(params.get('type') === 'template' ? 'template' : 'work')
+  const [templateKind, setTemplateKind] = useState(TEMPLATE_KINDS[0].id)
+  const [templatePages, setTemplatePages] = useState([]) // [{ file, slots, error }]
 
   const [formats, setFormats] = useState([])
   const [sourceFiles, setSourceFiles] = useState({})
@@ -157,6 +179,18 @@ export default function CreatorUploadPage() {
   const thumbUrl = useObjectUrl(thumbnailFile)
   const videoUrl = useObjectUrl(previewVideoFile)
 
+  const isTemplate = mode === 'template'
+  const templateTotals = templatePages.reduce(
+    (acc, p) => ({
+      logo: acc.logo + (p.slots?.logo || 0),
+      colors: [...new Set([...acc.colors, ...(p.slots?.colors || [])])],
+      text: [...new Set([...acc.text, ...(p.slots?.text || [])])],
+      image: acc.image + (p.slots?.image || 0),
+      bad: acc.bad + (p.error ? 1 : 0),
+    }),
+    { logo: 0, colors: [], text: [], image: 0, bad: 0 }
+  )
+
   const needsVideoPreview = formats.some((f) => VIDEO_FORMATS.includes(f))
   const tier = needsVideoPreview ? TIERS.express : formats.length > 0 ? TIERS.standard : null
   const categoryLabel = CATEGORIES.find((c) => c.id === category)?.label
@@ -165,17 +199,51 @@ export default function CreatorUploadPage() {
   // doesn't reshuffle as you tick things.
   const orderedFormats = FORMATS.filter((f) => formats.includes(f.id))
 
-  const checklist = [
-    { done: formats.length > 0, label: 'Choose at least one format' },
-    { done: formats.length > 0 && formats.every((f) => sourceFiles[f]), label: 'Attach a file for each format' },
-    { done: Boolean(thumbnailFile), label: 'Add a thumbnail' },
-    ...(needsVideoPreview ? [{ done: Boolean(previewVideoFile), label: 'Add an MP4 preview' }] : []),
-    { done: Boolean(title.trim()), label: 'Give it a title' },
-    { done: Boolean(description.trim()), label: 'Write a description' },
-    { done: rightsConfirmed, label: 'Confirm you own the rights' },
-  ]
+  const checklist = isTemplate
+    ? [
+        { done: templatePages.length > 0 && templateTotals.bad === 0, label: 'Add your SVG pages' },
+        { done: templateTotals.logo > 0, label: 'Include a logo slot' },
+        { done: templateTotals.colors.length > 0, label: 'Include a colour slot' },
+        { done: Boolean(thumbnailFile), label: 'Add a thumbnail' },
+        { done: Boolean(title.trim()), label: 'Give it a title' },
+        { done: Boolean(description.trim()), label: 'Write a description' },
+        { done: rightsConfirmed, label: 'Confirm you own the rights' },
+      ]
+    : [
+        { done: formats.length > 0, label: 'Choose at least one format' },
+        { done: formats.length > 0 && formats.every((f) => sourceFiles[f]), label: 'Attach a file for each format' },
+        { done: Boolean(thumbnailFile), label: 'Add a thumbnail' },
+        ...(needsVideoPreview ? [{ done: Boolean(previewVideoFile), label: 'Add an MP4 preview' }] : []),
+        { done: Boolean(title.trim()), label: 'Give it a title' },
+        { done: Boolean(description.trim()), label: 'Write a description' },
+        { done: rightsConfirmed, label: 'Confirm you own the rights' },
+      ]
   const remaining = checklist.filter((c) => !c.done).length
   const canSubmit = remaining === 0 && !submitting
+
+  /** Reads each page in the browser and says what slots it found, before upload. */
+  async function addTemplateFiles(fileList) {
+    const files = [...fileList].filter((f) => /\.svg$/i.test(f.name))
+    if (!files.length) {
+      setError('Template pages are SVG files, exported from Illustrator, Figma or Canva.')
+      return
+    }
+    setError('')
+    const read = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const slots = inspectPage(await file.text())
+          if (!slots.logo && !slots.colors.length) {
+            return { file, slots, error: 'No named slots found. Name the layers before exporting.' }
+          }
+          return { file, slots, error: '' }
+        } catch (err) {
+          return { file, slots: null, error: err.message }
+        }
+      })
+    )
+    setTemplatePages((prev) => [...prev, ...read].slice(0, MAX_TEMPLATE_PAGES))
+  }
 
   function toggleFormat(id) {
     setFormats((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]))
@@ -196,10 +264,14 @@ export default function CreatorUploadPage() {
         category,
         description: description.trim(),
         behindTheDesign: behindTheDesign.trim(),
-        isAiGenerated: category.startsWith('ai-'),
+        isAiGenerated: !isTemplate && category.startsWith('ai-'),
         thumbnailFile,
-        previewVideoFile: needsVideoPreview ? previewVideoFile : null,
-        sourceFiles: orderedFormats.map((f) => ({ label: f.id, file: sourceFiles[f.id] })),
+        previewVideoFile: !isTemplate && needsVideoPreview ? previewVideoFile : null,
+        sourceFiles: isTemplate
+          ? templatePages.map((p) => ({ label: 'SVG', file: p.file }))
+          : orderedFormats.map((f) => ({ label: f.id, file: sourceFiles[f.id] })),
+        isTemplate,
+        templateKind: isTemplate ? templateKind : null,
       })
       setSubmitted(true)
     } catch (err) {
@@ -244,11 +316,127 @@ export default function CreatorUploadPage() {
       <header className="up-head">
         <h1>Upload work</h1>
         <p>Add the files, a preview and a few details. An admin reviews every piece before it goes live.</p>
+        <div className="up-modes" role="radiogroup" aria-label="What are you uploading?">
+          {[
+            { id: 'work', label: 'Finished work', blurb: 'Source files people download and edit.' },
+            { id: 'template', label: 'Creative Suite template', blurb: "A blank frame someone else's brand drops into." },
+          ].map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              role="radio"
+              aria-checked={mode === m.id}
+              className={mode === m.id ? 'up-mode up-mode-on' : 'up-mode'}
+              onClick={() => setMode(m.id)}
+            >
+              <strong>{m.label}</strong>
+              <span>{m.blurb}</span>
+            </button>
+          ))}
+        </div>
       </header>
 
       <form className="up-layout" onSubmit={handleSubmit}>
         <div className="up-main">
-          {/* ------------------------------------------------------------ files */}
+          {/* --------------------------------------------------------- template */}
+          {isTemplate ? (
+            <section className="up-card">
+              <div className="up-card-head">
+                <span className="up-step">1</span>
+                <div>
+                  <h2>Template pages</h2>
+                  <p>One SVG per page, in order. Up to {MAX_TEMPLATE_PAGES}.</p>
+                </div>
+              </div>
+
+              <div className="up-field">
+                <span className="up-label">What kind of template is it?</span>
+                <div className="up-cats" role="radiogroup" aria-label="Template kind">
+                  {TEMPLATE_KINDS.map((k) => (
+                    <button
+                      key={k.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={templateKind === k.id}
+                      className={templateKind === k.id ? 'up-cat up-cat-on' : 'up-cat'}
+                      onClick={() => setTemplateKind(k.id)}
+                      title={k.blurb}
+                    >
+                      {k.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="up-slots">
+                <strong>Name these layers before you export</strong>
+                <ul>
+                  {SLOT_HELP.map((s) => (
+                    <li key={s.id}>
+                      <code>{s.label}</code>
+                      <span>
+                        {s.note} {s.required && <em>Required.</em>}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <span className="up-slots-note">
+                  Illustrator and Figma both export a layer's name as the id, which is how the slots are found. Anything
+                  not named is left exactly as you drew it.
+                </span>
+              </div>
+
+              <TemplateDrop onFiles={addTemplateFiles} count={templatePages.length} max={MAX_TEMPLATE_PAGES} />
+
+              {templatePages.length > 0 && (
+                <ol className="up-pages">
+                  {templatePages.map((p, i) => (
+                    <li key={i} className={p.error ? 'up-page up-page-bad' : 'up-page'}>
+                      <span className="up-page-n">{i + 1}</span>
+                      <div className="up-page-info">
+                        <strong>{p.file.name}</strong>
+                        {p.error ? (
+                          <span className="up-page-err">{p.error}</span>
+                        ) : (
+                          <span>
+                            {Math.round(p.slots.width)}×{Math.round(p.slots.height)} ·{' '}
+                            {p.slots.logo ? `${p.slots.logo} logo slot${p.slots.logo === 1 ? '' : 's'}` : 'no logo slot'}
+                            {p.slots.colors.length ? ` · ${p.slots.colors.join(', ')}` : ''}
+                            {p.slots.text.length ? ` · ${p.slots.text.join(', ')}` : ''}
+                            {p.slots.image ? ` · ${p.slots.image} photo slot${p.slots.image === 1 ? '' : 's'}` : ''}
+                          </span>
+                        )}
+                      </div>
+                      <div className="up-page-actions">
+                        <button
+                          type="button"
+                          className="up-link"
+                          disabled={i === 0}
+                          onClick={() =>
+                            setTemplatePages((prev) => {
+                              const copy = prev.slice()
+                              ;[copy[i - 1], copy[i]] = [copy[i], copy[i - 1]]
+                              return copy
+                            })
+                          }
+                        >
+                          Up
+                        </button>
+                        <button
+                          type="button"
+                          className="up-icon-btn"
+                          aria-label={`Remove ${p.file.name}`}
+                          onClick={() => setTemplatePages((prev) => prev.filter((_, x) => x !== i))}
+                        >
+                          <Cross />
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+          ) : (
           <section className="up-card">
             <div className="up-card-head">
               <span className="up-step">1</span>
@@ -293,6 +481,7 @@ export default function CreatorUploadPage() {
               </div>
             )}
           </section>
+          )}
 
           {/* ---------------------------------------------------------- preview */}
           <section className="up-card">
@@ -302,12 +491,16 @@ export default function CreatorUploadPage() {
                 <h2>Preview</h2>
                 <p>
                   This is what people see in the library.{' '}
-                  {needsVideoPreview ? 'Video formats also need a short MP4 clip.' : 'A clean JPEG or PNG works best.'}
+                  {isTemplate
+                    ? 'Show the template filled with a sample brand, so people can see what it does.'
+                    : needsVideoPreview
+                      ? 'Video formats also need a short MP4 clip.'
+                      : 'A clean JPEG or PNG works best.'}
                 </p>
               </div>
             </div>
 
-            <div className={needsVideoPreview ? 'up-previews up-previews-two' : 'up-previews'}>
+            <div className={!isTemplate && needsVideoPreview ? 'up-previews up-previews-two' : 'up-previews'}>
               <DropZone
                 tall
                 label="Thumbnail"
@@ -319,7 +512,7 @@ export default function CreatorUploadPage() {
                 {thumbUrl && <img className="up-drop-media" src={thumbUrl} alt="" />}
               </DropZone>
 
-              {needsVideoPreview && (
+              {!isTemplate && needsVideoPreview && (
                 <DropZone
                   tall
                   label="Preview clip"
@@ -356,7 +549,7 @@ export default function CreatorUploadPage() {
               />
             </label>
 
-            <div className="up-field">
+            <div className="up-field" hidden={isTemplate}>
               <span className="up-label">Category</span>
               <div className="up-cats" role="radiogroup" aria-label="Category">
                 {CATEGORIES.map((c) => (
@@ -386,7 +579,11 @@ export default function CreatorUploadPage() {
                 value={description}
                 rows={4}
                 maxLength={DESCRIPTION_MAX}
-                placeholder="What's in the file, and what would someone use it for?"
+                placeholder={
+                  isTemplate
+                    ? 'What does this template present, and who is it for?'
+                    : "What's in the file, and what would someone use it for?"
+                }
                 onChange={(e) => setDescription(e.target.value)}
               />
             </label>
@@ -412,12 +609,25 @@ export default function CreatorUploadPage() {
             <div className="up-preview-card">
               <div className="up-preview-art">
                 {thumbUrl ? <img src={thumbUrl} alt="" /> : <span>Your thumbnail</span>}
-                {tier && <span className="up-tier">{tier.label}</span>}
+                {isTemplate ? (
+                  <span className="up-tier">Template</span>
+                ) : (
+                  tier && <span className="up-tier">{tier.label}</span>
+                )}
               </div>
               <div className="up-preview-meta">
                 <strong>{title.trim() || 'Untitled piece'}</strong>
-                <span>{categoryLabel}</span>
-                {orderedFormats.length > 0 && (
+                <span>{isTemplate ? TEMPLATE_KINDS.find((k) => k.id === templateKind)?.label : categoryLabel}</span>
+                {isTemplate && templatePages.length > 0 && (
+                  <div className="up-preview-formats">
+                    <span>{templatePages.length} page{templatePages.length === 1 ? '' : 's'}</span>
+                    {templateTotals.logo > 0 && <span>logo</span>}
+                    {templateTotals.colors.map((c) => (
+                      <span key={c}>{c}</span>
+                    ))}
+                  </div>
+                )}
+                {!isTemplate && orderedFormats.length > 0 && (
                   <div className="up-preview-formats">
                     {orderedFormats.map((f) => (
                       <span key={f.id}>{f.id}</span>
@@ -446,6 +656,7 @@ export default function CreatorUploadPage() {
               <span>
                 I own the full commercial rights to this work, and it doesn't include client trademarks or
                 confidential material.
+                {isTemplate && ' Subscribers may use this template with their own brand.'}
               </span>
             </label>
 
@@ -460,6 +671,52 @@ export default function CreatorUploadPage() {
           </div>
         </aside>
       </form>
+    </div>
+  )
+}
+
+/** Multi-file drop target for a template's pages. */
+function TemplateDrop({ onFiles, count, max }) {
+  const inputRef = useRef(null)
+  const [over, setOver] = useState(false)
+  const full = count >= max
+
+  return (
+    <div
+      className={['up-drop', over && 'up-drop-over', full && 'up-drop-full'].filter(Boolean).join(' ')}
+      onDragOver={(e) => {
+        e.preventDefault()
+        setOver(true)
+      }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => {
+        e.preventDefault()
+        setOver(false)
+        if (!full) onFiles(e.dataTransfer.files)
+      }}
+    >
+      <div className="up-drop-row">
+        <span className="up-drop-badge">SVG</span>
+        <div className="up-drop-text">
+          <strong>{full ? `That's the maximum of ${max} pages` : 'Add SVG pages'}</strong>
+          <span>{count > 0 ? `${count} added. Drop more here, or browse.` : 'Drop them here, or browse. Order matters.'}</span>
+        </div>
+        <button type="button" className="up-browse" disabled={full} onClick={() => inputRef.current?.click()}>
+          <Arrow />
+          Browse
+        </button>
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".svg,image/svg+xml"
+        multiple
+        hidden
+        onChange={(e) => {
+          onFiles(e.target.files)
+          e.target.value = ''
+        }}
+      />
     </div>
   )
 }

@@ -7,8 +7,11 @@ import { send, methodGuard, withErrorHandling } from '../http.js'
  * state, with the controls to change it.
  *
  * GET     ?status=&q=   list
- * PATCH   { id, isFree?, moderationStatus?, moderationNote? }
+ * PATCH   { id, isFree?, isFeatured?, moderationStatus?, moderationNote? }
  * DELETE  ?id=          remove a piece outright
+ *
+ * isFeatured puts a template in front of subscribers in the Creative Suite.
+ * Only templates can be featured, and only live ones are ever shown.
  */
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
@@ -25,10 +28,13 @@ export default async function handler(req, res) {
       const rows = await sql`
         SELECT c.id, c.title, c.department, c.file_types, c.is_free, c.moderation_status,
                c.thumbnail_key, c.appreciation_count, c.download_count, c.created_at,
-               cr.name AS creator_name
+               c.is_template, c.template_kind, c.is_featured, c.template_slots,
+               cr.name AS creator_name,
+               (SELECT COUNT(*)::int FROM downloads d WHERE d.content_item_id = c.id AND d.source = 'template') AS template_uses
         FROM content_items c
         JOIN creators cr ON cr.id = c.creator_id
         WHERE (${status || null}::text IS NULL OR c.moderation_status = ${status || null})
+          AND (${req.query?.templates === '1'} = false OR c.is_template)
           AND (${q || null}::text IS NULL OR lower(c.title) LIKE ${like} OR lower(cr.name) LIKE ${like})
         ORDER BY c.created_at DESC
         LIMIT 200
@@ -45,6 +51,11 @@ export default async function handler(req, res) {
           thumbnailKey: r.thumbnail_key,
           appreciations: r.appreciation_count,
           downloads: r.download_count,
+          isTemplate: r.is_template,
+          templateKind: r.template_kind,
+          isFeatured: r.is_featured,
+          templatePages: r.template_slots?.summary?.pages || 0,
+          templateUses: r.template_uses,
           creatorName: r.creator_name,
           createdAt: r.created_at,
         })),
@@ -52,8 +63,13 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PATCH') {
-      const { id, isFree, moderationStatus, moderationNote } = req.body || {}
+      const { id, isFree, isFeatured, moderationStatus, moderationNote } = req.body || {}
       if (!id) return send(res, 400, { error: 'id is required' })
+      if (isFeatured !== undefined) {
+        const [row] = await sql`SELECT is_template FROM content_items WHERE id = ${id}`
+        if (!row) return send(res, 404, { error: 'item not found' })
+        if (isFeatured && !row.is_template) return send(res, 400, { error: 'Only templates can be featured.' })
+      }
       if (moderationStatus && !['pending', 'approved', 'rejected'].includes(moderationStatus)) {
         return send(res, 400, { error: 'moderationStatus must be pending, approved or rejected' })
       }
@@ -61,6 +77,8 @@ export default async function handler(req, res) {
       const rows = await sql`
         UPDATE content_items SET
           is_free = COALESCE(${isFree ?? null}, is_free),
+          is_featured = COALESCE(${isFeatured ?? null}, is_featured),
+          featured_at = CASE WHEN ${isFeatured === true} THEN now() WHEN ${isFeatured === false} THEN NULL ELSE featured_at END,
           moderation_status = COALESCE(${moderationStatus ?? null}, moderation_status),
           moderation_note = CASE WHEN ${moderationNote === undefined} THEN moderation_note ELSE ${moderationNote?.trim() || null} END,
           moderated_at = CASE WHEN ${!!moderationStatus} THEN now() ELSE moderated_at END,

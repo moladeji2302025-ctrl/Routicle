@@ -23,6 +23,7 @@ export const TYPES = {
   gzip: { label: 'Premiere Pro project', ext: '.prproj' },
   fig: { label: 'Figma file', ext: '.fig' },
   zip: { label: 'ZIP archive', ext: '.zip' },
+  svg: { label: 'SVG', ext: '.svg' },
   // Recognised only so the refusal can say what the file really is.
   exe: { label: 'Windows program', dangerous: true },
   elf: { label: 'Linux program', dangerous: true },
@@ -90,8 +91,12 @@ export function detectType(input) {
   if (ascii(bytes, 0, 8) === 'fig-kiwi') return 'fig'
   if (startsWith(bytes, [0x50, 0x4b, 0x03, 0x04])) return 'zip'
 
-  const head = ascii(bytes, 0, Math.min(bytes.length, 64)).trimStart().toLowerCase()
+  const head = ascii(bytes, 0, Math.min(bytes.length, 64)).replace(/^\uFEFF|^\xEF\xBB\xBF/, '').trimStart().toLowerCase()
   if (head.startsWith('<!doctype html') || head.startsWith('<html') || head.startsWith('<script')) return 'html'
+  // An SVG is text, so its first bytes only say "XML" or "svg". That is enough
+  // to route it: every template page is then read in full and checked by
+  // templateSvg.js before it is accepted.
+  if (head.startsWith('<svg') || head.startsWith('<?xml') || head.startsWith('<!-- generator') || head.startsWith('<!doctype svg')) return 'svg'
 
   return null
 }
@@ -118,13 +123,15 @@ export const SOURCE_RULES = {
   AEP: { types: ['aep'], exts: ['.aep', '.aet'], name: 'After Effects project' },
   PPRO: { types: ['gzip'], exts: ['.prproj'], name: 'Premiere Pro project' },
   Figma: { types: ['fig'], exts: ['.fig'], name: 'Figma file' },
+  // One page of a Creative Suite template. Only accepted on template uploads.
+  SVG: { types: ['svg'], exts: ['.svg'], name: 'SVG template page', maxBytes: 5 * MB },
 }
 
 /** The rule for an upload slot, or null when the slot or format is unknown. */
 export function ruleFor(kind, format) {
   if (kind === 'source') {
     const rule = SOURCE_RULES[format]
-    return rule ? { ...rule, maxBytes: null } : null
+    return rule ? { ...rule, maxBytes: rule.maxBytes || null } : null
   }
   return RULES[kind] || null
 }

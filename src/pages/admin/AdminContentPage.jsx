@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as api from '../../lib/api'
 import { categoryLabel } from '../../data/categories'
+import { TEMPLATE_KINDS } from '../../lib/templateFill'
 
 const STATUSES = [
   { id: '', label: 'All' },
@@ -12,13 +13,14 @@ const STATUSES = [
 export default function AdminContentPage() {
   const [items, setItems] = useState(null)
   const [status, setStatus] = useState('')
+  const [templatesOnly, setTemplatesOnly] = useState(false)
   const [query, setQuery] = useState('')
   const [error, setError] = useState('')
   const [busyId, setBusyId] = useState('')
 
   async function load() {
     try {
-      const { items: rows } = await api.fetchAdminContent({ status, q: query.trim() })
+      const { items: rows } = await api.fetchAdminContent({ status, q: query.trim(), templates: templatesOnly })
       setItems(rows)
     } catch (err) {
       setError(err.message)
@@ -29,7 +31,7 @@ export default function AdminContentPage() {
   useEffect(() => {
     const t = setTimeout(load, 250)
     return () => clearTimeout(t)
-  }, [status, query])
+  }, [status, query, templatesOnly])
 
   async function act(id, fn) {
     setBusyId(id)
@@ -49,7 +51,8 @@ export default function AdminContentPage() {
       <h2>Library</h2>
       <p className="settings-section-desc">
         Everything in the catalogue, whatever its state. Marking a piece free removes its paywall
-        for everyone; removing it takes it down permanently.
+        for everyone; removing it takes it down permanently. Featuring a live template puts it in front
+        of subscribers in the Creative Suite, where every use pays its creator like a download.
       </p>
 
       <div className="projects-toolbar">
@@ -64,6 +67,13 @@ export default function AdminContentPage() {
               {s.label}
             </button>
           ))}
+          <button
+            type="button"
+            className={templatesOnly ? 'explore-chip explore-chip-active' : 'explore-chip'}
+            onClick={() => setTemplatesOnly((v) => !v)}
+          >
+            Templates
+          </button>
         </div>
         <input
           type="search"
@@ -89,8 +99,12 @@ export default function AdminContentPage() {
                 <span className="download-title">{item.title}</span>
                 <span className="download-meta">
                   {item.creatorName} · {categoryLabel(item.category)}
-                  {item.fileTypes.length > 0 ? ` · ${item.fileTypes.join(', ')}` : ''} ·{' '}
-                  {item.downloads} downloads
+                  {item.isTemplate
+                    ? ` · ${TEMPLATE_KINDS.find((k) => k.id === item.templateKind)?.label || 'Template'}, ${item.templatePages} page${item.templatePages === 1 ? '' : 's'} · ${item.templateUses} uses`
+                    : item.fileTypes.length > 0
+                      ? ` · ${item.fileTypes.join(', ')}`
+                      : ''}{' '}
+                  · {item.downloads} downloads
                 </span>
               </div>
 
@@ -98,6 +112,19 @@ export default function AdminContentPage() {
                 {item.moderationStatus}
               </span>
               {item.isFree && <span className="settings-pill">Free</span>}
+              {item.isFeatured && <span className="settings-pill settings-pill-featured">Featured</span>}
+
+              {item.isTemplate && (
+                <button
+                  type="button"
+                  className="settings-btn"
+                  disabled={busyId === item.id || (!item.isFeatured && item.moderationStatus !== 'approved')}
+                  title={item.moderationStatus !== 'approved' && !item.isFeatured ? 'Approve it first' : undefined}
+                  onClick={() => act(item.id, () => api.patchAdminTemplateFeature(item.id, !item.isFeatured))}
+                >
+                  {item.isFeatured ? 'Unfeature' : 'Feature'}
+                </button>
+              )}
 
               <button
                 type="button"

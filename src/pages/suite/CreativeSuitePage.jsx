@@ -4,6 +4,7 @@ import { buildLogoPack, svgToRaster, downloadBlob, PALETTE_PRESETS, isDark } fro
 import { PenIcon, UploadIcon } from '../../components/icons'
 import FontPicker from '../../components/FontPicker'
 import MarkEditor from '../../components/MarkEditor'
+import FeaturedTemplates from './FeaturedTemplates'
 
 const FORMATS = [
   { ext: 'svg', label: 'SVG', type: null },
@@ -95,7 +96,9 @@ export default function CreativeSuitePage() {
         <div>
           <h2>Creative Suite</h2>
           <p className="settings-section-desc">
-            Upload a sketch or a flat logo image. We'll turn it into vectors, then build a full pack with primary, secondary and tertiary lockups, the mark, the wordmark and the palette.
+            Upload a sketch or a flat logo image. We'll turn it into vectors, then build a full pack with primary, secondary
+            and tertiary lockups, the mark, the wordmark and the palette — and drop the result into a featured template to
+            present it.
           </p>
         </div>
       </div>
@@ -272,6 +275,9 @@ export default function CreativeSuitePage() {
           ))}
         </div>
       )}
+
+      {/* Step four: the same brand, presented in a creator's frame. */}
+      <FeaturedTemplates trace={trace} name={name} tagline={tagline} palette={palette} font={font} />
     </>
   )
 }
