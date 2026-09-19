@@ -116,3 +116,20 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 -- A display-only WebP copy of the thumbnail, made in the uploader's browser.
 -- The gated download is always the original source file.
 ALTER TABLE content_items ADD COLUMN IF NOT EXISTS thumbnail_webp_key text;
+
+-- ---------------------------------------------------------------------------
+-- Newsletter signups from logged-out visitors (see handlers/newsletter.js).
+-- Double opt-in: a row stays 'pending' until the confirmation link is used.
+-- Only a SHA-256 of the confirmation token is stored. The unsubscribe token is
+-- kept as is because every future newsletter has to carry it.
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+  email text PRIMARY KEY,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'unsubscribed')),
+  source text,
+  confirm_token_hash text,
+  confirm_expires_at timestamptz,
+  unsubscribe_token text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  confirmed_at timestamptz,
+  unsubscribed_at timestamptz
+);

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
+import NewsletterSignup from './NewsletterSignup'
 
 const COLUMNS = [
   {
@@ -49,6 +50,7 @@ export default function Footer() {
         <div className="footer-grid">
           <div className="footer-brand">
             <img src="/brand/routicle-wordmark-black.svg" alt="Routicle" className="footer-logo" />
+            <NewsletterSignup variant="footer" />
           </div>
 
           {COLUMNS.map((col) => (

@@ -36,7 +36,7 @@ function columnCountFor(width, offset = 0) {
  *      "measured" would flip true well before the images are actually in.
  *      Real completion is tracked from each <img>'s own load/error event.
  */
-export default function FeedGrid({ items }) {
+export default function FeedGrid({ items, className = '' }) {
   const { settings } = useApp()
   const offset = DENSITY_OFFSET[settings.appearance.density] ?? 0
   const [columnCount, setColumnCount] = useState(() => columnCountFor(window.innerWidth, offset))
@@ -147,7 +147,7 @@ export default function FeedGrid({ items }) {
   }, [items, columnCount, allLoaded, heights])
 
   return (
-    <div className="feed-grid">
+    <div className={className ? `feed-grid ${className}` : 'feed-grid'}>
       {columns.map((col, ci) => (
         <div className="feed-grid-column" key={ci}>
           {col.map((item, i) => (

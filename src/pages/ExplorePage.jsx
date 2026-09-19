@@ -5,7 +5,11 @@ import { CATEGORIES } from '../data/categories'
 import { applyBrowsingFilters } from '../data/settings'
 import { getCreatorByName } from '../data/creators'
 import FeedGrid from '../components/FeedGrid'
+import NewsletterSignup from '../components/NewsletterSignup'
 import { SearchIcon, SlidersIcon, ChevronDownIcon } from '../components/icons'
+
+// How many results come before the email signup for logged-out visitors.
+const NEWSLETTER_AFTER = 12
 
 const SORTS = [
   { id: 'recommended', label: 'Recommended' },
@@ -170,8 +174,19 @@ export default function ExplorePage() {
 
       <p className="explore-count">{results.length} result{results.length === 1 ? '' : 's'}</p>
 
-      {results.length > 0 ? (
-        <FeedGrid items={results} />
+      {results.length > 0 && !currentUser && results.length > NEWSLETTER_AFTER ? (
+        // Logged-out visitors get the email signup a couple of rows in, where
+        // someone browsing will actually pass it, rather than under the footer.
+        <>
+          <FeedGrid items={results.slice(0, NEWSLETTER_AFTER)} className="feed-grid-split" />
+          <NewsletterSignup variant="band" source="explore" />
+          <FeedGrid items={results.slice(NEWSLETTER_AFTER)} />
+        </>
+      ) : results.length > 0 ? (
+        <>
+          <FeedGrid items={results} />
+          {!currentUser && <NewsletterSignup variant="band" source="explore" />}
+        </>
       ) : (
         <p className="explore-empty">Nothing matches those filters yet.</p>
       )}

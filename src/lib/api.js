@@ -173,6 +173,11 @@ export function markItemFreeRemote(id, isFree) {
   return request(`/content?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ isFree }) })
 }
 
+/** Newsletter signup for logged-out visitors. `website` is the honeypot field. */
+export function subscribeNewsletter({ email, source, website }) {
+  return request('/public/newsletter', { method: 'POST', body: JSON.stringify({ email, source, website }) })
+}
+
 /** Returns presigned, time-limited download URLs for a live item's real source files. */
 export function requestDownload(itemId, userEmail, organizationId) {
   return request('/library/downloads', { method: 'POST', body: JSON.stringify({ itemId, userEmail, organizationId }) })

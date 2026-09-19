@@ -271,3 +271,33 @@ export function inviteEmail({ teamName, inviterName, acceptUrl, role }) {
 
   return { text, html }
 }
+
+export function newsletterConfirmEmail({ confirmUrl }) {
+  const text = [
+    'Thanks for signing up to Routicle updates.',
+    '',
+    'Confirm your email to start getting them:',
+    confirmUrl,
+    '',
+    "The link works for 48 hours. If you didn't sign up, ignore this email and you won't hear from us again.",
+  ].join('\n')
+
+  const html = `
+<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#16161a">
+  <p style="margin:0 0 24px;font-size:18px;font-weight:700;letter-spacing:-0.01em">Routicle</p>
+  <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;font-weight:700;letter-spacing:-0.02em">
+    Confirm your email
+  </h1>
+  <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#5a5a63">
+    Thanks for signing up. Confirm and we'll send you new work from creators and the occasional product update.
+  </p>
+  <a href="${escapeHtml(confirmUrl)}" style="display:inline-block;padding:12px 22px;border-radius:999px;background:#6750de;color:#fff;font-size:14px;font-weight:600;text-decoration:none">
+    Confirm my email
+  </a>
+  <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#8a8a94">
+    The link works for 48 hours. If you didn't sign up, ignore this email and you won't hear from us again.
+  </p>
+</div>`.trim()
+
+  return { text, html }
+}
