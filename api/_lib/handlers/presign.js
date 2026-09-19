@@ -4,6 +4,7 @@ import { buildObjectKey, presignUpload, SOURCE_BUCKET, PREVIEW_BUCKET, publicPre
 import { maxFileBytes, maxCreatorBytes, maxLibraryBytes, formatBytes } from '../limits.js'
 import { requireUser } from '../auth.js'
 import { requireCreator } from '../guard.js'
+import { ruleFor, extensionOf, TYPES } from '../fileTypes.js'
 import { limit, LIMITS } from '../ratelimit.js'
 
 /**
@@ -22,12 +23,26 @@ export default async function handler(req, res) {
     if (!user) return
     if (!(await limit(req, res, { name: 'presign', key: user.id, ...LIMITS.presign }))) return
 
-    const { fileName, contentType, kind, size } = req.body || {}
+    const { fileName, kind, format, size } = req.body || {}
     if (!fileName || !kind) {
       return send(res, 400, { error: 'fileName and kind are required' })
     }
-    if (!['source', 'thumbnail', 'preview'].includes(kind)) {
-      return send(res, 400, { error: 'kind must be one of source, thumbnail, preview' })
+
+    // The first gate, before a single byte is uploaded: the slot must exist,
+    // and the file's extension must be one that slot accepts. This is only an
+    // early rejection of obvious mistakes. Extensions are trivially renamed, so
+    // the check that counts reads the uploaded bytes at submission.
+    const rule = ruleFor(kind, format)
+    if (!rule) {
+      return send(res, 400, {
+        error: kind === 'source' ? `Unknown file format: ${format || 'none given'}.` : `Unknown upload slot: ${kind}.`,
+      })
+    }
+    const ext = extensionOf(fileName)
+    if (!rule.exts.includes(ext)) {
+      return send(res, 415, {
+        error: `A ${rule.name} has to be ${rule.exts.join(', ')}. That file is ${ext || 'unnamed'}.`,
+      })
     }
 
     // A declared size is required: it is what gets signed into the URL, and
@@ -36,7 +51,9 @@ export default async function handler(req, res) {
     if (!Number.isFinite(declared) || declared <= 0) {
       return send(res, 400, { error: 'size (in bytes) is required' })
     }
-    const perFile = maxFileBytes()
+    // Each slot has its own ceiling (a thumbnail has no business being 3GB);
+    // source files fall back to the global per-file limit.
+    const perFile = rule.maxBytes || maxFileBytes()
     if (declared > perFile) {
       return send(res, 413, {
         error: `That file is ${formatBytes(declared)}. The limit per file is ${formatBytes(perFile)}.`,
@@ -66,11 +83,15 @@ export default async function handler(req, res) {
     }
 
     const bucket = kind === 'source' ? SOURCE_BUCKET : PREVIEW_BUCKET
-    const objectKey = buildObjectKey({ creatorId, fileName, kind })
+    // Stored under a generated id with the slot's canonical extension. The
+    // uploaded filename is never part of the key.
+    const canonical = TYPES[rule.types[0]]?.ext || ''
+    const objectKey = buildObjectKey({ creatorId, kind, ext: rule.exts.includes(ext) ? ext : canonical })
     const uploadUrl = await presignUpload({
       bucket,
       key: objectKey,
-      contentType: contentType || 'application/octet-stream',
+      // Content-Type is set by us from the slot, not echoed from the client.
+      contentType: 'application/octet-stream',
       contentLength: declared,
     })
 

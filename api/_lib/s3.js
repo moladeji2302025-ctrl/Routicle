@@ -36,9 +36,25 @@ function sanitizeFileName(name) {
   return (name || 'file').replace(/[^a-zA-Z0-9._-]/g, '-').slice(-140)
 }
 
-/** Builds a unique object key, namespaced by kind and creator, for a new upload. */
-export function buildObjectKey({ creatorId, fileName, kind }) {
-  return `${kind}/${creatorId}/${randomUUID()}-${sanitizeFileName(fileName)}`
+/**
+ * A new object key: the upload slot, the owning creator, and a random id.
+ *
+ * The uploader's filename is deliberately not part of it. A key carrying a
+ * user-supplied name is a key someone else chose, and it leaks that name to
+ * anyone who sees the URL. The name the creator knows is stored separately, as
+ * metadata on the submission. The extension is the canonical one for the
+ * slot's real type, never the uploaded file's own.
+ *
+ * The `kind/creatorId/` prefix is also what proves ownership later: a
+ * submission may only reference keys under its own creator's prefix.
+ */
+export function buildObjectKey({ creatorId, kind, ext = '' }) {
+  return `${kind}/${creatorId}/${randomUUID()}${ext}`
+}
+
+/** The key prefix every object belonging to this creator and slot carries. */
+export function ownedPrefix(kind, creatorId) {
+  return `${kind}/${creatorId}/`
 }
 
 /**
@@ -71,6 +87,42 @@ export async function headObjectSize({ bucket, key }) {
     // Missing or unreadable: count as zero rather than failing the submission.
     return 0
   }
+}
+
+/**
+ * Size, and whether the object exists at all. Unlike headObjectSize this does
+ * not swallow a missing object: validation has to know the difference between
+ * an empty file and one that was never uploaded.
+ */
+export async function statObject({ bucket, key }) {
+  try {
+    const res = await getClient().send(new HeadObjectCommand({ Bucket: bucket, Key: key }))
+    return { exists: true, size: Number(res.ContentLength) || 0 }
+  } catch (err) {
+    const status = err?.$metadata?.httpStatusCode
+    if (status === 404 || err?.name === 'NotFound' || err?.name === 'NoSuchKey') return { exists: false, size: 0 }
+    throw err
+  }
+}
+
+/**
+ * The first bytes of a stored object, for signature checks. A ranged read, so
+ * inspecting a 4GB upload costs the same as inspecting a 4KB one.
+ */
+export async function readObjectStart({ bucket, key, bytes = 64 }) {
+  const res = await getClient().send(
+    new GetObjectCommand({ Bucket: bucket, Key: key, Range: `bytes=0-${bytes - 1}` })
+  )
+  const chunks = []
+  let total = 0
+  for await (const chunk of res.Body) {
+    chunks.push(chunk)
+    total += chunk.length
+    // A server that ignores Range sends the whole object; stop early rather
+    // than buffering gigabytes to look at sixty-four of them.
+    if (total >= bytes) break
+  }
+  return new Uint8Array(Buffer.concat(chunks).subarray(0, bytes))
 }
 
 export async function deleteObject({ bucket, key }) {

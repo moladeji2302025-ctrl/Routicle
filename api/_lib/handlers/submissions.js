@@ -1,5 +1,15 @@
 import { sql } from '../db.js'
-import { headObjectSize, publicPreviewUrl, SOURCE_BUCKET, PREVIEW_BUCKET } from '../s3.js'
+import {
+  publicPreviewUrl,
+  statObject,
+  readObjectStart,
+  deleteObject,
+  ownedPrefix,
+  SOURCE_BUCKET,
+  PREVIEW_BUCKET,
+} from '../s3.js'
+import { detectType, ruleFor, mismatchMessage, displayName } from '../fileTypes.js'
+import { maxFileBytes, maxSubmissionBytes, formatBytes } from '../limits.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { requireUser, requireAdmin } from '../auth.js'
 import { requireCreator } from '../guard.js'
@@ -93,16 +103,83 @@ export default async function handler(req, res) {
     if (!creator) return
     const creatorId = creator.id
 
-    // Measure what actually landed in the bucket rather than trusting the
-    // browser's claim: the presigned URL enforces the declared size, but the
-    // number recorded here is what storage is really being billed for.
+    /* ---- Every file, checked from its own bytes ---- */
+
     const sources = Array.isArray(sourceObjectKeys) ? sourceObjectKeys : []
-    const sizes = await Promise.all([
-      headObjectSize({ bucket: PREVIEW_BUCKET, key: thumbnailKey }),
-      ...(previewVideoKey ? [headObjectSize({ bucket: PREVIEW_BUCKET, key: previewVideoKey })] : []),
-      ...sources.map((f) => headObjectSize({ bucket: SOURCE_BUCKET, key: f.key })),
-    ])
-    const totalBytes = sizes.reduce((sum, n) => sum + n, 0)
+    const files = [
+      { kind: 'thumbnail', bucket: PREVIEW_BUCKET, key: thumbnailKey },
+      ...(req.body?.thumbnailWebpKey
+        ? [{ kind: 'thumbnail-webp', bucket: PREVIEW_BUCKET, key: req.body.thumbnailWebpKey }]
+        : []),
+      ...(previewVideoKey ? [{ kind: 'preview', bucket: PREVIEW_BUCKET, key: previewVideoKey }] : []),
+      ...sources.map((f) => ({
+        kind: 'source',
+        bucket: SOURCE_BUCKET,
+        key: f?.key,
+        format: f?.label,
+        name: displayName(f?.name),
+      })),
+    ]
+
+    // Anything this request uploaded is removed if the submission is refused,
+    // so a rejected file doesn't sit in the bucket. Only keys under this
+    // creator's own prefix are ever touched.
+    async function discardAll() {
+      await Promise.all(
+        files
+          .filter((f) => typeof f.key === 'string' && f.key.startsWith(ownedPrefix(f.kind, creatorId)))
+          .map((f) => deleteObject({ bucket: f.bucket, key: f.key }))
+      )
+    }
+
+    async function refuse(status, error, file) {
+      await discardAll()
+      return send(res, status, { error, file: file || null })
+    }
+
+    let totalBytes = 0
+    for (const f of files) {
+      const rule = ruleFor(f.kind, f.format)
+      const label = f.name || rule?.name || f.kind
+      if (!rule) return refuse(400, `Unknown file format: ${f.format || 'none given'}.`, label)
+
+      // Ownership. Keys are namespaced by creator, and a submission may only
+      // point at its own. Without this, anyone who learned another creator's
+      // key could publish that creator's source file as their own work.
+      if (typeof f.key !== 'string' || !f.key.startsWith(ownedPrefix(f.kind, creatorId))) {
+        return refuse(403, "One of these files doesn't belong to your account.", label)
+      }
+
+      const { exists, size } = await statObject({ bucket: f.bucket, key: f.key })
+      if (!exists) return refuse(400, `${label} didn't finish uploading. Please try again.`, label)
+      if (size === 0) return refuse(400, `${label} is empty.`, label)
+
+      const ceiling = rule.maxBytes || maxFileBytes()
+      if (size > ceiling) {
+        return refuse(413, `${label} is ${formatBytes(size)}. The limit is ${formatBytes(ceiling)}.`, label)
+      }
+
+      // The check that counts: what the file's own bytes say it is.
+      const head = await readObjectStart({ bucket: f.bucket, key: f.key, bytes: 64 })
+      const detected = detectType(head)
+      if (!detected || !rule.types.includes(detected)) {
+        return refuse(415, `${label}: ${mismatchMessage(rule, detected)}`, label)
+      }
+
+      f.size = size
+      f.type = detected
+      totalBytes += size
+    }
+
+    if (totalBytes > maxSubmissionBytes()) {
+      return refuse(413, `This submission is ${formatBytes(totalBytes)}. The limit is ${formatBytes(maxSubmissionBytes())}.`)
+    }
+
+    // What's stored per source file: the key, and the creator's own filename
+    // kept apart from it as a display name, with the size and verified type.
+    const storedSources = files
+      .filter((f) => f.kind === 'source')
+      .map((f) => ({ label: f.format, key: f.key, name: f.name, size: f.size, type: f.type }))
 
     const rows = await sql`
       INSERT INTO content_items (
@@ -110,8 +187,8 @@ export default async function handler(req, res) {
         behind_the_design, is_ai_generated, thumbnail_key, preview_video_key, source_object_keys,
         total_bytes
       ) VALUES (
-        ${creatorId}, ${title}, ${category}, ${subCategory || null}, ${fileTypes || []}, ${description || null},
-        ${behindTheDesign || null}, ${Boolean(isAiGenerated)}, ${thumbnailKey}, ${previewVideoKey || null}, ${JSON.stringify(sources)},
+        ${creatorId}, ${title}, ${category}, ${subCategory || null}, ${storedSources.map((f) => f.label)}, ${description || null},
+        ${behindTheDesign || null}, ${Boolean(isAiGenerated)}, ${thumbnailKey}, ${previewVideoKey || null}, ${JSON.stringify(storedSources)},
         ${totalBytes}
       )
       RETURNING *

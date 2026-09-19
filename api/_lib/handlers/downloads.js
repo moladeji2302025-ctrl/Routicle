@@ -84,7 +84,7 @@ export default async function handler(req, res) {
         url: await presignDownload({
           bucket: SOURCE_BUCKET,
           key: entry.key,
-          downloadFileName: `${item.title}-${entry.label}`,
+          downloadFileName: entry.name || `${item.title}-${entry.label}`,
         }),
       }))
     )

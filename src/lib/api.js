@@ -63,14 +63,16 @@ export function fetchPendingSubmissions() {
   return request('/creator/submissions?status=pending')
 }
 
-async function presignUpload({ file, kind }) {
+async function presignUpload({ file, kind, format }) {
   const { uploadUrl, objectKey, publicUrl } = await request('/creator/presign', {
     method: 'POST',
-    body: JSON.stringify({ fileName: file.name, contentType: file.type, kind, size: file.size }),
+    body: JSON.stringify({ fileName: file.name, kind, format, size: file.size }),
   })
   const putRes = await fetch(uploadUrl, {
     method: 'PUT',
-    headers: { 'Content-Type': file.type || 'application/octet-stream' },
+    // Must match what the server signed; the real type is checked from the
+    // bytes after upload, not taken from this header.
+    headers: { 'Content-Type': 'application/octet-stream' },
     body: file,
   })
   if (!putRes.ok) throw new Error(`Upload of ${file.name} failed (${putRes.status})`)
@@ -103,8 +105,9 @@ export async function submitRealUpload({
 
   const sourceObjectKeys = []
   for (const { label, file } of sourceFiles) {
-    const uploaded = await presignUpload({ file, kind: 'source' })
-    sourceObjectKeys.push({ label, key: uploaded.objectKey })
+    const uploaded = await presignUpload({ file, kind: 'source', format: label })
+    // The filename travels as metadata; the stored key never contains it.
+    sourceObjectKeys.push({ label, key: uploaded.objectKey, name: file.name })
   }
 
   return request('/creator/submissions', {
