@@ -15759,6 +15759,45 @@ div.dt-e-multi {
     display: inline;
   }
 
+  /* Everything around the pages has to give up its padding and background, or
+     it pushes a page over the sheet and every page after it moves down. */
+  .suite-head,
+  .app-scrim,
+  .doc-upgrade,
+  .settings-error,
+  .settings-notice {
+    display: none !important;
+  }
+
+  .doc-layout {
+    display: block !important;
+  }
+
+  .doc-main {
+    padding: 0 !important;
+    background: none !important;
+    border-radius: 0 !important;
+  }
+
+  .dt-wrap {
+    overflow: visible !important;
+  }
+
+  /* The app shell is a full-viewport flex column on screen. In print that
+     height leaves a blank sheet after the last page. */
+  html,
+  body,
+  #root,
+  .app-shell,
+  .app-main-col,
+  .app-main,
+  .suite-shell,
+  .suite-body {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
   .dt-e:empty::before {
     content: none;
   }
@@ -16564,4 +16603,641 @@ div.dt-e-multi {
 .settings-pill-featured {
   background: color-mix(in srgb, var(--brand-violet) 18%, transparent);
   color: var(--brand-violet);
+}
+
+/* ============================================================
+   Proposal, at the Branded Proposal template's own measurements
+   ============================================================ */
+
+/* Every number here was read off the template PDF (fonts, sizes, colours,
+   positions), not estimated from a screenshot. The page is the template's
+   893 × 1263; body copy is 18px on a 29px line; headings are 50px Medium;
+   content runs 36px in from either edge; bars are 41px high on a 51px pitch.
+   Scoped to .dt-prop so contracts, briefs and invoices are untouched. */
+
+.dt-prop {
+  width: 893px;
+  gap: 32px;
+}
+
+.dt-prop .dt-page {
+  width: 893px;
+  height: 1263px;
+  min-height: 0;
+  padding: 0;
+  display: block;
+  font-size: 18px;
+  line-height: 29px;
+  font-weight: 400;
+}
+
+/* ------------------------------------------------- header and footer */
+
+.dt-prop .dt-head {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 110px;
+  margin: 0;
+  display: block;
+}
+
+.dt-prop .dt-head .dt-wordmark {
+  position: absolute;
+  left: 36px;
+  top: 38px;
+  max-width: 230px;
+  font-family: var(--dt-body);
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.dt-prop .dt-head-meta {
+  position: absolute;
+  right: 44px;
+  top: 34px;
+  text-align: left;
+  font-size: 15px;
+  line-height: 21px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--dt-ink);
+}
+
+.dt-prop .dt-foot {
+  position: absolute;
+  left: 36px;
+  right: 36px;
+  top: 1143.5px;
+  margin: 0;
+  padding: 26px 0 0;
+  border-top: 1.5px solid var(--dt-ink);
+}
+
+.dt-prop .dt-prepared {
+  grid-template-columns: 362px 223px 1fr;
+  gap: 0;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.dt-prop .dt-body {
+  position: absolute;
+  left: 36px;
+  right: 36px;
+  top: 139px;
+  bottom: 133px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --------------------------------------------------------- headings */
+
+.dt-prop .dt-h {
+  margin: 0 0 28px;
+}
+
+/* Offer, budget and timeline leave a taller gap under the title. */
+.dt-prop .dt-h-far {
+  margin-bottom: 56px;
+}
+
+.dt-prop .dt-pg-services .dt-body {
+  top: 234px;
+}
+
+.dt-prop .dt-pg-phases .dt-body {
+  top: 153px;
+}
+
+.dt-prop .dt-h h2,
+.dt-prop .dt-contents-title {
+  font-size: 50px;
+  line-height: 61px;
+  letter-spacing: -0.005em;
+}
+
+.dt-prop.dt-headfont-body .dt-h h2,
+.dt-prop.dt-headfont-body .dt-contents-title {
+  font-weight: 500;
+}
+
+.dt-prop .dt-h-num {
+  margin-bottom: 2px;
+  font-size: 13px;
+}
+
+.dt-prop .dt-contents-title {
+  margin: 48px 0 43px;
+}
+
+.dt-prop .dt-staff-intro {
+  min-height: 87px;
+}
+
+.dt-prop .dt-bars.dt-bars-pin {
+  margin-top: auto;
+  margin-bottom: 19px;
+}
+
+.dt-prop .dt-cols2 {
+  display: grid;
+  grid-template-columns: 486px 1fr;
+}
+
+.dt-prop .dt-cols2 .dt-p {
+  margin-bottom: 20px;
+}
+
+/* --------------------------------------------------------- copy */
+
+.dt-prop .dt-p {
+  margin: 0 0 29px;
+  font-size: 18px;
+  line-height: 29px;
+}
+
+.dt-prop .dt-lead {
+  margin: 0 0 29px;
+  font-size: 18px;
+  line-height: 29px;
+  font-weight: 600;
+}
+
+.dt-prop .dt-small {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.dt-prop .dt-accent-strong {
+  font-weight: 600;
+}
+
+.dt-prop .dt-note-plain {
+  margin: 24px 0 0;
+  font-size: 17px;
+  line-height: 23px;
+  font-style: italic;
+}
+
+.dt-prop .dt-note-plain b {
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* -------------------------------------------------------- contents */
+
+.dt-prop .dt-contents {
+  gap: 11.7px;
+}
+
+.dt-prop .dt-contents li {
+  height: 49px;
+  padding: 0 0 0 30px;
+  font-size: 18px;
+  line-height: 49px;
+  border-left-width: 11px;
+}
+
+.dt-prop .dt-contents b {
+  margin-right: 5px;
+}
+
+/* ---------------------------------------------- vision and mission */
+
+.dt-prop .dt-cols {
+  grid-template-columns: 396px 396px;
+  gap: 29px;
+  /* The template pins the band and the values to the lower half of the page
+     whatever the copy above them runs to, so the columns hold their height. */
+  min-height: 563px;
+  align-content: start;
+}
+
+.dt-prop .dt-block-band {
+  height: 224px;
+  margin: 40px 0 18px;
+}
+
+.dt-prop .dt-values {
+  grid-template-columns: 220px 1fr;
+  align-items: start;
+}
+
+.dt-prop .dt-values .dt-h {
+  margin: 0;
+}
+
+.dt-prop .dt-values .dt-h h2 {
+  font-size: 50px;
+}
+
+.dt-prop .dt-dots {
+  grid-template-columns: 269px 269px;
+  gap: 0;
+  padding-top: 8px;
+  font-size: 20px;
+}
+
+.dt-prop .dt-dots li {
+  min-height: 39.5px;
+  gap: 16px;
+  line-height: 39.5px;
+}
+
+.dt-prop .dt-dots li::before {
+  width: 11px;
+  height: 11px;
+}
+
+/* ------------------------------------------------------ who are we */
+
+.dt-prop .dt-who {
+  grid-template-columns: 235px 1fr;
+  gap: 48px;
+  margin-bottom: 21px;
+}
+
+.dt-prop .dt-block-tall {
+  height: 381px;
+  margin-top: 90px;
+}
+
+.dt-prop .dt-bars {
+  margin: 12px 0 0;
+  gap: 10px;
+}
+
+.dt-prop .dt-bars li {
+  min-height: 41px;
+  padding: 6px 41px;
+  font-size: 18px;
+  line-height: 29px;
+}
+
+.dt-prop .dt-bars-tight {
+  margin: 5px 0 17px;
+}
+
+.dt-prop .dt-bars-tight li {
+  padding: 6px 16px;
+}
+
+/* --------------------------------------------------------- staff */
+
+.dt-prop .dt-staff {
+  gap: 35px;
+  margin-top: 0;
+}
+
+.dt-prop .dt-member {
+  grid-template-columns: 118px 1fr;
+  gap: 28px;
+}
+
+.dt-prop .dt-avatar {
+  width: 118px;
+  height: 118px;
+  font-size: 30px;
+  opacity: 0.9;
+}
+
+.dt-prop .dt-member-top {
+  grid-template-columns: 346px 329px;
+  gap: 0;
+}
+
+.dt-prop .dt-member-top strong {
+  font-size: 18px;
+  line-height: 25px;
+  font-weight: 600;
+}
+
+.dt-prop .dt-member-role {
+  font-size: 17px;
+  line-height: 21px;
+  margin-top: 2px;
+}
+
+.dt-prop .dt-exp {
+  padding-top: 12px;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.dt-prop .dt-exp-track {
+  height: 5px;
+}
+
+.dt-prop .dt-member .dt-small {
+  margin-top: 16px;
+}
+
+/* -------------------------------------------------- service strategy */
+
+.dt-prop .dt-block-banner {
+  height: 277px;
+  margin: 14px 0 40px;
+}
+
+.dt-prop .dt-titled .dt-p {
+  margin-bottom: 29px;
+}
+
+/* ---------------------------------------------------------- case study */
+
+.dt-prop .dt-indent {
+  padding-left: 230px;
+  padding-right: 20px;
+}
+
+.dt-prop .dt-block-case {
+  height: 171px;
+  margin: 0 0 17px;
+}
+
+.dt-prop .dt-table-accent {
+  height: 41px;
+  padding: 6px 16px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 29px;
+}
+
+/* ---------------------------------------------- services and budget */
+
+.dt-prop .dt-table {
+  gap: 9.5px;
+  margin: 8px 0 22px;
+}
+
+.dt-prop .dt-table-head,
+.dt-prop .dt-table-row {
+  min-height: 41px;
+  padding: 6px 0;
+  font-size: 18px;
+  line-height: 29px;
+}
+
+.dt-prop .dt-table-head {
+  background: color-mix(in srgb, var(--dt-ink) 47%, var(--dt-page));
+}
+
+/* Case-study bars are the accent colour, not the table-header grey. */
+.dt-prop .dt-table-head.dt-table-accent {
+  background: var(--dt-accent);
+  color: var(--dt-accent-ink);
+}
+
+.dt-prop .dt-table-2 {
+  grid-template-columns: 486px 1fr;
+  gap: 0;
+}
+
+.dt-prop .dt-table-2 > :first-child {
+  padding-left: var(--dt-pl, 16px);
+}
+
+.dt-prop .dt-table-2 > :nth-child(2) {
+  padding-left: 0;
+}
+
+.dt-prop .dt-table-budget {
+  --dt-pl: 23px;
+}
+
+.dt-prop .dt-note {
+  margin: 30px 0 0 3px;
+  min-height: 119px;
+  padding: 24px 16px 20px;
+  font-size: 17px;
+  line-height: 23px;
+}
+
+/* ----------------------------------------------------------- phases */
+
+.dt-prop .dt-indent-sm {
+  padding-left: 158px;
+}
+
+.dt-prop .dt-phases {
+  gap: 30px;
+  margin-top: 0;
+}
+
+.dt-prop .dt-phase {
+  grid-template-columns: 89px 1fr;
+  gap: 35px;
+}
+
+.dt-prop .dt-phase-num {
+  height: 35px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 35px;
+}
+
+.dt-prop .dt-phase strong {
+  margin: 0 0 11px;
+  font-size: 18px;
+  line-height: 29px;
+  font-weight: 600;
+}
+
+.dt-prop .dt-phase .dt-p {
+  margin: 0;
+}
+
+.dt-prop .dt-steps {
+  gap: 10px;
+  padding-top: 0;
+  margin-top: auto;
+}
+
+.dt-prop .dt-step {
+  display: flex;
+  gap: 8px;
+  min-height: 41px;
+  padding: 6px 0 6px 223px;
+  font-size: 18px;
+  line-height: 29px;
+}
+
+.dt-prop .dt-step b {
+  grid-column: auto;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------- offer */
+
+.dt-prop .dt-offer {
+  grid-template-columns: 251px 281px 251px;
+  gap: 18.5px;
+  align-items: center;
+  margin: 16px 0 0;
+}
+
+.dt-prop .dt-offer-1,
+.dt-prop .dt-offer-2,
+.dt-prop .dt-offer-4 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 251px));
+  justify-content: space-between;
+}
+
+.dt-prop .dt-pack {
+  margin: 0;
+  min-height: 553px;
+  border-radius: 0;
+}
+
+.dt-prop .dt-pack-featured {
+  min-height: 598px;
+}
+
+.dt-prop .dt-pack-head {
+  height: 65px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.dt-prop .dt-pack-featured .dt-pack-head {
+  height: 87px;
+  padding: 0;
+}
+
+.dt-prop .dt-pack-body {
+  padding: 26px 18px 15px;
+}
+
+.dt-prop .dt-bullets {
+  gap: 0;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+}
+
+.dt-prop .dt-pack-foot {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 0.9px solid #868686;
+}
+
+.dt-prop .dt-pack-price {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 29px;
+}
+
+.dt-prop .dt-pack-time {
+  margin-top: 4px;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+/* ---------------------------------------------------------- timeline */
+
+.dt-prop .dt-gantt {
+  gap: 13.5px;
+  margin-top: 30px;
+}
+
+.dt-prop .dt-gantt-row {
+  grid-template-columns: 184px 1fr;
+}
+
+.dt-prop .dt-gantt-dates b {
+  font-size: 18px;
+}
+
+/* The template's labels are short; a studio's own ("Feedback & refinement")
+   aren't, so they set a touch smaller to stay on one line. */
+.dt-prop .dt-gantt-label {
+  font-size: 15.5px;
+  line-height: 20px;
+  padding-right: 8px;
+}
+
+.dt-prop .dt-gantt-ticks {
+  gap: 8.6px;
+}
+
+.dt-prop .dt-gantt-ticks span {
+  padding: 0;
+  height: 30px;
+  font-size: 13px;
+  line-height: 30px;
+}
+
+.dt-prop .dt-gantt-track {
+  height: 30px;
+}
+
+.dt-prop .dt-gantt-bar {
+  font-size: 13px;
+  line-height: 30px;
+}
+
+/* ------------------------------------------------------------ cover */
+
+/* The proposal's interior pages are absolutely laid out, but a cover is a
+   flex row (band and title side by side) or column, whatever its style. */
+.dt-prop .dt-page.dt-cover {
+  display: flex;
+}
+
+.dt-prop .dt-cover-bleed .dt-cover-main {
+  position: relative;
+  padding: 0;
+}
+
+.dt-prop .dt-cover-bleed .dt-cover-title-wrap {
+  position: absolute;
+  left: 34px;
+  right: 30px;
+  top: 343px;
+  margin: 0;
+}
+
+.dt-prop .dt-cover-bleed .dt-cover-title {
+  line-height: 0.945;
+  letter-spacing: -0.02em;
+}
+
+.dt-prop .dt-cover-bleed .dt-cover-bottom {
+  position: absolute;
+  left: 36px;
+  right: 36px;
+  top: 1172px;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.dt-prop .dt-cover-bleed .dt-prepared {
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.dt-prop .dt-cover-title {
+  line-height: 0.95;
+}
+
+/* Print: the proposal's pages are their own size, edge to edge. */
+@page dtprop {
+  size: 893px 1263px;
+  margin: 0;
+}
+
+@media print {
+  .dt-prop .dt-page {
+    page: dtprop;
+  }
 }

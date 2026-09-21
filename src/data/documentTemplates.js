@@ -245,42 +245,44 @@ function buildProposal({ studio, project, packages = [], lines = [] }) {
         `${studioOf(studio).name} is a design studio that turns ideas into brands people remember. We pair strategy with craft, so every piece we make does a job for the business behind it.`,
     },
     whatWeDo: {
-      body: `${studioOf(studio).name} brings brands to life through considered, strategic design, from logos to full visual identities.`,
+      body: `${studioOf(studio).name} specializes in bringing brands to life through visionary designs. From logos to multimedia experiences, we craft designs that resonate with your audience and elevate your brand to new heights.`,
       items: studio.whatWeDo?.length ? studio.whatWeDo : ['Brand & visual identity', 'Marketing campaigns', 'Social media design'],
     },
     staff: {
-      intro: `At ${studioOf(studio).name} we take pride in the talented people who make up our team. Our collective experience and dedication drive the work we deliver for our clients.`,
+      lead: `At ${studioOf(studio).name}`,
+      intro: 'we take pride in the diverse and talented individuals who make up our team. Our collective experience and dedication drive our success in delivering exceptional solutions to our clients.',
       members: (studio.staff || []).map((m) => ({ name: m.name || '', role: m.role || '', years: m.years || '', bio: m.bio || '' })),
     },
     strategy: [
-      { title: 'Discovery Session', body: 'Our journey begins with you. Through open conversation we get to know your business, your audience and what this project needs to do.' },
-      { title: 'Proposal Submission', body: 'Following discovery, we turn what we learned into a detailed proposal: a clear roadmap for the work, the timeline and the investment.' },
-      { title: 'Contract Submission', body: 'Once you approve the proposal, we formalise the partnership in a contract, so both sides are clear on the terms before work begins.' },
-      { title: 'Concept Development', body: 'With the groundwork laid, the designers turn insight into concepts, grounded in what came out of the discovery session.' },
-      { title: 'Iterative Feedback and Refinement', body: 'Your feedback shapes the outcome. We review, refine and tailor the designs with you until they match your vision.' },
+      { title: 'Discovery Session', body: 'Our journey begins with you. Through open communication and shared vision, we embark on a creative partnership that goes beyond conventional agency-client relationships.' },
+      { title: 'Proposal Submission', body: 'Following the discovery session, we translate our insights into a detailed proposal that outlines a strategic roadmap for your brand’s visual identity.' },
+      { title: 'Contract Submission', body: 'Upon your approval of the proposal, we formalize our partnership by designing a contract. We do this to convey our commitment to transparency and professionalism, ensuring a smooth and secure creative process.' },
+      { title: 'Concept Development', body: 'With the groundwork laid, the designer(s) dive into visionary ideation, translating insights from the discovery session into tangible design concepts.' },
+      { title: 'Iterative Feedback and Refinement', body: 'Your feedback is invaluable. We believe in an iterative feedback process where you play an active role in shaping the final outcome. Through regular communication and feedback sessions, we refine and tailor the designs to align perfectly with your vision.' },
     ],
     caseStudy: hasCase
       ? { summary: studio.caseStudy.summary, goals: studio.caseStudy.goals || [], results: studio.caseStudy.results || [] }
       : { summary: '', goals: [], results: [] },
     services: {
-      intro: 'The services we offer, priced per project. Every engagement is scoped to what the client actually needs.',
+      intro: 'Every service below is priced per project and scoped to what the client actually needs.',
+      intro2: 'Where a package does not fit, we are glad to put together a custom quote.',
       rows: (studio.whatWeDo?.length ? studio.whatWeDo : ['Graphic Design', 'Motion Graphics', 'Brand Strategy']).map((name) => ({
         name,
         price: 'On request',
       })),
     },
     phases: {
-      intro: `Below are the phases involved in crafting a tailored solution for ${client.name}.`,
+      intro: `Below you will find the phases involved in Crafting the Customized Solution, and Shaping ${client.name}’s Online presence.`,
       items: [
-        { title: 'Discovery Phase', body: "We research the client's business, target audience, industry, competition and objectives through interviews, market analysis and brand audits, to understand the brand's values, positioning and goals." },
-        { title: 'Proposal Submission Phase', body: 'We set out the scope of work, timeline, deliverables and costs, and show how the design solution addresses the needs uncovered in discovery.' },
-        { title: 'Contract Submission Phase', body: 'Once the proposal is approved, a contract formalises the terms: payment, milestones, intellectual property and responsibilities on both sides.' },
-        { title: 'Content Strategy Development Phase', body: 'Together we define key brand messages, tone of voice and the visual elements that guide every asset, so the identity stays consistent across touchpoints.' },
-        { title: 'Iterative Feedback and Refinement Phase', body: 'The client reviews concepts and prototypes, and we refine them round by round until the final identity matches their vision and objectives.' },
+        { title: 'Discovery Phase', body: 'In this phase, the design team conducts thorough research to understand the client’s business, target audience, industry landscape, competition, and objectives. This involves gathering information through client interviews, market analysis, and brand audits to gain insights into the brand’s values, positioning, and goals.' },
+        { title: 'Proposal Submission Phase', body: 'After the discovery phase, the design team creates a detailed proposal outlining the scope of work, project timeline, deliverables, and cost estimates based on the insights gathered. The proposal highlights how the design solution will address the client’s needs and objectives, demonstrating the value the design team can provide.' },
+        { title: 'Contract Submission Phase', body: 'Once the client approves the proposal, the design team prepares and submits a contract outlining the terms and conditions of the project, including payment terms, project milestones, intellectual property rights, and other legal considerations. Signing the contract formalizes the agreement between the client and the design team, establishing clear expectations and responsibilities for both parties.' },
+        { title: 'Content Strategy Development Phase', body: 'With the contract in place, the design team collaborates with the client to develop a content strategy that aligns with the brand’s identity and messaging goals. This involves defining key brand messages, tone of voice, and visual elements to be incorporated into the design assets. The content strategy guides the creation of brand collaterals such as logos, typography, color palette, and imagery, ensuring consistency and coherence across all touchpoints.' },
+        { title: 'Iterative Feedback and Refinement Phase', body: 'Throughout the design process, the client provides feedback on the initial design concepts and prototypes presented by the design team. This feedback loop allows for iterative refinement and improvement of the design solutions based on client input and preferences. The design team incorporates client feedback, making adjustments and revisions as necessary to ensure that the final brand identity aligns with the client’s vision and objectives.' },
       ],
     },
     offer: {
-      intro: `It was great speaking with ${client.contact || 'you'} and learning about what ${client.name} needs. Below is the estimated investment to complete this project.`,
+      intro: `It was enlightening speaking with ${client.contact || 'you'} and learning about the ${project.name || 'project'} needs of ${client.name}.\n\nBelow, you’ll find your estimated investment to complete this project.`,
       packages: packages.length
         ? packages.map((p, i) => ({
             name: p.name || `Option ${i + 1}`,
@@ -297,13 +299,13 @@ function buildProposal({ studio, project, packages = [], lines = [] }) {
       note: 'Prices and offers are open to slight negotiation. The Client is afforded the opportunity to name a reasonable counter price for services. However, that does not guarantee acceptance.',
     },
     budget: {
-      intro: 'Below is the budget breakdown for the completion of the project.',
+      intro: 'Below you’ll find the Budget Breakdown for the completion of the project.',
       groups: lines.length
         ? [{ name: 'Services', rows: lines.map((l) => ({ label: l.description || '', amount: String((Number(l.price) || 0) * (Number(l.quantity) || 1)) })) }]
         : [],
     },
     timeline: {
-      intro: 'This is an approximate timeline for when we expect the project to reach completion. The dates are reference points rather than strict deadlines.',
+      intro: 'This is an approximate timeline for when I anticipate the project will reach completion. Please understand that these dates are not meant to pressure or rush the process; they serve more as reference points rather than strict deadlines.',
       rows: draftTimeline(project),
     },
     // Pages that can be left out. Case study and budget start off when there

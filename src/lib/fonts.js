@@ -22,21 +22,35 @@ const cssName = (family) => family.trim().replace(/\s+/g, '+')
  * Resolves either way: a family that fails to load is not worth blocking the
  * editor over, and the preview will simply fall back to the stack's next font.
  */
-export function ensureFont(family, { weights = [400, 700] } = {}) {
+export function ensureFont(family, { weights = [400, 700], italics = [] } = {}) {
   if (!family || typeof document === 'undefined') return Promise.resolve(false)
-  if (injected.has(family)) return injected.get(family)
+  // Keyed by what was asked for, not just the family: a document that needs
+  // Montserrat in five weights must not be answered by an earlier request for two.
+  const key = `${family}|${weights.join(',')}|${italics.join(',')}`
+  if (injected.has(key)) return injected.get(key)
 
   const promise = new Promise((resolve) => {
     const link = document.createElement('link')
     link.rel = 'stylesheet'
-    const axis = weights.length > 1 ? `:wght@${weights.join(';')}` : ''
+    let axis = ''
+    if (italics.length) {
+      // With an italic axis Google wants every tuple as ital,wght, sorted.
+      const tuples = [...weights.map((w) => `0,${w}`), ...italics.map((w) => `1,${w}`)]
+      axis = `:ital,wght@${tuples.join(';')}`
+    } else if (weights.length > 1 || weights[0] !== 400) {
+      // A single weight still needs its axis: without one Google serves 400 only.
+      axis = `:wght@${[...weights].sort((a, b) => a - b).join(';')}`
+    }
     link.href = `https://fonts.googleapis.com/css2?family=${cssName(family)}${axis}&display=swap`
 
     link.onload = async () => {
       try {
         // The stylesheet only declares the face; this is what actually fetches
         // the file and tells us it is ready to draw with.
-        await Promise.all(weights.map((w) => document.fonts.load(`${w} 16px "${family}"`)))
+        await Promise.all([
+          ...weights.map((w) => document.fonts.load(`${w} 16px "${family}"`)),
+          ...italics.map((w) => document.fonts.load(`italic ${w} 16px "${family}"`)),
+        ])
         resolve(true)
       } catch {
         resolve(false)
@@ -46,7 +60,7 @@ export function ensureFont(family, { weights = [400, 700] } = {}) {
     document.head.appendChild(link)
   })
 
-  injected.set(family, promise)
+  injected.set(key, promise)
   return promise
 }
 

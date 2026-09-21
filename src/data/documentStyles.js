@@ -25,7 +25,9 @@ export const DOCUMENT_STYLES = [
     id: 'branded',
     name: 'Branded',
     blurb: 'The original: bold orange cover, grey pages, serif display.',
-    display: 'DM Serif Display',
+    // The template sets its title in Century Schoolbook Bold, which is
+    // commercial. PT Serif Bold has the same weight, width and terminals.
+    display: 'PT Serif',
     body: 'Montserrat',
     cover: 'bleed',
     heads: 'plain',
@@ -50,6 +52,8 @@ export const DOCUMENT_STYLES = [
     display: 'Fraunces',
     body: 'Lora',
     cover: 'frame',
+    coverItalic: true,
+    coverWeight: 400,
     heads: 'numbered',
     corners: 0,
     colors: { accent: '#1F4D3A', page: '#F5F0E6', ink: '#1B1B18', muted: '#58564E', panel: '#E8E1D2', coverInk: '#1B1B18' },
@@ -101,6 +105,9 @@ export const DOCUMENT_STYLES = [
 ]
 
 export const DEFAULT_STYLE_ID = 'branded'
+
+/** The weight and slant a style sets its cover title in. */
+export const coverFace = (style) => ({ weight: style.coverWeight || 700, italic: Boolean(style.coverItalic) })
 
 export function findStyle(id) {
   return DOCUMENT_STYLES.find((s) => s.id === id) || DOCUMENT_STYLES[0]

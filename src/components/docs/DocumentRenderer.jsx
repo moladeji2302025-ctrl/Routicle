@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { findStyle, styleVars } from '../../data/documentStyles'
+import { findStyle, styleVars, coverFace } from '../../data/documentStyles'
 import { longDate, shortDate, money, invoiceTotals, amountInWords } from '../../data/documentTemplates'
 import { ensureFont } from '../../lib/fonts'
 import { DocProvider, useDoc, E, EDate, EList, EditOnly, useListOps, RemoveBtn, AddBtn } from './DocEditable'
@@ -14,7 +14,15 @@ import { DocProvider, useDoc, E, EDate, EList, EditOnly, useListOps, RemoveBtn, 
  * reflowed, so what you see on a phone is still the page that will print.
  */
 
-const PAGE_WIDTH = 794
+/**
+ * The proposal is drawn at the size of the Branded Proposal template itself
+ * (893 × 1263), so its type sizes and spacing are the template's own numbers
+ * rather than an approximation of them. Contracts, briefs and invoices keep
+ * A4 at 96dpi.
+ */
+const A4_WIDTH = 794
+const PROPOSAL_WIDTH = 893
+const pageWidthFor = (kind) => (kind === 'proposal' ? PROPOSAL_WIDTH : A4_WIDTH)
 
 /* ------------------------------------------------------------- shared bits */
 
@@ -24,10 +32,10 @@ function Wordmark({ className = '' }) {
   return <E path="studio.name" className={`dt-wordmark ${className}`} placeholder="Studio name" />
 }
 
-function Heading({ n, children }) {
+function Heading({ n, far, children }) {
   const { style } = useDocMeta()
   return (
-    <div className={`dt-h dt-h-${style.heads}`}>
+    <div className={`dt-h dt-h-${style.heads}${far ? ' dt-h-far' : ''}`}>
       {style.heads === 'numbered' && n != null && <span className="dt-h-num">{String(n).padStart(2, '0')}</span>}
       <h2>{children}</h2>
       {style.heads === 'rule' && <span className="dt-h-bar" />}
@@ -36,22 +44,17 @@ function Heading({ n, children }) {
 }
 
 function ProposalHead() {
-  const { get } = useDoc()
+  // Exactly what the template's header carries: the mark, and the two dates.
   return (
     <header className="dt-head">
-      <Wordmark />
+      <Wordmark className="dt-logo" />
       <div className="dt-head-meta">
         <div>
-          <b>ISSUED</b> <EDate path="issued" format={longDate} />
+          ISSUED <EDate path="issued" format={longDate} />
         </div>
         <div>
-          <b>VALID UNTIL</b> <EDate path="validUntil" format={longDate} />
+          VALID UNTIL <EDate path="validUntil" format={longDate} />
         </div>
-        {get('client.name') && (
-          <div className="dt-head-for">
-            <b>FOR</b> <E path="client.name" />
-          </div>
-        )}
       </div>
     </header>
   )
@@ -104,18 +107,72 @@ function Page({ children, className = '', head = true, foot = true, kind }) {
 
 /* -------------------------------------------------------------- the cover */
 
-function Cover({ title, bottom }) {
-  const { style } = useDocMeta()
+/** How much of the page a cover's title may span, by cover layout. */
+function titleRoom(cover, pageWidth) {
+  switch (cover) {
+    case 'bleed':
+      return pageWidth * 0.913 // the template's "Proposal" runs from x34 to x849 of 893
+    case 'split':
+      return pageWidth * 0.62 - 90
+    case 'frame':
+      return pageWidth - 150
+    default:
+      return pageWidth - 80
+  }
+}
+
+/**
+ * Sizes a cover title so its widest word fills the room the layout gives it.
+ * The template's title is set as large as the page allows, and every style
+ * uses a different face with different widths, so the size can't be fixed:
+ * it is measured from the face itself once it has loaded.
+ */
+function useFitTitle(words, style, room) {
+  const [size, setSize] = useState(null)
+  const { weight, italic } = coverFace(style)
+  const key = words.join(' ')
+
+  useEffect(() => {
+    let cancelled = false
+    ensureFont(style.display, { weights: [weight], italics: italic ? [weight] : [] }).then(() => {
+      if (cancelled) return
+      const ctx = document.createElement('canvas').getContext('2d')
+      ctx.font = `${italic ? 'italic ' : ''}${weight} 100px "${style.display}"`
+      // The titles are set with a slight negative tracking.
+      const widest = Math.max(...key.split(' ').map((w) => ctx.measureText(w).width - w.length * 2))
+      if (widest > 0) setSize(Math.min(230, Math.max(60, (room / widest) * 100)))
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [key, style.display, weight, italic, room])
+
+  return size
+}
+
+function Cover({ title, bottom, kind }) {
+  const { style, pageWidth } = useDocMeta()
   const words = String(title).split(/\s+/)
   const banded = style.cover === 'split' || style.cover === 'top'
+  const { weight, italic } = coverFace(style)
+  const fit = useFitTitle(words, style, titleRoom(style.cover, pageWidth))
+  const titleStyle = {
+    fontWeight: weight,
+    fontStyle: italic ? 'italic' : 'normal',
+    ...(fit ? { fontSize: `${fit}px` } : {}),
+    // The template's title lines sit 173px apart on a 893px page.
+    ...(style.cover === 'bleed' ? { lineHeight: `${Math.round(pageWidth * 0.1937)}px` } : {}),
+  }
+
   return (
     <section className={`dt-page dt-cover dt-cover-${style.cover}`}>
       {banded && <div className="dt-cover-band"><Wordmark className="dt-cover-mark" /></div>}
       <div className="dt-cover-main">
+        {/* The template's cover is the title and the studio's details, nothing
+            else. Layouts with somewhere to put a mark still show one. */}
         {!banded && style.cover !== 'bleed' && <Wordmark className="dt-cover-mark" />}
-        {style.cover === 'bleed' && <Wordmark className="dt-cover-mark dt-cover-mark-bleed" />}
         <div className="dt-cover-title-wrap">
-          <h1 className={`dt-cover-title dt-cover-title-${words.length}`}>
+          <h1 className={`dt-cover-title dt-cover-title-${words.length}`} style={titleStyle}>
             {words.map((w, i) => (
               <span key={i}>
                 {w}
@@ -123,9 +180,6 @@ function Cover({ title, bottom }) {
               </span>
             ))}
           </h1>
-          <p className="dt-cover-for">
-            Prepared for <E path="client.name" placeholder="Client" />
-          </p>
         </div>
         <div className="dt-cover-bottom">{bottom}</div>
       </div>
@@ -214,7 +268,7 @@ function Proposal() {
           </div>
           <Heading>What we do?</Heading>
           <E as="p" path="whatWeDo.body" multiline className="dt-p" placeholder="What the studio does" />
-          <EList path="whatWeDo.items" className="dt-bars" addLabel="Add service" placeholder="Service" />
+          <EList path="whatWeDo.items" className="dt-bars dt-bars-pin" addLabel="Add service" placeholder="Service" />
         </Page>
       )}
 
@@ -278,7 +332,14 @@ function StaffPages({ n }) {
       {p === 0 && (
         <>
           <Heading n={n}>Our Staff</Heading>
-          <E as="p" path="staff.intro" multiline className="dt-p dt-p-lg" placeholder="Introduce the team" />
+          <p className="dt-p dt-staff-intro">
+            {get('staff.lead') != null && (
+              <>
+                <E path="staff.lead" className="dt-accent-strong" placeholder="At your studio" />{' '}
+              </>
+            )}
+            <E path="staff.intro" multiline placeholder="Introduce the team" />
+          </p>
         </>
       )}
       <div className="dt-staff">
@@ -319,9 +380,12 @@ function StaffPages({ n }) {
 function ServicesPage({ n }) {
   const { list, add, remove } = useListOps('services.rows')
   return (
-    <Page kind="proposal">
+    <Page kind="proposal" className="dt-pg-services">
       <Heading n={n}>Services & Prices</Heading>
-      <E as="p" path="services.intro" multiline className="dt-p" placeholder="A line about how you price" />
+      <div className="dt-cols2">
+        <E as="p" path="services.intro" multiline className="dt-p" placeholder="A line about how you price" />
+        <E as="p" path="services.intro2" multiline className="dt-p" placeholder="A second line" />
+      </div>
       <div className="dt-table">
         <div className="dt-table-head dt-table-2">
           <span>Services</span>
@@ -349,7 +413,7 @@ function PhasePages({ n }) {
   const items = get('phases.items') || []
   const pages = chunk(items.map((_, i) => i), 3)
   return pages.map((indexes, p) => (
-    <Page kind="proposal" key={p}>
+    <Page kind="proposal" key={p} className={p === 0 ? 'dt-pg-phases' : ''}>
       <div className="dt-indent-sm">
         {p === 0 && (
           <>
@@ -372,6 +436,11 @@ function PhasePages({ n }) {
         {p === pages.length - 1 && <AddBtn onClick={() => add({ title: '', body: '' })}>Add phase</AddBtn>}
       </div>
       {p === pages.length - 1 && (
+        <div className="dt-indent-sm dt-note-plain">
+          <b>NOTE:</b> <E path="offer.note" multiline placeholder="Pricing note" />
+        </div>
+      )}
+      {p === pages.length - 1 && (
         <div className="dt-steps">
           {items.map((it, i) => (
             <div key={i} className="dt-step">
@@ -391,7 +460,7 @@ function OfferPage({ n }) {
   const cur = get('currency')
   return (
     <Page kind="proposal">
-      <Heading n={n}>Our Offer</Heading>
+      <Heading n={n} far>Our Offer</Heading>
       <E as="p" path="offer.intro" multiline className="dt-p" placeholder="Thank them for the conversation" />
       <div className={`dt-offer dt-offer-${Math.min(4, Math.max(1, list.length))}`}>
         {list.map((p, i) => (
@@ -442,10 +511,10 @@ function BudgetPage({ n }) {
   const addGroup = () => set('budget.groups', [...groups, { name: 'Design', rows: [{ label: '', amount: '' }] }])
   return (
     <Page kind="proposal">
-      <Heading n={n}>Budget Breakdown</Heading>
+      <Heading n={n} far>Budget Breakdown</Heading>
       <E as="p" path="budget.intro" multiline className="dt-p" placeholder="Introduce the budget" />
       {groups.map((g, gi) => (
-        <div key={gi} className="dt-table dt-row-edit">
+        <div key={gi} className="dt-table dt-table-budget dt-row-edit">
           <div className="dt-table-head dt-table-2">
             <E path={`budget.groups.${gi}.name`} placeholder="Group" />
             <span>Price</span>
@@ -483,7 +552,7 @@ function TimelinePage({ n }) {
 
   return (
     <Page kind="proposal">
-      <Heading n={n}>Project Timeline</Heading>
+      <Heading n={n} far>Project Timeline</Heading>
       <E as="p" path="timeline.intro" multiline className="dt-p" placeholder="How to read the timeline" />
       <div className="dt-gantt">
         <div className="dt-gantt-row dt-gantt-dates">
@@ -889,7 +958,7 @@ function Invoice() {
 
 /* ------------------------------------------------------------------ shell */
 
-const MetaContext = createContext({ style: findStyle() })
+const MetaContext = createContext({ style: findStyle(), pageWidth: A4_WIDTH })
 const useDocMeta = () => useContext(MetaContext)
 
 /**
@@ -898,12 +967,13 @@ const useDocMeta = () => useContext(MetaContext)
  */
 export default function DocumentRenderer({ doc, onChange = () => {}, editable = false, mode = 'full', fit = true }) {
   const style = findStyle(doc.style)
+  const pageWidth = pageWidthFor(doc.kind)
   const wrapRef = useRef(null)
   const [scale, setScale] = useState(1)
 
   useEffect(() => {
-    ensureFont(style.display, { weights: [400, 600, 700] })
-    if (style.body !== style.display) ensureFont(style.body, { weights: [300, 400, 600, 700] })
+    ensureFont(style.display, { weights: [400, 500, 600, 700] })
+    if (style.body !== style.display) ensureFont(style.body, { weights: [400, 500, 600, 700], italics: [400] })
   }, [style.display, style.body])
 
   // Zoom the stack down to the column it sits in, rather than reflowing it.
@@ -912,22 +982,22 @@ export default function DocumentRenderer({ doc, onChange = () => {}, editable = 
     const el = wrapRef.current
     // A zero width (not laid out yet) would mean zoom: 0, which browsers treat
     // as no zoom at all.
-    const measure = () => el.clientWidth > 0 && setScale(Math.min(1, el.clientWidth / PAGE_WIDTH))
+    const measure = () => el.clientWidth > 0 && setScale(Math.min(1, el.clientWidth / pageWidth))
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [fit])
+  }, [fit, pageWidth])
 
   const body =
     doc.kind === 'proposal' ? <Proposal /> : doc.kind === 'invoice' ? <Invoice /> : <ClauseDoc />
 
   return (
     <div ref={wrapRef} className="dt-wrap">
-      <MetaContext.Provider value={{ style, coverOnly: mode === 'cover' }}>
+      <MetaContext.Provider value={{ style, pageWidth, coverOnly: mode === 'cover' }}>
         <DocProvider doc={doc} onChange={onChange} editable={editable}>
           <div
-            className={`dt-doc dt-style-${style.id} dt-heads-${style.heads} ${mode === 'cover' ? 'dt-only-cover' : ''} ${style.id === 'branded' ? 'dt-headfont-body' : ''}`}
+            className={`dt-doc dt-style-${style.id} dt-heads-${style.heads} ${doc.kind === 'proposal' ? 'dt-prop' : ''} ${mode === 'cover' ? 'dt-only-cover' : ''} ${style.id === 'branded' ? 'dt-headfont-body' : ''}`}
             style={{ ...styleVars(style, doc.accent), zoom: scale }}
           >
             {body}
