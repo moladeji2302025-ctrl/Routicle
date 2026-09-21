@@ -3,6 +3,7 @@ import { requireUser } from '../_lib/auth.js'
 import { send, methodGuard, withErrorHandling } from '../_lib/http.js'
 import { withCors } from '../_lib/cors.js'
 import generateImage from '../_lib/handlers/generateImage.js'
+import { notifyClientResponse, withinMs } from '../_lib/email/index.js'
 
 /**
  * The Business Suite API, behind one Vercel function.
@@ -381,7 +382,7 @@ async function publicForm(req, res, slug) {
   if (!slug) return send(res, 400, { error: 'Form link is missing its id.' })
 
   const rows = await sql`
-    SELECT f.*, p.name AS project_name, p.client_company
+    SELECT f.*, p.name AS project_name, p.client_company, p.user_id AS owner_id
     FROM project_forms f JOIN suite_projects p ON p.id = f.project_id
     WHERE f.share_slug = ${slug}
   `
@@ -403,9 +404,23 @@ async function publicForm(req, res, slug) {
   const { answers, respondentName, respondentEmail } = req.body || {}
   if (!answers || typeof answers !== 'object') return send(res, 400, { error: 'No answers were submitted.' })
 
-  await sql`
+  const [saved] = await sql`
     INSERT INTO form_submissions (form_id, answers, respondent_name, respondent_email)
     VALUES (${form.id}, ${JSON.stringify(answers)}, ${respondentName || null}, ${respondentEmail || null})
+    RETURNING id
   `
+
+  // Tell the studio that owns the project. The client is on a public page with
+  // no account, so nothing here may make them wait on, or see, this email.
+  await withinMs(
+    notifyClientResponse({
+      ownerUserId: form.owner_id,
+      projectId: form.project_id,
+      projectName: form.project_name,
+      respondent: respondentName ? String(respondentName).slice(0, 80) : '',
+      formTitle: form.title,
+      submissionId: saved.id,
+    })
+  )
   return send(res, 201, { ok: true })
 }

@@ -17241,3 +17241,204 @@ div.dt-e-multi {
     page: dtprop;
   }
 }
+
+/* ============================================================
+   Admin > Email
+   ============================================================ */
+
+.em-checks {
+  list-style: none;
+  margin: 18px 0 22px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.em-check {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.em-check strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--text);
+}
+
+.em-check span {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.em-check-dot {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.em-check-ok .em-check-dot {
+  background: #2f9e6b;
+}
+
+.em-check-warn .em-check-dot {
+  background: #d99a1f;
+}
+
+.em-check-bad .em-check-dot {
+  background: #d64545;
+}
+
+.em-box {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-2);
+}
+
+.em-box h3,
+.em-h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.em-h3 {
+  margin: 26px 0 10px;
+}
+
+.em-test-row {
+  display: grid;
+  grid-template-columns: 1fr minmax(160px, 220px) auto;
+  gap: 10px;
+}
+
+.em-preview {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.em-preview summary {
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.em-preview pre {
+  margin: 0;
+  padding: 4px 14px 14px;
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: var(--text-muted);
+}
+
+.em-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 18px 0 8px;
+}
+
+.em-stats > div {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--app-hover);
+}
+
+.em-stats strong {
+  display: block;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.em-stats span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.em-body {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.em-progress {
+  display: grid;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.em-progress-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--app-hover);
+}
+
+.em-progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--brand-violet);
+  transition: width 0.3s ease;
+}
+
+.em-status {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--app-hover);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: var(--text-muted);
+}
+
+.em-status-sent,
+.em-status-delivered {
+  background: color-mix(in srgb, #2f9e6b 16%, transparent);
+  color: #2f9e6b;
+}
+
+.em-status-bounced,
+.em-status-complained,
+.em-status-failed {
+  background: color-mix(in srgb, #d64545 14%, transparent);
+  color: #d64545;
+}
+
+.em-status-suppressed,
+.em-status-skipped,
+.em-status-delayed {
+  background: color-mix(in srgb, #d99a1f 16%, transparent);
+  color: #b57d0d;
+}
+
+@media (max-width: 700px) {
+  .em-test-row {
+    grid-template-columns: 1fr;
+  }
+
+  .em-stats {
+    grid-template-columns: 1fr;
+  }
+}

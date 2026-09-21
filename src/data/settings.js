@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS = {
     followedCreators: true,
     teamActivity: true,
     moderationResults: true,
+    clientResponses: true,
     payouts: true,
     productUpdates: true,
     marketing: false,

@@ -7,6 +7,7 @@ import {
   UsersIcon,
   HelpIcon,
   GridIcon,
+  BellIcon,
 } from '../../components/icons'
 
 const ADMIN_NAV = [
@@ -16,6 +17,7 @@ const ADMIN_NAV = [
   { to: '/admin/moderation', label: 'Moderation', icon: GridIcon },
   { to: '/admin/resources', label: 'Resources', icon: HelpIcon },
   { to: '/admin/users', label: 'People', icon: UsersIcon },
+  { to: '/admin/email', label: 'Email', icon: BellIcon },
 ]
 
 /**

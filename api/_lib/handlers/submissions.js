@@ -13,6 +13,7 @@ import { maxFileBytes, maxSubmissionBytes, formatBytes } from '../limits.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { requireUser, requireAdmin } from '../auth.js'
 import { requireCreator } from '../guard.js'
+import { notifySubmissionReceived } from '../email/index.js'
 import { inspectTemplate, TEMPLATE_KINDS } from '../templateSvg.js'
 
 const STATUSES = ['pending', 'approved', 'rejected', 'changes-requested']
@@ -230,6 +231,8 @@ export default async function handler(req, res) {
     // Running total per creator, so a quota check is one column read rather
     // than a scan of every item they have ever uploaded.
     await sql`UPDATE creators SET storage_bytes = storage_bytes + ${totalBytes} WHERE id = ${creatorId}`
+
+    await notifySubmissionReceived({ creatorEmail: creator.email, title: rows[0].title, itemId: rows[0].id })
 
     send(res, 201, rows[0])
   })

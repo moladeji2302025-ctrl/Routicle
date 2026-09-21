@@ -1,5 +1,6 @@
 import { sql } from './db.js'
 import { periodEndFrom } from './plans.js'
+import { notifySubscriptionActive } from './email/index.js'
 
 /**
  * Marks a transaction paid and turns it into an active subscription.
@@ -53,6 +54,26 @@ export async function activateFromTransaction(reference, paystackData = {}) {
     )
     RETURNING *
   `
+
+  // The receipt. Both the webhook and the buyer's return to the site confirm
+  // the same payment, so this is keyed by the payment reference and only the
+  // first of them sends it. It never throws: a payment that went through must
+  // not be reported as failed because an email could not be sent.
+  try {
+    await notifySubscriptionActive({
+      userId: txn.user_id,
+      organizationId: txn.organization_id,
+      tier: txn.tier,
+      cycle: txn.billing_cycle,
+      amountMinor: txn.amount_minor,
+      currency: txn.currency,
+      reference,
+      periodEnd,
+    })
+  } catch (err) {
+    console.error('receipt email failed', err.message)
+  }
+
   return inserted[0]
 }
 

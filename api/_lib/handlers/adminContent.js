@@ -1,6 +1,7 @@
 import { sql } from '../db.js'
 import { requireAdmin } from '../auth.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
+import { notifyModeration } from '../email/index.js'
 
 /**
  * Library management: everything in the catalogue regardless of moderation
@@ -74,6 +75,7 @@ export default async function handler(req, res) {
         return send(res, 400, { error: 'moderationStatus must be pending, approved or rejected' })
       }
 
+      const before = moderationStatus ? await sql`SELECT moderation_status FROM content_items WHERE id = ${id}` : []
       const rows = await sql`
         UPDATE content_items SET
           is_free = COALESCE(${isFree ?? null}, is_free),
@@ -84,9 +86,23 @@ export default async function handler(req, res) {
           moderated_at = CASE WHEN ${!!moderationStatus} THEN now() ELSE moderated_at END,
           updated_at = now()
         WHERE id = ${id}
-        RETURNING id
+        RETURNING id, title, creator_id, moderation_status, moderation_note, moderated_at
       `
       if (rows.length === 0) return send(res, 404, { error: 'item not found' })
+
+      // Approving or rejecting from here is a decision the creator should hear
+      // about, the same as from the queue. Unpublishing back to pending isn't.
+      if (moderationStatus && before[0]?.moderation_status !== rows[0].moderation_status) {
+        const [creator] = await sql`SELECT email FROM creators WHERE id = ${rows[0].creator_id}`
+        await notifyModeration({
+          itemId: rows[0].id,
+          title: rows[0].title,
+          status: rows[0].moderation_status,
+          note: rows[0].moderation_note,
+          creatorEmail: creator?.email,
+          moderatedAt: rows[0].moderated_at,
+        })
+      }
       return send(res, 200, { ok: true })
     }
 

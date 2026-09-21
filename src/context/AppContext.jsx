@@ -462,6 +462,31 @@ export function AppProvider({ children }) {
     }
     sessionStorage.removeItem(SIGNUP_METHOD_KEY)
 
+    // The welcome email, for an account under a day old. The server sends it
+    // once whatever happens here; remembering that we asked just saves a
+    // request on every page load for the rest of the first day.
+    if (createdAt && Date.now() - createdAt < 24 * 60 * 60 * 1000) {
+      const askedKey = `routicle.welcome-asked:${authUser.id}`
+      let asked = false
+      try {
+        asked = localStorage.getItem(askedKey) === '1'
+      } catch {
+        // storage blocked: the server's own check is what matters
+      }
+      if (!asked) {
+        api
+          .requestWelcomeEmail()
+          .then(() => {
+            try {
+              localStorage.setItem(askedKey, '1')
+            } catch {
+              // nothing to do
+            }
+          })
+          .catch(() => {})
+      }
+    }
+
     let isNewProfile = false
     setState((prev) => {
       const existing = prev.profiles[authUser.id]

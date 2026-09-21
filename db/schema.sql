@@ -133,3 +133,72 @@ CREATE TABLE IF NOT EXISTS newsletter_subscribers (
   confirmed_at timestamptz,
   unsubscribed_at timestamptz
 );
+
+-- ---------------------------------------------------------------------------
+-- Email system (see api/_lib/email/ and docs/EMAIL.md). All of these are also
+-- created on first use by ensureEmailTables(), so a fresh database needs no
+-- migration step.
+
+-- One row per message. Holds an address and a subject line, never a body, a
+-- link or a code. `dedupe_key` is what stops a retried webhook or a refreshed
+-- page from sending the same receipt twice.
+CREATE TABLE IF NOT EXISTS email_log (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  to_email text NOT NULL,
+  category text NOT NULL,                  -- transactional | notification | marketing
+  template text,
+  subject text,
+  status text NOT NULL DEFAULT 'queued'
+    CHECK (status IN ('queued','sent','delivered','delayed','bounced','complained','failed','suppressed','skipped')),
+  provider_id text,                        -- Resend's id, used to match webhook events
+  error text,
+  dedupe_key text,
+  user_id text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS email_log_dedupe_idx ON email_log (dedupe_key) WHERE dedupe_key IS NOT NULL;
+CREATE INDEX IF NOT EXISTS email_log_created_idx ON email_log (created_at DESC);
+CREATE INDEX IF NOT EXISTS email_log_provider_idx ON email_log (provider_id) WHERE provider_id IS NOT NULL;
+
+-- Addresses that must not be mailed: a permanent bounce, a spam report, or a
+-- manual block. Sending to these damages the sending domain's reputation.
+CREATE TABLE IF NOT EXISTS email_suppressions (
+  email text PRIMARY KEY,
+  reason text NOT NULL CHECK (reason IN ('bounce','complaint','manual')),
+  detail text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Which optional email an account wants. Kept here rather than in the browser
+-- because this is where the sending code can read it.
+CREATE TABLE IF NOT EXISTS email_preferences (
+  user_id text PRIMARY KEY,
+  prefs jsonb NOT NULL DEFAULT '{}'::jsonb,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS newsletter_broadcasts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  subject text NOT NULL,
+  preheader text,
+  body text NOT NULL,
+  status text NOT NULL DEFAULT 'sending' CHECK (status IN ('sending','sent')),
+  total integer NOT NULL DEFAULT 0,
+  sent integer NOT NULL DEFAULT 0,
+  failed integer NOT NULL DEFAULT 0,
+  created_by text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  finished_at timestamptz
+);
+
+-- A recipient is recorded here before they are sent to, which is what makes a
+-- half-finished broadcast resumable and impossible to send twice.
+CREATE TABLE IF NOT EXISTS newsletter_deliveries (
+  broadcast_id uuid NOT NULL REFERENCES newsletter_broadcasts(id) ON DELETE CASCADE,
+  email text NOT NULL,
+  status text NOT NULL DEFAULT 'queued',
+  provider_id text,
+  error text,
+  PRIMARY KEY (broadcast_id, email)
+);

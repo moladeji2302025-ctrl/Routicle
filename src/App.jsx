@@ -43,6 +43,7 @@ import AdminUpdatesPage from './pages/admin/AdminUpdatesPage'
 import AdminResourcesPage from './pages/admin/AdminResourcesPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminContentPage from './pages/admin/AdminContentPage'
+import AdminEmailPage from './pages/admin/AdminEmailPage'
 import UpdatesPage from './pages/UpdatesPage'
 import SuiteLayout from './pages/suite/SuiteLayout'
 import BusinessSuitePage from './pages/suite/BusinessSuitePage'
@@ -126,6 +127,7 @@ export default function App() {
               <Route path="moderation" element={<AdminModerationPage />} />
               <Route path="resources" element={<AdminResourcesPage />} />
               <Route path="users" element={<AdminUsersPage />} />
+              <Route path="email" element={<AdminEmailPage />} />
             </Route>
             <Route path="/about" element={<StaticPage slug="about" />} />
             <Route path="/careers" element={<StaticPage slug="careers" />} />

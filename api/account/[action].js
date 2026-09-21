@@ -1,7 +1,9 @@
 import { sql } from '../_lib/db.js'
 import { requireUser, isAdminUser } from '../_lib/auth.js'
 import { disableSubscription } from '../_lib/paystack.js'
-import { sendMail, inviteEmail, deletionCodeEmail, lockoutEmail, mailerConfigured, mailErrorFor } from '../_lib/mailer.js'
+import { inviteEmail, deletionCodeEmail, lockoutEmail, mailerConfigured, mailErrorFor } from '../_lib/mailer.js'
+import { deliver, notifyWelcome } from '../_lib/email/index.js'
+import { getPreferences, savePreferences } from '../_lib/email/store.js'
 import { checkSignIn, LOCK_MINUTES } from '../_lib/loginGuard.js'
 import { issueCode, consumeCode, maskEmail } from '../_lib/verifyCodes.js'
 import { limit, LIMITS } from '../_lib/ratelimit.js'
@@ -17,6 +19,8 @@ const INVITE_DAYS = 7
  * GET  /api/account/members  ?organizationId= — one workspace's members
  * POST /api/account/delete-request           emails a one-time code
  * POST /api/account/delete   { code }         deletes, once the code checks out
+ * POST /api/account/welcome                   sends the welcome email, once
+ * GET/POST /api/account/email-preferences     which optional email this account gets
  *
  * Members lives here rather than under a team route purely for Vercel's
  * twelve-function budget; it is still scoped to workspaces the caller is in.
@@ -30,6 +34,8 @@ export default withCors(['GET', 'POST'], async function handler(req, res) {
     if (action === 'signin-check') return signInCheck(req, res)
     if (action === 'delete-request') return requestDeletion(req, res)
     if (action === 'delete') return deleteAccount(req, res)
+    if (action === 'welcome') return welcome(req, res)
+    if (action === 'email-preferences') return emailPreferences(req, res)
     return send(res, 404, { error: `Unknown account route: ${action}` })
   })
 })
@@ -171,14 +177,20 @@ async function inviteMember(req, res) {
   const { text, html } = inviteEmail({ teamName, inviterName: user.name, acceptUrl, role: inviteRole })
 
   try {
-    await sendMail({
+    await deliver({
       to: invitee,
       subject: `${user.name || 'A teammate'} invited you to ${teamName} on Routicle`,
       text,
       html,
+      category: 'transactional',
+      template: 'invite',
+      userId: user.id,
       // Everything sends from one shared address, so replies would otherwise
       // land nowhere useful instead of with the person who invited them.
       replyTo: user.email,
+      // The invitation is the whole point of this request, so a failure to
+      // send it has to reach the person clicking Invite.
+      throwOnError: true,
     })
   } catch (err) {
     console.error('invite email failed', err)
@@ -225,7 +237,15 @@ async function signInCheck(req, res) {
     const base = (process.env.APP_URL || 'https://routicle.vercel.app').replace(/\/$/, '')
     const { text, html } = lockoutEmail({ minutes: LOCK_MINUTES, resetUrl: `${base}/signin?reset=1` })
     try {
-      await sendMail({ to: result.email, subject: 'Your Routicle account was locked', text, html })
+      await deliver({
+        to: result.email,
+        subject: 'Your Routicle account was locked',
+        text,
+        html,
+        category: 'transactional',
+        template: 'lockout',
+        userId: result.userId,
+      })
     } catch (err) {
       // The lock stands whether or not the email goes out.
       console.error('lockout email failed', err)
@@ -286,7 +306,16 @@ async function requestDeletion(req, res) {
   const { text, html } = deletionCodeEmail({ code, minutes })
 
   try {
-    await sendMail({ to: user.email, subject: 'Your Routicle account deletion code', text, html })
+    await deliver({
+      to: user.email,
+      subject: 'Your Routicle account deletion code',
+      text,
+      html,
+      category: 'transactional',
+      template: 'deletion_code',
+      userId: user.id,
+      throwOnError: true,
+    })
   } catch (err) {
     console.error('deletion code email failed', err)
     return send(res, 502, { error: `We couldn't send the code. ${mailErrorFor(err, { isAdmin: await isAdminUser(user) })}` })
@@ -371,4 +400,41 @@ async function deleteAccount(req, res) {
   await sql`DELETE FROM neon_auth."user" WHERE id = ${user.id}`
 
   send(res, 200, { ok: true, deletedWorkspaces: soloIds.length })
+}
+
+/**
+ * The welcome email, once per account and only for an account that really is
+ * new. The browser asks for it after sign-up; the dedupe key on the send is
+ * what makes asking twice harmless, and the age check is what stops everyone
+ * who already had an account from being welcomed the day this shipped.
+ */
+async function welcome(req, res) {
+  if (!methodGuard(req, res, ['POST'])) return
+  const user = await requireUser(req, res)
+  if (!user?.email) return
+  if (!(await limit(req, res, { name: 'welcome', key: user.id, ...LIMITS.write }))) return
+
+  const [row] = await sql`SELECT "createdAt" FROM neon_auth."user" WHERE id = ${user.id}`
+  const ageMs = row?.createdAt ? Date.now() - new Date(row.createdAt).getTime() : Infinity
+  if (!(ageMs < 3 * 24 * 60 * 60 * 1000)) return send(res, 200, { sent: false, reason: 'not-new' })
+
+  const result = await notifyWelcome(user)
+  send(res, 200, { sent: Boolean(result?.ok), status: result?.status || 'skipped' })
+}
+
+/**
+ * Which optional email this account receives. Kept on the server because the
+ * Settings page's own copy lives in the browser, where the code that sends
+ * email can't see it.
+ */
+async function emailPreferences(req, res) {
+  if (!methodGuard(req, res, ['GET', 'POST'])) return
+  const user = await requireUser(req, res)
+  if (!user) return
+
+  if (req.method === 'GET') return send(res, 200, { preferences: await getPreferences(user.id) })
+
+  if (!(await limit(req, res, { name: 'email-prefs', key: user.id, ...LIMITS.write }))) return
+  const preferences = await savePreferences(user.id, req.body?.preferences || req.body || {})
+  send(res, 200, { preferences })
 }

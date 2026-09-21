@@ -4,6 +4,7 @@ import { disableSubscription } from '../paystack.js'
 import { activeSubscription, serializeSubscription } from '../billing.js'
 import { requireUser } from '../auth.js'
 import { requireMembership } from '../guard.js'
+import { notifyCanceled } from '../email/index.js'
 
 /**
  * GET    ?organizationId=   the subscription currently in force
@@ -55,6 +56,12 @@ export default async function handler(req, res) {
 
     // Access is already paid for through the end of the current period.
     await sql`UPDATE subscriptions SET status = 'canceled', updated_at = now() WHERE id = ${sub.id}`
+    await notifyCanceled({
+      subscriptionId: sub.id,
+      userId,
+      tier: sub.tier,
+      accessUntil: sub.current_period_end,
+    })
 
     send(res, 200, { canceled: true, accessUntil: sub.current_period_end })
   })

@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
+import * as api from '../../lib/api'
+import { DEFAULT_SETTINGS } from '../../data/settings'
 import { Section, Row, Toggle } from '../../components/settings/SettingsControls'
 
 const ACTIVITY = [
@@ -11,6 +14,11 @@ const ACTIVITY = [
     key: 'teamActivity',
     title: 'Team activity',
     description: 'Invites, joins, and changes to your shared plan.',
+  },
+  {
+    key: 'clientResponses',
+    title: 'Client form responses',
+    description: 'When a client fills in one of your Business Suite discovery forms.',
   },
 ]
 
@@ -42,6 +50,37 @@ const ACCOUNT = [
 export default function NotificationSettings() {
   const { currentUser, settings, updateSettings, resetSettings } = useApp()
   const n = settings.notifications
+  const [saveError, setSaveError] = useState('')
+
+  // The choice that counts is the one on the server, because that is where the
+  // email is sent from. The browser copy is a fast cache of it.
+  useEffect(() => {
+    let cancelled = false
+    api
+      .fetchEmailPreferences()
+      .then(({ preferences }) => {
+        if (!cancelled) updateSettings('notifications', preferences)
+      })
+      .catch(() => {
+        // offline or signed out: keep showing the local copy
+      })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function change(patch) {
+    updateSettings('notifications', patch)
+    setSaveError('')
+    api.saveEmailPreferences(patch).catch(() => setSaveError("That change couldn't be saved. Check your connection and try again."))
+  }
+
+  function reset() {
+    resetSettings('notifications')
+    setSaveError('')
+    api.saveEmailPreferences(DEFAULT_SETTINGS.notifications).catch(() => setSaveError("That change couldn't be saved."))
+  }
 
   const accountRows = ACCOUNT.filter((row) => !row.creatorOnly || currentUser.isCreator)
 
@@ -53,7 +92,7 @@ export default function NotificationSettings() {
           <button
             type="button"
             className="settings-btn settings-btn-ghost"
-            onClick={() => resetSettings('notifications')}
+            onClick={reset}
           >
             Reset
           </button>
@@ -64,7 +103,7 @@ export default function NotificationSettings() {
             <Toggle
               label={row.title}
               checked={n[row.key]}
-              onChange={(value) => updateSettings('notifications', { [row.key]: value })}
+              onChange={(value) => change({ [row.key]: value })}
             />
           </Row>
         ))}
@@ -76,14 +115,16 @@ export default function NotificationSettings() {
             <Toggle
               label={row.title}
               checked={n[row.key]}
-              onChange={(value) => updateSettings('notifications', { [row.key]: value })}
+              onChange={(value) => change({ [row.key]: value })}
             />
           </Row>
         ))}
       </Section>
 
+      {saveError && <p className="settings-error">{saveError}</p>}
+
       <p className="settings-footnote">
-        Your preferences are saved to your account. We haven't switched on email delivery yet, so nothing will be sent until we do, even if it's turned on here.
+        Your choices are saved to your account. Receipts, security notices and workspace invites are always sent, because you need them.
       </p>
     </>
   )

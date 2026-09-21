@@ -203,6 +203,62 @@ export function patchAdminTemplateFeature(id, isFeatured) {
   return request('/admin/content', { method: 'PATCH', body: JSON.stringify({ id, isFeatured }) })
 }
 
+/* ------------------------------------------------------------------ email */
+
+/** Which optional email this account receives. Kept on the server so email code can see it. */
+export function fetchEmailPreferences() {
+  return request('/account/email-preferences')
+}
+
+export function saveEmailPreferences(preferences) {
+  return request('/account/email-preferences', { method: 'POST', body: JSON.stringify({ preferences }) })
+}
+
+/** Asks for the welcome email. Safe to repeat: the server sends it once. */
+export function requestWelcomeEmail() {
+  return request('/account/welcome', { method: 'POST', body: '{}' })
+}
+
+export function fetchAdminEmailStatus() {
+  return request('/admin/email')
+}
+
+export function fetchAdminEmailLog({ status, q } = {}) {
+  const params = new URLSearchParams({ op: 'log' })
+  if (status) params.set('status', status)
+  if (q) params.set('q', q)
+  return request(`/admin/email?${params}`)
+}
+
+export function fetchAdminTemplatePreview(name) {
+  return request(`/admin/email?op=preview&t=${encodeURIComponent(name)}`)
+}
+
+export function sendAdminTestEmail({ to, template } = {}) {
+  return request('/admin/email', { method: 'POST', body: JSON.stringify({ op: 'test', to, template }) })
+}
+
+export function fetchAdminSuppressions() {
+  return request('/admin/email?op=suppressions')
+}
+
+export function suppressEmailAddress(email) {
+  return request('/admin/email', { method: 'POST', body: JSON.stringify({ op: 'suppress', email }) })
+}
+
+export function unsuppressEmailAddress(email) {
+  return request(`/admin/email?email=${encodeURIComponent(email)}`, { method: 'DELETE' })
+}
+
+export function fetchAdminNewsletter() {
+  return request('/admin/newsletter')
+}
+
+/** ops: preview | test | create | send-batch */
+export function adminNewsletter(op, data = {}) {
+  return request('/admin/newsletter', { method: 'POST', body: JSON.stringify({ op, ...data }) })
+}
+
 /** Newsletter signup for logged-out visitors. `website` is the honeypot field. */
 export function subscribeNewsletter({ email, source, website }) {
   return request('/public/newsletter', { method: 'POST', body: JSON.stringify({ email, source, website }) })

@@ -2,12 +2,14 @@ import crypto from 'node:crypto'
 import { sql } from '../db.js'
 import { send, withErrorHandling } from '../http.js'
 import { limit } from '../ratelimit.js'
-import { sendMail, newsletterConfirmEmail, mailErrorFor } from '../mailer.js'
+import { newsletterConfirmEmail, mailErrorFor } from '../mailer.js'
+import { deliver } from '../email/index.js'
 
 /**
  * Newsletter signup for visitors without an account.
  *
  * POST { email, source, website }   sign up; always the same answer
+ * POST ?unsubscribe=<token>         one-click unsubscribe (RFC 8058), for mail clients
  * GET  ?confirm=<token>             double opt-in link from the email
  * GET  ?unsubscribe=<token>         one-click unsubscribe
  *
@@ -85,6 +87,17 @@ export default async function handler(req, res) {
 
     if (req.method !== 'POST') return send(res, 405, { error: 'Method not allowed' })
 
+    // Gmail's and Apple's own "Unsubscribe" buttons POST to the URL in the
+    // List-Unsubscribe header and expect a bare 200, not a redirect.
+    if (typeof req.query?.unsubscribe === 'string' && req.query.unsubscribe) {
+      await sql`
+        UPDATE newsletter_subscribers
+        SET status = 'unsubscribed', unsubscribed_at = now(), confirm_token_hash = NULL
+        WHERE unsubscribe_token = ${req.query.unsubscribe}
+      `
+      return send(res, 200, { ok: true })
+    }
+
     if (!(await limit(req, res, { name: 'newsletter-ip', limit: 5, windowSeconds: 3600 }))) return
 
     const { email: raw, source, website } = req.body || {}
@@ -117,7 +130,16 @@ export default async function handler(req, res) {
     const confirmUrl = `${base}/api/public/newsletter?confirm=${confirmToken}`
     const { text, html } = newsletterConfirmEmail({ confirmUrl })
     try {
-      await sendMail({ to: email, subject: 'Confirm your Routicle updates', text, html })
+      await deliver({
+        to: email,
+        subject: 'Confirm your Routicle updates',
+        text,
+        html,
+        category: 'transactional',
+        template: 'newsletter_confirm',
+        // Not a dedupe key: signing up again after the link expired must send a new one.
+        throwOnError: true,
+      })
     } catch (err) {
       return send(res, 503, { error: mailErrorFor(err) })
     }

@@ -6,6 +6,8 @@ import resources from '../_lib/handlers/adminResources.js'
 import users from '../_lib/handlers/adminUsers.js'
 import content from '../_lib/handlers/adminContent.js'
 import moderation from '../_lib/handlers/adminModeration.js'
+import email from '../_lib/handlers/adminEmail.js'
+import newsletter from '../_lib/handlers/adminNewsletter.js'
 import { withCors } from '../_lib/cors.js'
 
 /**
@@ -19,7 +21,7 @@ import { withCors } from '../_lib/cors.js'
  * Each handler still runs its own requireAdmin() — routing through here changes
  * nothing about who is allowed in.
  */
-const ROUTES = { session, overview, updates, resources, users, content, moderation }
+const ROUTES = { session, overview, updates, resources, users, content, moderation, email, newsletter }
 
 export default withCors(['GET', 'POST', 'PATCH', 'DELETE'], async function handler(req, res) {
   const action = req.query?.action
