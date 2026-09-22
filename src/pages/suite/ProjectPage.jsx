@@ -401,8 +401,16 @@ export default function ProjectPage() {
  */
 function NewDocument({ project, profile, submissions, busy, draft, onCreate, onGoTab }) {
   const [kind, setKind] = useState('proposal')
-  const [style, setStyle] = useState(rememberedStyle)
+  const [style, setStyle] = useState(() => rememberedStyle('proposal'))
   const [accent, setAccent] = useState(null)
+
+  // Switching kind (Proposal/Contract/Brief/Invoice) can leave the picked
+  // style invalid — Invoice's own layouts don't apply to a Contract, say.
+  // Fall back to whatever was last picked for the newly chosen kind.
+  useEffect(() => {
+    const current = findStyle(style)
+    if (current.kinds && !current.kinds.includes(kind)) setStyle(rememberedStyle(kind))
+  }, [kind])
 
   const preview = useMemo(() => draft(kind, style, accent), [draft, kind, style, accent])
   const checks = readiness(kind, { profile, project, submissions, figures: project.figures })

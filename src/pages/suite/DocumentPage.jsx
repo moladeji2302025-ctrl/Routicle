@@ -114,7 +114,7 @@ export default function DocumentPage() {
       lines: figures.lines || [],
       invoiceNumber: doc.content?.number,
       period: doc.period || undefined,
-      style: v2 ? doc.content.style : rememberedStyle(),
+      style: v2 ? doc.content.style : rememberedStyle(doc.kind),
       accent: v2 ? doc.content.accent : null,
     })
     change({ ...doc, content })

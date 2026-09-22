@@ -19463,3 +19463,353 @@ a.sp-card:hover .sp-link svg {
   text-align: center;
   line-height: 1.4;
 }
+
+/* ============================================================
+   Fifteen invoice-only layouts (documentStyles.js: inv-*)
+   Each rearranges the same eight blocks — head, meta, parties, lines,
+   add-line button, totals, amount-in-words, bank — via a scoped CSS grid.
+   Specificity (.dt-style-<id> .dt-inv-*) beats the base .dt-inv-* rules
+   above, so every other style keeps today's plain top-to-bottom flow.
+   ============================================================ */
+
+/* ---- Ledger: a left column of numbers ---- */
+
+.dt-style-inv-ledger .dt-invoice {
+  display: grid;
+  grid-template-columns: 176px 1fr;
+  column-gap: 30px;
+  grid-template-areas:
+    'meta head'
+    'meta parties'
+    'meta lines'
+    'meta add'
+    'bank totals'
+    'bank words';
+}
+
+.dt-style-inv-ledger .dt-inv-head { grid-area: head; border-bottom: none; padding-bottom: 0; }
+.dt-style-inv-ledger .dt-inv-meta { grid-area: meta; width: 100%; margin: 0; align-self: start; }
+.dt-style-inv-ledger .dt-inv-meta tr { border-bottom: 1px dashed color-mix(in srgb, var(--dt-ink) 30%, transparent); }
+.dt-style-inv-ledger .dt-inv-parties { grid-area: parties; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; }
+.dt-style-inv-ledger .dt-inv-lines { grid-area: lines; }
+.dt-style-inv-ledger .dt-add { grid-area: add; }
+.dt-style-inv-ledger .dt-inv-totals { grid-area: totals; width: 100%; margin: 26px 0 0; }
+.dt-style-inv-ledger .dt-inv-words { grid-area: words; width: 100%; margin: 10px 0 0; }
+.dt-style-inv-ledger .dt-inv-bank { grid-area: bank; align-self: start; margin-top: 30px; padding-top: 16px; border-top: 2px solid var(--dt-ink); }
+
+/* ---- Statement: meta as a row of pills ---- */
+
+.dt-style-inv-statement .dt-inv-meta {
+  display: block;
+  width: 100%;
+  margin: 26px 0 36px;
+}
+
+.dt-style-inv-statement .dt-inv-meta tbody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dt-style-inv-statement .dt-inv-meta tr {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 16px;
+  border: 1px solid var(--dt-ink);
+  border-radius: 999px;
+}
+
+.dt-style-inv-statement .dt-inv-meta th,
+.dt-style-inv-statement .dt-inv-meta td {
+  padding: 0;
+  border: none;
+  font-size: 10.5px;
+}
+
+.dt-style-inv-statement .dt-inv-meta th { opacity: 0.6; font-weight: 600; }
+.dt-style-inv-statement .dt-inv-lines th,
+.dt-style-inv-statement .dt-inv-lines td { border-color: color-mix(in srgb, var(--dt-accent) 30%, var(--dt-ink) 20%); }
+.dt-style-inv-statement .dt-inv-grand th,
+.dt-style-inv-statement .dt-inv-grand td { color: var(--dt-accent); }
+
+/* ---- Bracket: a heavy double-ruled frame ---- */
+
+.dt-style-inv-bracket .dt-invoice {
+  border: 5px double var(--dt-ink);
+  padding: 46px 46px 30px;
+}
+
+.dt-style-inv-bracket .dt-inv-head { border-bottom: 3px double var(--dt-ink); }
+.dt-style-inv-bracket .dt-inv-totals { width: 360px; margin-left: auto; border: 1.5px solid var(--dt-ink); padding: 6px 18px; }
+.dt-style-inv-bracket .dt-inv-totals td { padding-right: 0; }
+.dt-style-inv-bracket .dt-inv-grand { border-bottom: none !important; border-top: 2px solid var(--dt-ink); }
+
+/* ---- Stub: a tinted right column for totals and bank ---- */
+
+.dt-style-inv-stub .dt-invoice {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  column-gap: 34px;
+  row-gap: 0;
+  grid-template-areas:
+    'head head'
+    'meta meta'
+    'parties totals'
+    'lines totals'
+    'add bank';
+}
+
+.dt-style-inv-stub .dt-inv-head { grid-area: head; }
+.dt-style-inv-stub .dt-inv-meta { grid-area: meta; }
+.dt-style-inv-stub .dt-inv-parties { grid-area: parties; }
+.dt-style-inv-stub .dt-inv-lines { grid-area: lines; }
+.dt-style-inv-stub .dt-add { grid-area: add; }
+.dt-style-inv-stub .dt-inv-totals,
+.dt-style-inv-stub .dt-inv-bank {
+  background: var(--dt-panel);
+  padding: 20px;
+  border-radius: var(--dt-radius);
+}
+.dt-style-inv-stub .dt-inv-totals { grid-area: totals; width: 100%; margin: 0 0 12px; align-self: start; }
+.dt-style-inv-stub .dt-inv-bank { grid-area: bank; align-self: start; }
+
+/* ---- Cards: each line item is its own card ---- */
+
+.dt-style-inv-cards .dt-inv-lines,
+.dt-style-inv-cards .dt-inv-lines tbody {
+  display: block;
+  width: 100%;
+}
+
+.dt-style-inv-cards .dt-inv-lines thead { display: none; }
+
+.dt-style-inv-cards .dt-inv-lines tr {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+  padding: 12px 16px;
+  border: 1px solid color-mix(in srgb, var(--dt-ink) 15%, transparent);
+  border-radius: var(--dt-radius);
+  background: var(--dt-panel);
+}
+
+.dt-style-inv-cards .dt-inv-lines td {
+  height: auto;
+  padding: 0;
+  border: none;
+  text-align: left;
+}
+
+.dt-style-inv-cards .dt-inv-lines td:nth-child(1) { width: auto; color: var(--dt-accent); font-weight: 700; }
+.dt-style-inv-cards .dt-inv-lines td:nth-child(2) { flex: 1; }
+.dt-style-inv-cards .dt-inv-lines td:nth-child(3),
+.dt-style-inv-cards .dt-inv-lines td:nth-child(4),
+.dt-style-inv-cards .dt-inv-lines td:nth-child(5) { width: auto; }
+.dt-style-inv-cards .dt-inv-blank { display: none; }
+
+/* ---- Bare: hairlines only, huge margins, nothing boxed ---- */
+
+.dt-style-inv-minimal .dt-invoice { padding: 72px 64px 40px; }
+.dt-style-inv-minimal .dt-inv-head { border-bottom: none; padding-bottom: 10px; }
+.dt-style-inv-minimal .dt-inv-meta { border: none; }
+.dt-style-inv-minimal .dt-inv-meta tr { border-bottom: none; }
+.dt-style-inv-minimal .dt-inv-box,
+.dt-style-inv-minimal .dt-inv-pay { border: none; padding: 0; }
+.dt-style-inv-minimal .dt-inv-lines th { border: none; text-align: left; padding-left: 0; }
+.dt-style-inv-minimal .dt-inv-lines th:nth-child(2) { padding-left: 0; }
+.dt-style-inv-minimal .dt-inv-lines td { border: none; border-bottom: 1px solid color-mix(in srgb, var(--dt-ink) 18%, transparent); text-align: left; }
+.dt-style-inv-minimal .dt-inv-lines td:nth-child(1) { color: var(--dt-muted); }
+.dt-style-inv-minimal .dt-inv-totals { border: none; }
+.dt-style-inv-minimal .dt-inv-bank { border: none; }
+
+/* ---- Compact: dense, small, header and meta share a row ---- */
+
+.dt-style-inv-compact .dt-invoice { padding: 34px 36px 24px; font-size: 11px; letter-spacing: 0.06em; }
+.dt-style-inv-compact .dt-inv-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 20px;
+}
+.dt-style-inv-compact .dt-inv-title { font-size: 22px; letter-spacing: 0.14em; }
+.dt-style-inv-compact .dt-inv-meta { width: auto; margin: 0; border: none; }
+.dt-style-inv-compact .dt-inv-meta tr { display: inline-flex; gap: 4px; border: none; margin-right: 14px; }
+.dt-style-inv-compact .dt-inv-meta th,
+.dt-style-inv-compact .dt-inv-meta td { padding: 0; font-size: 9.5px; }
+.dt-style-inv-compact .dt-inv-parties { margin: 22px 0 20px; gap: 24px; }
+.dt-style-inv-compact .dt-inv-box { padding: 10px 12px 18px; }
+.dt-style-inv-compact .dt-inv-lines td { height: 26px; }
+
+/* ---- Receipt: a narrow centred column, dashed rules ---- */
+
+.dt-style-inv-receipt .dt-invoice { max-width: 380px; margin: 0 auto; padding: 50px 0; text-align: center; }
+.dt-style-inv-receipt .dt-inv-head { flex-direction: column; gap: 6px; border-bottom: 1px dashed var(--dt-ink); }
+.dt-style-inv-receipt .dt-inv-meta,
+.dt-style-inv-receipt .dt-inv-totals,
+.dt-style-inv-receipt .dt-inv-bank { width: 100%; margin: 18px 0; border: none; }
+.dt-style-inv-receipt .dt-inv-meta tr,
+.dt-style-inv-receipt .dt-inv-totals tr { border-bottom: 1px dashed color-mix(in srgb, var(--dt-ink) 40%, transparent); }
+.dt-style-inv-receipt .dt-inv-parties { grid-template-columns: 1fr; gap: 14px; text-align: left; margin: 0 auto 18px; max-width: 300px; }
+.dt-style-inv-receipt .dt-inv-box { padding-bottom: 16px; }
+.dt-style-inv-receipt .dt-inv-pay { padding-top: 0; }
+.dt-style-inv-receipt .dt-inv-lines { border-top: 1px dashed var(--dt-ink); border-bottom: 1px dashed var(--dt-ink); font-size: 10px; letter-spacing: 0.06em; }
+.dt-style-inv-receipt .dt-inv-lines th,
+.dt-style-inv-receipt .dt-inv-lines td { border: none; padding: 4px 3px; }
+.dt-style-inv-receipt .dt-inv-lines th:nth-child(2) { padding-left: 3px; }
+.dt-style-inv-receipt .dt-inv-lines td:nth-child(1) { width: 18px; }
+.dt-style-inv-receipt .dt-inv-lines td:nth-child(2) { text-align: left; }
+.dt-style-inv-receipt .dt-inv-lines td:nth-child(3) { width: 26px; }
+.dt-style-inv-receipt .dt-inv-lines td:nth-child(4),
+.dt-style-inv-receipt .dt-inv-lines td:nth-child(5) { width: 64px; }
+.dt-style-inv-receipt .dt-inv-words { width: 100%; margin: 0 auto; }
+
+/* ---- Split Head: title and meta share the top row ---- */
+
+.dt-style-inv-splithead .dt-inv-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  border-bottom: none;
+}
+.dt-style-inv-splithead .dt-inv-mark { grid-row: 2; justify-self: start; margin-top: 6px; }
+.dt-style-inv-splithead .dt-inv-meta {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 260px;
+  margin: 0;
+}
+.dt-style-inv-splithead .dt-inv-parties { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--dt-ink); }
+
+/* ---- Sidebar Totals: a right column runs the full page ---- */
+
+.dt-style-inv-sidebar .dt-invoice {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  column-gap: 32px;
+  grid-template-areas:
+    'head side'
+    'meta side'
+    'parties side'
+    'lines side'
+    'add side';
+}
+.dt-style-inv-sidebar .dt-inv-head { grid-area: head; }
+.dt-style-inv-sidebar .dt-inv-meta { grid-area: meta; width: 100%; }
+.dt-style-inv-sidebar .dt-inv-parties { grid-area: parties; grid-template-columns: 1fr; gap: 16px; }
+.dt-style-inv-sidebar .dt-inv-lines { grid-area: lines; }
+.dt-style-inv-sidebar .dt-add { grid-area: add; }
+.dt-style-inv-sidebar .dt-inv-totals,
+.dt-style-inv-sidebar .dt-inv-words,
+.dt-style-inv-sidebar .dt-inv-bank {
+  grid-column: 2;
+  width: 100%;
+  margin: 0 0 20px;
+}
+.dt-style-inv-sidebar .dt-inv-totals { grid-row: 1 / span 5; align-self: start; background: var(--dt-panel); padding: 20px; border-radius: var(--dt-radius); }
+
+/* ---- Stamped: a ghost numeral behind the total ---- */
+
+.dt-style-inv-stamped .dt-invoice { position: relative; }
+.dt-style-inv-stamped .dt-inv-totals { position: relative; z-index: 1; }
+.dt-style-inv-stamped .dt-inv-totals::before {
+  content: 'PAID';
+  position: absolute;
+  right: -10px;
+  top: -60px;
+  font-family: var(--dt-display);
+  font-size: 120px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--dt-accent) 10%, transparent);
+  z-index: -1;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ---- Tiles: bill-to, payable-to and meta as three tiles ---- */
+
+/* Bill-to, payable-to and the invoice meta, as three equal tiles in one row:
+   .dt-inv-parties (already two of them, side by side) spans two of three
+   outer columns, and .dt-inv-meta takes the third. */
+.dt-style-inv-tiles .dt-invoice {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 14px;
+  grid-template-areas: 'head head head' 'parties parties meta' 'lines lines lines' 'add add add' 'totals totals totals' 'words words words' 'bank bank bank';
+}
+.dt-style-inv-tiles .dt-inv-head { grid-area: head; border-bottom: none; }
+.dt-style-inv-tiles .dt-inv-parties { grid-area: parties; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 24px 0 34px; }
+.dt-style-inv-tiles .dt-inv-meta { grid-area: meta; align-self: start; width: 100%; margin: 24px 0 34px; }
+.dt-style-inv-tiles .dt-inv-lines { grid-area: lines; }
+.dt-style-inv-tiles .dt-add { grid-area: add; }
+.dt-style-inv-tiles .dt-inv-totals { grid-area: totals; }
+.dt-style-inv-tiles .dt-inv-words { grid-area: words; }
+.dt-style-inv-tiles .dt-inv-bank { grid-area: bank; }
+.dt-style-inv-tiles .dt-inv-box,
+.dt-style-inv-tiles .dt-inv-pay,
+.dt-style-inv-tiles .dt-inv-meta {
+  padding: 16px 16px 20px;
+  border: 1px solid color-mix(in srgb, var(--dt-ink) 25%, transparent);
+  border-radius: var(--dt-radius);
+  background: var(--dt-panel);
+}
+.dt-style-inv-tiles .dt-inv-pay { padding-top: 16px; }
+.dt-style-inv-tiles .dt-inv-meta th,
+.dt-style-inv-tiles .dt-inv-meta td { border: none; padding: 3px 0; }
+
+/* ---- Letter: reads like a formal letter ---- */
+
+.dt-style-inv-letter .dt-inv-title { font-size: 26px; letter-spacing: 0.06em; text-transform: none; }
+.dt-style-inv-letter .dt-invoice { line-height: 1.9; }
+.dt-style-inv-letter .dt-inv-meta,
+.dt-style-inv-letter .dt-inv-bank { border: none; }
+.dt-style-inv-letter .dt-inv-meta tr,
+.dt-style-inv-letter .dt-inv-bank tr { border-bottom: none; }
+.dt-style-inv-letter .dt-inv-parties { grid-template-columns: 1fr; gap: 10px; max-width: 420px; }
+.dt-style-inv-letter .dt-inv-box,
+.dt-style-inv-letter .dt-inv-pay { border: none; padding: 0; }
+.dt-style-inv-letter .dt-inv-lines th,
+.dt-style-inv-letter .dt-inv-lines td { border-left: none; border-right: none; }
+
+/* ---- Rail: a colour stripe down the left edge ---- */
+
+.dt-style-inv-rail .dt-invoice { padding-left: 78px; position: relative; }
+.dt-style-inv-rail .dt-invoice::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 22px;
+  background: var(--dt-accent);
+}
+.dt-style-inv-rail .dt-inv-title { color: var(--dt-accent); }
+
+/* ---- Dashboard: the total in a big coloured tile ---- */
+
+.dt-style-inv-dashboard .dt-invoice {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas: 'head' 'callout' 'meta' 'parties' 'lines' 'add' 'totals' 'words' 'bank';
+}
+.dt-style-inv-dashboard .dt-inv-head { grid-area: head; margin-bottom: 0; }
+.dt-style-inv-dashboard .dt-inv-meta { grid-area: meta; }
+.dt-style-inv-dashboard .dt-inv-parties { grid-area: parties; }
+.dt-style-inv-dashboard .dt-inv-lines { grid-area: lines; }
+.dt-style-inv-dashboard .dt-add { grid-area: add; }
+.dt-style-inv-dashboard .dt-inv-words { grid-area: words; }
+.dt-style-inv-dashboard .dt-inv-bank { grid-area: bank; }
+.dt-style-inv-dashboard .dt-inv-totals {
+  grid-area: callout;
+  width: 100%;
+  margin: 24px 0;
+  padding: 22px 26px;
+  background: var(--dt-accent);
+  border-radius: var(--dt-radius);
+}
+.dt-style-inv-dashboard .dt-inv-totals th,
+.dt-style-inv-dashboard .dt-inv-totals td { color: var(--dt-accent-ink); border-bottom-color: color-mix(in srgb, var(--dt-accent-ink) 25%, transparent); }
+.dt-style-inv-dashboard .dt-inv-grand th,
+.dt-style-inv-dashboard .dt-inv-grand td { font-size: 20px; border-bottom: none; }

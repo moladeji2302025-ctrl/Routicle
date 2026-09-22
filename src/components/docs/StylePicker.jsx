@@ -4,18 +4,27 @@ import DocumentRenderer from './DocumentRenderer'
 
 const STYLE_KEY = 'routicle.doc-style'
 
-/** The style picked last time, so the next document starts in the same look. */
-export function rememberedStyle() {
+/**
+ * The style picked last time for this kind of document, so the next one
+ * starts in the same look. Kept per kind: an invoice-only style like Ledger
+ * remembered as "last used" must never become the default for a new proposal.
+ */
+export function rememberedStyle(kind) {
   try {
-    return localStorage.getItem(STYLE_KEY) || 'branded'
+    const stored = JSON.parse(localStorage.getItem(STYLE_KEY) || '{}')
+    const id = stored[kind]
+    const style = id && DOCUMENT_STYLES.find((s) => s.id === id)
+    if (style && (!style.kinds || style.kinds.includes(kind))) return id
   } catch {
-    return 'branded'
+    // storage blocked or unreadable: fall through to the default
   }
+  return 'branded'
 }
 
-export function rememberStyle(id) {
+export function rememberStyle(kind, id) {
   try {
-    localStorage.setItem(STYLE_KEY, id)
+    const stored = JSON.parse(localStorage.getItem(STYLE_KEY) || '{}')
+    localStorage.setItem(STYLE_KEY, JSON.stringify({ ...stored, [kind]: id }))
   } catch {
     // storage blocked: the choice just isn't remembered
   }
@@ -28,7 +37,11 @@ export function rememberStyle(id) {
  */
 export default function StylePicker({ doc, value, onChange, accent, compact = false }) {
   const previews = useMemo(
-    () => DOCUMENT_STYLES.map((s) => ({ style: s, doc: { ...doc, style: s.id, accent: accent || null } })),
+    () =>
+      DOCUMENT_STYLES.filter((s) => !s.kinds || s.kinds.includes(doc.kind)).map((s) => ({
+        style: s,
+        doc: { ...doc, style: s.id, accent: accent || null },
+      })),
     [doc, accent]
   )
   return (
@@ -41,7 +54,7 @@ export default function StylePicker({ doc, value, onChange, accent, compact = fa
           aria-checked={value === style.id}
           className={value === style.id ? 'doc-style doc-style-on' : 'doc-style'}
           onClick={() => {
-            rememberStyle(style.id)
+            rememberStyle(doc.kind, style.id)
             onChange(style.id)
           }}
         >
