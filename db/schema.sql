@@ -202,3 +202,21 @@ CREATE TABLE IF NOT EXISTS newsletter_deliveries (
   error text,
   PRIMARY KEY (broadcast_id, email)
 );
+
+-- ---------------------------------------------------------------------------
+-- Staff roles and the admin activity log.
+-- role: admin | marketing | sales | support | moderator. Admin can do
+-- everything; the others open only their own department's console pages.
+-- ---------------------------------------------------------------------------
+ALTER TABLE IF EXISTS platform_admins ADD COLUMN IF NOT EXISTS role text NOT NULL DEFAULT 'admin';
+
+CREATE TABLE IF NOT EXISTS admin_audit_log (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  actor_id uuid,
+  actor_email text,
+  action text NOT NULL,
+  target text,
+  detail jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS admin_audit_log_created_idx ON admin_audit_log (created_at DESC);
