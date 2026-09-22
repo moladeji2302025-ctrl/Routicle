@@ -10572,6 +10572,114 @@ a.admin-stat:hover {
   cursor: pointer;
 }
 
+/* ---- palette lab: presets, colour theory, photo extraction ---- */
+
+.pl {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pl-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.pl-tab {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+}
+
+.pl-tab-on {
+  background: var(--brand-violet);
+  color: #fff;
+}
+
+.pl-theory,
+.pl-photo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pl-theory-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pl-seed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pl-seed input[type='color'] {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.pl-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pl-preview {
+  display: flex;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.pl-preview span {
+  flex: 1;
+}
+
+.pl-contrast {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.pl-contrast-label {
+  font-weight: 650;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+}
+
+.pl-contrast-pass {
+  color: #2f9e63;
+}
+
+.pl-contrast-fail {
+  color: #e5484d;
+}
+
 /* ---- generated pack ---- */
 
 .cs-pack {

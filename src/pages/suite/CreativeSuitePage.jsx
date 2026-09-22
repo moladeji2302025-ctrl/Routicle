@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
 import { vectorize } from '../../lib/vectorize'
-import { buildLogoPack, svgToRaster, downloadBlob, PALETTE_PRESETS, isDark } from '../../lib/logoPack'
+import { buildLogoPack, svgToRaster, downloadBlob, PALETTE_PRESETS } from '../../lib/logoPack'
 import { PenIcon, UploadIcon } from '../../components/icons'
 import FontPicker from '../../components/FontPicker'
 import MarkEditor from '../../components/MarkEditor'
+import PaletteLab from '../../components/PaletteLab'
 import FeaturedTemplates from './FeaturedTemplates'
 
 const FORMATS = [
@@ -200,33 +201,7 @@ export default function CreativeSuitePage() {
           <FontPicker value={font} onChange={setFont} />
 
           <span className="settings-stack-label" style={{ marginTop: 6 }}>Palette</span>
-          <div className="cs-palettes">
-            {PALETTE_PRESETS.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                className={palette === p.colors ? 'cs-palette cs-palette-on' : 'cs-palette'}
-                onClick={() => setPalette(p.colors)}
-                title={p.label}
-              >
-                {p.colors.map((c) => (
-                  <span key={c} style={{ background: c }} />
-                ))}
-              </button>
-            ))}
-          </div>
-          <div className="cs-swatches">
-            {palette.map((c, i) => (
-              <label key={i} className="cs-swatch" style={{ background: c, color: isDark(c) ? '#fff' : '#16161a' }}>
-                {c.toUpperCase()}
-                <input
-                  type="color"
-                  value={c}
-                  onChange={(e) => setPalette(palette.map((x, xi) => (xi === i ? e.target.value : x)))}
-                />
-              </label>
-            ))}
-          </div>
+          <PaletteLab palette={palette} onChange={setPalette} />
         </div>
       </div>
 
