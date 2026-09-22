@@ -190,6 +190,8 @@ export function AppProvider({ children }) {
    * nothing.
    */
   const [isPlatformAdmin, setIsPlatformAdmin] = useState(false)
+  const isPlatformAdminRef = useRef(false)
+  isPlatformAdminRef.current = isPlatformAdmin
   // Why admin was refused, surfaced in the console's gate so a misconfiguration
   // is readable without opening devtools.
   const [adminReason, setAdminReason] = useState('')
@@ -1003,9 +1005,9 @@ export function AppProvider({ children }) {
       generateImage(prompt) {
         let ok = false
         updateUser((user) => {
-          if (user.credits.image <= 0) return user
+          if (user.credits.image <= 0 && !isPlatformAdminRef.current) return user
           ok = true
-          const credits = { ...user.credits, image: user.credits.image - 1 }
+          const credits = { ...user.credits, image: Math.max(0, user.credits.image - 1) }
           // Settings > AI Studio can turn history off; the credit is still spent.
           if (!settingsRef.current.studio.keepHistory) return { ...user, credits }
           const result = { id: `gen-${Date.now()}`, prompt, createdAt: Date.now(), type: 'image' }
@@ -1021,9 +1023,9 @@ export function AppProvider({ children }) {
       upscaleImage(genId) {
         let ok = false
         updateUser((user) => {
-          if (user.credits.image <= 0) return user
+          if (user.credits.image <= 0 && !isPlatformAdminRef.current) return user
           ok = true
-          return { ...user, credits: { ...user.credits, image: user.credits.image - 1 } }
+          return { ...user, credits: { ...user.credits, image: Math.max(0, user.credits.image - 1) } }
         })
         return ok
       },
@@ -1031,9 +1033,10 @@ export function AppProvider({ children }) {
       generateVideo(prompt, seconds = 5) {
         let ok = false
         updateUser((user) => {
-          if (user.role !== 'express' || user.credits.video < seconds) return user
+          const admin = isPlatformAdminRef.current
+          if (!admin && (user.role !== 'express' || user.credits.video < seconds)) return user
           ok = true
-          const credits = { ...user.credits, video: user.credits.video - seconds }
+          const credits = { ...user.credits, video: Math.max(0, user.credits.video - seconds) }
           if (!settingsRef.current.studio.keepHistory) return { ...user, credits }
           const result = { id: `gen-${Date.now()}`, prompt, seconds, createdAt: Date.now(), type: 'video' }
           return {
@@ -1114,9 +1117,29 @@ export function AppProvider({ children }) {
 
   const activeTeam = useMemo(() => teams.find((t) => t.id === activeTeamId) || null, [teams, activeTeamId])
 
+  // An admin sees the product the way its top plan does, with nothing to fill
+  // in first: Express, a creator, credits to spare, and past the welcome flow.
+  // This is a view over the real profile, not a change to it, so revoking
+  // admin leaves the account exactly as it was. The server grants the same
+  // rights independently; this only stops the interface from asking.
+  const adminView = useMemo(() => {
+    const u = state.currentUser
+    if (!u || !isPlatformAdmin) return u
+    return {
+      ...u,
+      role: 'express',
+      isCreator: true,
+      isAdmin: true,
+      needsOnboarding: false,
+      billingMode: 'monthly',
+      credits: { image: 9999, video: 9999 },
+    }
+  }, [state.currentUser, isPlatformAdmin])
+
   const value = useMemo(
     () => ({
       ...state,
+      currentUser: adminView,
       ...actions,
       contentItems: mergedContentItems,
       pendingSubmissions: livePendingSubmissions,
@@ -1134,6 +1157,7 @@ export function AppProvider({ children }) {
     }),
     [
       state,
+      adminView,
       actions,
       mergedContentItems,
       livePendingSubmissions,

@@ -14,6 +14,7 @@
 
 import { sql } from './db.js'
 import { send } from './http.js'
+import { isAdminId } from './auth.js'
 
 /* ------------------------------------------------------------ memberships */
 
@@ -80,6 +81,9 @@ export function requiredTierFor(item) {
  * says it is on Express is just a client saying so.
  */
 export async function effectiveTier(userId, organizationId) {
+  // Platform admins hold everything, whatever they have or haven't paid.
+  if (await isAdminId(userId)) return 'express'
+
   const rows = organizationId
     ? await sql`
         SELECT s.tier
@@ -170,7 +174,16 @@ export async function creatorFor(user) {
 }
 
 export async function requireCreator(res, user) {
-  const creator = await creatorFor(user)
+  let creator = await creatorFor(user)
+  // An admin doesn't have to apply: the record is made for them the first time
+  // they need one.
+  if (!creator && user.email && (await isAdminId(user.id))) {
+    await sql`
+      INSERT INTO creators (name, email) VALUES (${user.name || user.email}, ${String(user.email).toLowerCase()})
+      ON CONFLICT (email) DO NOTHING
+    `
+    creator = await creatorFor(user)
+  }
   if (!creator) {
     send(res, 403, { error: 'Apply as a creator first' })
     return null

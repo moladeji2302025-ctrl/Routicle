@@ -108,6 +108,23 @@ export async function isAdminUser(user) {
   return rows.length > 0
 }
 
+/**
+ * The same check by user id alone, for entitlement code that only has an id.
+ * Admins hold every premium feature: this is what lets the platform's own
+ * operators test and run the product without buying a plan.
+ */
+export async function isAdminId(userId) {
+  if (!userId) return false
+  const rows = await sql`
+    SELECT u.email, EXISTS (SELECT 1 FROM platform_admins a WHERE a.user_id = u.id) AS granted
+    FROM neon_auth."user" u WHERE u.id = ${userId} LIMIT 1
+  `
+  if (!rows[0]) return false
+  if (rows[0].granted) return true
+  const email = (rows[0].email || '').toLowerCase()
+  return Boolean(email) && bootstrapEmails().includes(email)
+}
+
 /** Resolves to the session user, or sends 401 and resolves to null. */
 export async function requireUser(req, res) {
   const session = await getSession(req)

@@ -1,6 +1,7 @@
 import { sql } from '../db.js'
 import { send, methodGuard } from '../http.js'
 import { effectiveTier, TIER_RANK } from '../guard.js'
+import { isAdminId } from '../auth.js'
 import { limit } from '../ratelimit.js'
 
 /**
@@ -37,7 +38,8 @@ export default async function generateImage(req, res, user) {
 
   const enabled = Boolean(process.env.FAL_KEY)
   const tier = await effectiveTier(user.id, req.body?.organizationId || req.query?.organizationId || null)
-  const allowance = MONTHLY[tier] ?? 0
+  const admin = await isAdminId(user.id)
+  const allowance = admin ? 100000 : MONTHLY[tier] ?? 0
   const used = await usedThisMonth(user.id)
 
   if (req.method === 'GET') return send(res, 200, { enabled, used, limit: allowance, tier })

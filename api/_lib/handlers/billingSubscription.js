@@ -2,7 +2,7 @@ import { sql } from '../db.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 import { disableSubscription } from '../paystack.js'
 import { activeSubscription, serializeSubscription } from '../billing.js'
-import { requireUser } from '../auth.js'
+import { requireUser, isAdminId } from '../auth.js'
 import { requireMembership } from '../guard.js'
 import { notifyCanceled } from '../email/index.js'
 
@@ -25,6 +25,22 @@ export default async function handler(req, res) {
     if (organizationId && !(await requireMembership(res, userId, organizationId))) return
 
     if (req.method === 'GET') {
+      // An admin account is on Express by right, not by payment. It is shown as
+      // such (and can't be "cancelled"), rather than looking like a free plan.
+      if (await isAdminId(userId)) {
+        return send(res, 200, {
+          subscription: {
+            id: 'admin',
+            tier: 'express',
+            billingCycle: 'annual',
+            status: 'active',
+            organizationId: organizationId || null,
+            currentPeriodEnd: null,
+            isRecurring: false,
+            isAdminGrant: true,
+          },
+        })
+      }
       const sub = await activeSubscription({ userId, organizationId })
       return send(res, 200, { subscription: serializeSubscription(sub) })
     }
