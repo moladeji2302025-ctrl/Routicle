@@ -214,6 +214,15 @@ export function saveEmailPreferences(preferences) {
   return request('/account/email-preferences', { method: 'POST', body: JSON.stringify({ preferences }) })
 }
 
+/** Has this account done the welcome flow? Answered by the server, not this browser. */
+export function fetchOnboarding() {
+  return request('/account/onboarding')
+}
+
+export function markOnboardingDone() {
+  return request('/account/onboarding', { method: 'POST', body: '{}' })
+}
+
 /** Asks for the welcome email. Safe to repeat: the server sends it once. */
 export function requestWelcomeEmail() {
   return request('/account/welcome', { method: 'POST', body: '{}' })

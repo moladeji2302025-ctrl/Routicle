@@ -495,6 +495,17 @@ export function AppProvider({ children }) {
       }
     }
 
+    // Whether this account has already done the welcome flow is the server's
+    // to say. A new device has no saved profile, and used to look like a new
+    // account. If the server can't be reached, nobody is sent through it:
+    // being wrongly shown it is worse than missing it.
+    let onboarded = true
+    try {
+      onboarded = (await api.fetchOnboarding()).done === true
+    } catch {
+      // keep the safe default
+    }
+
     let isNewProfile = false
     setState((prev) => {
       const existing = prev.profiles[authUser.id]
@@ -508,9 +519,9 @@ export function AppProvider({ children }) {
         name: authUser.name || base.name,
         email: authUser.email || base.email,
         image: authUser.image || base.image || null,
-        // Only ever set on a profile created right now. Anyone already in
-        // storage predates onboarding and shouldn't be sent through it.
-        needsOnboarding: existing ? base.needsOnboarding === true : true,
+        // Needed only when the server has no record of it being done, whether
+        // this browser has seen the account before or not.
+        needsOnboarding: !onboarded && (existing ? base.needsOnboarding === true : true),
       }
       return {
         ...prev,
@@ -830,6 +841,8 @@ export function AppProvider({ children }) {
           onboarding: { role, goals, heard, path, tier, completedAt: Date.now() },
           needsOnboarding: false,
         }))
+        // Remembered on the server so no other device asks again.
+        api.markOnboardingDone().catch((err) => console.error('onboarding save failed', err))
 
         // Turning every category off would leave an empty library, so an
         // all-off answer is treated as no preference rather than a total mute.

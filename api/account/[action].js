@@ -21,6 +21,7 @@ const INVITE_DAYS = 7
  * POST /api/account/delete   { code }         deletes, once the code checks out
  * POST /api/account/welcome                   sends the welcome email, once
  * GET/POST /api/account/email-preferences     which optional email this account gets
+ * GET/POST /api/account/onboarding            whether the welcome flow has been done, and marking it done
  *
  * Members lives here rather than under a team route purely for Vercel's
  * twelve-function budget; it is still scoped to workspaces the caller is in.
@@ -36,9 +37,29 @@ export default withCors(['GET', 'POST'], async function handler(req, res) {
     if (action === 'delete') return deleteAccount(req, res)
     if (action === 'welcome') return welcome(req, res)
     if (action === 'email-preferences') return emailPreferences(req, res)
+    if (action === 'onboarding') return onboarding(req, res)
     return send(res, 404, { error: `Unknown account route: ${action}` })
   })
 })
+
+/**
+ * Whether this account has been through the welcome flow. Kept on the server
+ * because the browser can't be trusted to remember: a new device, a cleared
+ * cache or a private window has no saved profile, and used to look like a
+ * brand-new account. POST marks it done, once and for good.
+ */
+async function onboarding(req, res) {
+  if (!methodGuard(req, res, ['GET', 'POST'])) return
+  const user = await requireUser(req, res)
+  if (!user) return
+
+  if (req.method === 'POST') {
+    await sql`INSERT INTO onboarding_done (user_id) VALUES (${user.id}) ON CONFLICT (user_id) DO NOTHING`
+    return send(res, 200, { done: true })
+  }
+  const rows = await sql`SELECT 1 FROM onboarding_done WHERE user_id = ${user.id} LIMIT 1`
+  return send(res, 200, { done: rows.length > 0 })
+}
 
 /** Shaped to match what the team UI already renders: id, userId, role, user{}. */
 async function listMembers(req, res) {

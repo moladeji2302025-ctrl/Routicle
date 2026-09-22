@@ -220,3 +220,10 @@ CREATE TABLE IF NOT EXISTS admin_audit_log (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS admin_audit_log_created_idx ON admin_audit_log (created_at DESC);
+
+-- Accounts that have finished the welcome flow. Server-side so a new device
+-- doesn't send an existing account through it again.
+CREATE TABLE IF NOT EXISTS onboarding_done (
+  user_id uuid PRIMARY KEY,
+  completed_at timestamptz NOT NULL DEFAULT now()
+);
