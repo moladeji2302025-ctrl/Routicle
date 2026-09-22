@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as api from '../../lib/api'
+import { BriefcaseIcon } from '../../components/icons'
+import AdminEmpty from '../../components/admin/AdminEmpty'
 
 const STATUS_LABEL = { new: 'New', contacted: 'Contacted', replied: 'Replied', won: 'Won', lost: 'Lost' }
 const STATUSES = ['new', 'contacted', 'replied', 'won', 'lost']
@@ -171,10 +173,22 @@ export default function AdminLeadsPage() {
 
       <form className="admin-form adm-lead-add" onSubmit={addLead}>
         <div className="admin-form-row">
-          <input className="settings-input" placeholder="Email" type="email" required value={addForm.email} onChange={(e) => setAddForm((f) => ({ ...f, email: e.target.value }))} />
-          <input className="settings-input" placeholder="Name" value={addForm.name} onChange={(e) => setAddForm((f) => ({ ...f, name: e.target.value }))} />
-          <input className="settings-input" placeholder="Company" value={addForm.company} onChange={(e) => setAddForm((f) => ({ ...f, company: e.target.value }))} />
-          <input className="settings-input" placeholder="Source" value={addForm.source} onChange={(e) => setAddForm((f) => ({ ...f, source: e.target.value }))} />
+          <label className="settings-field">
+            <span className="settings-field-label">Email</span>
+            <input className="settings-input" placeholder="lead@company.com" type="email" required value={addForm.email} onChange={(e) => setAddForm((f) => ({ ...f, email: e.target.value }))} />
+          </label>
+          <label className="settings-field">
+            <span className="settings-field-label">Name</span>
+            <input className="settings-input" placeholder="Full name" value={addForm.name} onChange={(e) => setAddForm((f) => ({ ...f, name: e.target.value }))} />
+          </label>
+          <label className="settings-field">
+            <span className="settings-field-label">Company</span>
+            <input className="settings-input" placeholder="Company" value={addForm.company} onChange={(e) => setAddForm((f) => ({ ...f, company: e.target.value }))} />
+          </label>
+          <label className="settings-field">
+            <span className="settings-field-label">Source</span>
+            <input className="settings-input" placeholder="e.g. LinkedIn" value={addForm.source} onChange={(e) => setAddForm((f) => ({ ...f, source: e.target.value }))} />
+          </label>
         </div>
         <div className="adm-lead-add-actions">
           <button type="submit" className="settings-btn" disabled={addBusy}>{addBusy ? 'Adding…' : 'Add lead'}</button>
@@ -206,7 +220,9 @@ export default function AdminLeadsPage() {
       {leads === null ? (
         <p className="explore-empty">Loading…</p>
       ) : leads.length === 0 ? (
-        <p className="explore-empty">No leads yet. Add one or import a CSV.</p>
+        <AdminEmpty icon={BriefcaseIcon} title="No leads yet">
+          Add one above, or import a CSV of prospects to start reaching out.
+        </AdminEmpty>
       ) : (
         <ul className="adm-people">
           {leads.map((l) => (
