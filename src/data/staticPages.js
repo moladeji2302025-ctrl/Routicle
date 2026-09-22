@@ -89,7 +89,7 @@ export const STATIC_PAGES = {
     title: 'Blog',
     accent: 'Blog',
     eyebrow: 'Notes and news',
-    lede: 'Nothing here yet. Once Routicle is further along, we’ll post product updates, creator spotlights and notes on what we’re working on.',
+    lede: 'Product updates, creator spotlights and notes on what we’re working on.',
     topics: ['Product updates', 'Creator spotlights', 'Work in progress'],
   },
 

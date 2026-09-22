@@ -1,8 +1,9 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getStaticPage, STATIC_NAV, CONTACT_EMAIL } from '../data/staticPages'
 import Reveal from '../components/Reveal'
+import * as api from '../lib/api'
 import NewsletterSignup from '../components/NewsletterSignup'
 import { SparkleIcon, SearchIcon, ChevronDownIcon } from '../components/icons'
 
@@ -262,20 +263,53 @@ function Contact({ page }) {
 
 function Blog({ page }) {
   const { currentUser } = useApp()
+  const [posts, setPosts] = useState(null)
+
+  useEffect(() => {
+    let live = true
+    api
+      .fetchBlogPosts()
+      .then(({ posts: rows }) => live && setPosts(rows))
+      .catch(() => live && setPosts([]))
+    return () => {
+      live = false
+    }
+  }, [])
+
+  const hasPosts = Array.isArray(posts) && posts.length > 0
+
   return (
     <>
       <Section>
-        <div className="sp-posts" aria-hidden="true">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="sp-card sp-post">
-              <span className="sp-post-tag">{page.topics[i]}</span>
-              <span className="sp-bar sp-bar-lg" />
-              <span className="sp-bar" />
-              <span className="sp-bar sp-bar-sm" />
-              <span className="sp-post-soon">Coming soon</span>
-            </div>
-          ))}
-        </div>
+        {hasPosts ? (
+          <div className="blog-grid">
+            {posts.map((p) => (
+              <Link key={p.slug} to={`/blog/${p.slug}`} className="sp-card blog-card">
+                {p.coverUrl ? <img className="blog-card-cover" src={p.coverUrl} alt="" loading="lazy" /> : <span className="blog-card-cover blog-card-cover-empty" aria-hidden="true" />}
+                <span className="blog-card-body">
+                  <span className="blog-card-title">{p.title}</span>
+                  {p.excerpt && <span className="blog-card-excerpt">{p.excerpt}</span>}
+                  <span className="blog-card-meta">
+                    {p.authorName ? `${p.authorName} · ` : ''}
+                    {new Date(p.publishedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        ) : posts === null ? null : (
+          <div className="sp-posts" aria-hidden="true">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="sp-card sp-post">
+                <span className="sp-post-tag">{page.topics[i]}</span>
+                <span className="sp-bar sp-bar-lg" />
+                <span className="sp-bar" />
+                <span className="sp-bar sp-bar-sm" />
+                <span className="sp-post-soon">Coming soon</span>
+              </div>
+            ))}
+          </div>
+        )}
       </Section>
 
       <Section>

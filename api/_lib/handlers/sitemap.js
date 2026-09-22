@@ -51,6 +51,8 @@ export default async function handler(req, res) {
       LIMIT 45000
     `
 
+    const posts = await sql`SELECT slug, COALESCE(updated_at, published_at) AS modified FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC LIMIT 1000`
+
     const url = (loc, { lastmod, changefreq, priority } = {}) =>
       '  <url>\n' +
       `    <loc>${escapeXml(loc)}</loc>\n` +
@@ -62,6 +64,7 @@ export default async function handler(req, res) {
     const entries = [
       ...STATIC.map((p) => url(base + p.path, p)),
       ...CATEGORIES.map((c) => url(`${base}/explore?category=${c}`, { changefreq: 'daily', priority: '0.8' })),
+      ...posts.map((p) => url(`${base}/blog/${p.slug}`, { lastmod: p.modified, changefreq: 'monthly', priority: '0.5' })),
       ...designs.map((d) => url(`${base}/design/${d.id}`, { lastmod: d.modified, changefreq: 'weekly', priority: '0.6' })),
     ]
 

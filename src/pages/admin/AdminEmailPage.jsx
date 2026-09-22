@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import * as api from '../../lib/api'
 
 const TABS = [
@@ -18,7 +19,9 @@ const dateTime = (v) => (v ? new Date(v).toLocaleString('en-GB', { day: 'numeric
  * is set.
  */
 export default function AdminEmailPage() {
-  const [tab, setTab] = useState('status')
+  // A blog post handed over from Admin > Blog opens straight on the newsletter.
+  const handedOver = useLocation().state?.newsletter || null
+  const [tab, setTab] = useState(handedOver ? 'newsletter' : 'status')
   return (
     <section className="admin-section">
       <h2>Email</h2>
@@ -35,7 +38,7 @@ export default function AdminEmailPage() {
       </nav>
 
       {tab === 'status' && <SetupTab />}
-      {tab === 'newsletter' && <NewsletterTab />}
+      {tab === 'newsletter' && <NewsletterTab initial={handedOver} />}
       {tab === 'log' && <LogTab />}
       {tab === 'suppressed' && <SuppressedTab />}
     </section>
@@ -200,11 +203,11 @@ function SetupTab() {
 
 const HELP = '# A heading\n\nA paragraph with **bold** and a [link](https://routicle.vercel.app).\n\n- a bullet\n- another'
 
-function NewsletterTab() {
+function NewsletterTab({ initial = null }) {
   const [info, setInfo] = useState(null)
-  const [subject, setSubject] = useState('')
-  const [preheader, setPreheader] = useState('')
-  const [body, setBody] = useState('')
+  const [subject, setSubject] = useState(initial?.subject || '')
+  const [preheader, setPreheader] = useState(initial?.preheader || '')
+  const [body, setBody] = useState(initial?.body || '')
   const [preview, setPreview] = useState(null)
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')

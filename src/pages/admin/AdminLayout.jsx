@@ -10,6 +10,7 @@ import {
   BellIcon,
   ShieldIcon,
   LockIcon,
+  PenIcon,
 } from '../../components/icons'
 
 export const ROLE_LABEL = {
@@ -44,6 +45,7 @@ const GROUPS = [
     items: [
       { to: '/admin/updates', label: "What's new", icon: SparkleIcon, roles: ['admin', 'marketing'] },
       { to: '/admin/resources', label: 'Resources', icon: HelpIcon, roles: ['admin', 'marketing'] },
+      { to: '/admin/blog', label: 'Blog', icon: PenIcon, roles: ['admin', 'marketing'] },
       { to: '/admin/email', label: 'Email', icon: BellIcon, roles: ['admin', 'marketing'] },
     ],
   },

@@ -312,6 +312,15 @@ export function fetchUpdates(limit) {
   return request(`/public/updates${limit ? `?limit=${limit}` : ''}`)
 }
 
+/** The public blog: the list, or one post by its slug. */
+export function fetchBlogPosts() {
+  return request('/public/blog')
+}
+
+export function fetchBlogPost(slug) {
+  return request(`/public/blog?slug=${encodeURIComponent(slug)}`)
+}
+
 export function fetchPublicResources() {
   return request('/public/resources')
 }
@@ -472,6 +481,20 @@ export function fetchAdminUsers(q) {
 
 export function grantAdmin(userId, role = 'admin') {
   return request('/admin/users', { method: 'POST', body: JSON.stringify({ userId, role }) })
+}
+
+export function fetchAdminBlog() {
+  return request('/admin/blog')
+}
+
+export function saveAdminBlog(post) {
+  return post.id
+    ? request('/admin/blog', { method: 'PATCH', body: JSON.stringify(post) })
+    : request('/admin/blog', { method: 'POST', body: JSON.stringify(post) })
+}
+
+export function deleteAdminBlog(id) {
+  return request(`/admin/blog?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 export function fetchAdminAudit(limit = 100) {
