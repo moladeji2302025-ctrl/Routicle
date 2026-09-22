@@ -276,3 +276,44 @@ CREATE TABLE IF NOT EXISTS support_messages (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS support_messages_ticket_idx ON support_messages (ticket_id, created_at);
+
+-- ---------------------------------------------------------------------------
+-- Sales leads: a prospect list, deliberately separate from account emails.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS leads (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email text NOT NULL UNIQUE,
+  name text,
+  company text,
+  source text,
+  status text NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'replied', 'won', 'lost')),
+  notes text,
+  unsubscribe_token text NOT NULL,
+  unsubscribed_at timestamptz,
+  created_by uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS leads_status_idx ON leads (status, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS lead_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  lead_id uuid NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+  subject text NOT NULL,
+  body text NOT NULL,
+  sent_by uuid,
+  sent_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS lead_messages_lead_idx ON lead_messages (lead_id, sent_at);
+
+-- App-wide switches (maintenance banner, sign-ups on/off, AI images on/off).
+CREATE TABLE IF NOT EXISTS app_settings (
+  key text PRIMARY KEY,
+  value jsonb NOT NULL,
+  updated_by uuid,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Plan grants (subscriptions.provider = 'admin-grant') and account suspension
+-- reuse existing columns: subscriptions.provider, and Better Auth's own
+-- neon_auth."user".banned / "banReason" / "banExpires". No new columns needed.
