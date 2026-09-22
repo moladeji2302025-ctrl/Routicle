@@ -5,6 +5,7 @@ import { PenIcon, UploadIcon } from '../../components/icons'
 import FontPicker from '../../components/FontPicker'
 import MarkEditor from '../../components/MarkEditor'
 import PaletteLab from '../../components/PaletteLab'
+import BrandGuide from '../../components/BrandGuide'
 import FeaturedTemplates from './FeaturedTemplates'
 
 const FORMATS = [
@@ -17,6 +18,7 @@ const slug = (s) => (s || 'brand').toLowerCase().replace(/[^a-z0-9]+/g, '-').rep
 
 export default function CreativeSuitePage() {
   const fileRef = useRef(null)
+  const [showGuide, setShowGuide] = useState(false)
   const [preview, setPreview] = useState('')
   const [trace, setTrace] = useState(null)
   const [tracing, setTracing] = useState(false)
@@ -252,6 +254,36 @@ export default function CreativeSuitePage() {
       )}
 
       {/* Step four: the same brand, presented in a creator's frame. */}
+      {/* Step four: a real, printable brand guide, built entirely from the
+          pack above — nothing here is asked for twice. */}
+      {trace && (
+        <>
+          <div className="suite-section-head" style={{ marginTop: 10 }}>
+            <div>
+              <h2>4. Brand guide</h2>
+              <p className="settings-section-desc">
+                A style guide generated from this pack — logo usage, clear space, the palette with real values,
+                type and misuse examples. Print it, or save as PDF.
+              </p>
+            </div>
+            <button type="button" className="settings-btn settings-btn-primary" onClick={() => setShowGuide((v) => !v)}>
+              {showGuide ? 'Hide brand guide' : 'Generate brand guide'}
+            </button>
+          </div>
+
+          {showGuide && (
+            <div className="bg-wrap">
+              <div className="bg-toolbar dt-screen-only">
+                <button type="button" className="settings-btn settings-btn-primary" onClick={() => window.print()}>
+                  Print / PDF
+                </button>
+              </div>
+              <BrandGuide pack={pack} name={name} tagline={tagline} palette={palette} font={font} />
+            </div>
+          )}
+        </>
+      )}
+
       <FeaturedTemplates trace={trace} name={name} tagline={tagline} palette={palette} font={font} />
     </>
   )

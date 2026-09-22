@@ -20601,3 +20601,383 @@ a.sp-card:hover .sp-link svg {
 .dt-heads-mono .dt-clause-h { font-family: var(--dt-body); text-transform: uppercase; letter-spacing: 0.02em; }
 .dt-heads-ghost .dt-clause-h { color: var(--dt-accent); }
 .dt-heads-rule .dt-clause-h { padding-bottom: 8px; border-bottom: 2px solid var(--dt-accent); display: inline-block; }
+
+/* ============================================================
+   Brand Guide: a real, printable style guide generated from a Creative
+   Suite pack. Pages are sized and printed exactly like the Business Suite's
+   documents (A4, window.print(), break-after: page) — same mechanism,
+   no PDF library, no server round trip.
+   ============================================================ */
+
+.bg-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.bg-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bg-doc {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.bg-page {
+  position: relative;
+  width: 794px;
+  min-height: 1123px;
+  padding: 64px 64px 56px;
+  background: var(--bg-paper);
+  color: var(--bg-ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 12px 40px -18px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  font-family: var(--bg-font);
+}
+
+.bg-page h2 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.bg-lede {
+  max-width: 56ch;
+  margin: 0 0 40px;
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.72;
+}
+
+/* ---- cover ---- */
+
+.bg-cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--bg-ink);
+  color: var(--bg-paper);
+}
+
+.bg-kicker {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 20px;
+}
+
+.bg-cover h1 {
+  margin: 0;
+  font-size: 84px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.bg-cover-tagline {
+  margin: 22px 0 0;
+  font-size: 17px;
+  opacity: 0.75;
+}
+
+.bg-cover-swatches {
+  display: flex;
+  height: 22px;
+  margin-top: 56px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bg-cover-swatches span {
+  flex: 1;
+}
+
+/* ---- logo page ---- */
+
+.bg-logo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.bg-logo-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 36px 24px;
+  border: 1px solid color-mix(in srgb, var(--bg-ink) 14%, transparent);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.bg-logo-cell-wide {
+  grid-column: 1 / -1;
+  padding: 48px 24px;
+}
+
+.bg-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 110px;
+}
+
+.bg-mark svg {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.bg-logo-cell-wide .bg-mark {
+  height: 130px;
+}
+
+/* ---- clear space & minimum size ---- */
+
+.bg-clearspace {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 48px;
+}
+
+.bg-clearspace-ring {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  padding: 56px;
+  border: 1.5px dashed color-mix(in srgb, var(--bg-accent) 55%, transparent);
+  border-radius: 10px;
+}
+
+.bg-clearspace-ring .bg-mark {
+  height: 100%;
+}
+
+.bg-minsize {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+
+.bg-minsize-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 32px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-ink) 5%, transparent);
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.bg-mark-small {
+  height: 24px;
+}
+
+.bg-mark-tiny {
+  height: 14px;
+}
+
+/* ---- palette page ---- */
+
+.bg-swatch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bg-swatch-row {
+  display: grid;
+  grid-template-columns: 110px 100px 1fr 1fr;
+  align-items: center;
+  padding: 26px 26px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.bg-swatch-role {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.bg-swatch-hex {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.bg-swatch-fmt {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+/* ---- typography page ---- */
+
+.bg-type-scale {
+  display: flex;
+  flex-direction: column;
+}
+
+.bg-type-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: baseline;
+  gap: 16px;
+  padding: 22px 0;
+  border-top: 1px solid color-mix(in srgb, var(--bg-ink) 14%, transparent);
+}
+
+.bg-type-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.bg-type-sample {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- don't page ---- */
+
+.bg-donts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.bg-dont-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 30px 18px;
+  border: 1px solid color-mix(in srgb, var(--bg-ink) 14%, transparent);
+  border-radius: 12px;
+  font-size: 11.5px;
+  text-align: center;
+  opacity: 0.75;
+}
+
+.bg-dont-cell .bg-mark {
+  height: 70px;
+}
+
+.bg-dont-cell::after {
+  content: '✕';
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #e5484d;
+}
+
+/* These three land the modifier class on .bg-mark itself (passed as Mark's
+   own className), not on an ancestor of it — a same-element compound
+   selector, no space, unlike .bg-dont-recolor/-lowcontrast below which wrap
+   Mark in a classed parent instead. */
+.bg-mark.bg-dont-stretch svg {
+  transform: scaleX(1.9);
+}
+
+.bg-mark.bg-dont-rotate svg {
+  transform: rotate(28deg);
+}
+
+.bg-mark.bg-dont-shadow svg {
+  filter: drop-shadow(6px 8px 0 color-mix(in srgb, var(--bg-ink) 40%, transparent)) drop-shadow(0 0 14px var(--bg-accent));
+}
+
+.bg-dont-recolor .bg-mark svg * {
+  fill: #e5484d !important;
+}
+
+.bg-dont-lowcontrast {
+  background: var(--bg-accent);
+}
+
+.bg-dont-lowcontrast .bg-mark svg * {
+  fill: color-mix(in srgb, var(--bg-accent) 85%, var(--bg-ink) 15%) !important;
+}
+
+.bg-dont-crowd {
+  position: relative;
+}
+
+.bg-dont-crowd-text {
+  position: absolute;
+  top: 38px;
+  left: 12px;
+  right: 12px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.bg-footer {
+  position: absolute;
+  left: 64px;
+  right: 64px;
+  bottom: 40px;
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--bg-ink) 14%, transparent);
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+@media print {
+  .bg-wrap > .bg-toolbar,
+  .app-sidebar,
+  .app-topbar,
+  .app-tabbar,
+  .suite-head p,
+  .suite-tabs,
+  .suite-subtabs,
+  .suite-crumbs {
+    display: none !important;
+  }
+
+  .app-shell,
+  .app-main,
+  .suite-shell,
+  .suite-body {
+    display: block !important;
+  }
+
+  .bg-doc {
+    gap: 0;
+  }
+
+  .bg-page {
+    page: bgpage;
+    box-shadow: none;
+    break-after: page;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .bg-page:last-child {
+    break-after: auto;
+  }
+}
