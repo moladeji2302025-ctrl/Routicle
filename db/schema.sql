@@ -227,3 +227,23 @@ CREATE TABLE IF NOT EXISTS onboarding_done (
   user_id uuid PRIMARY KEY,
   completed_at timestamptz NOT NULL DEFAULT now()
 );
+
+-- ---------------------------------------------------------------------------
+-- The Routicle blog. status: draft | published. The public read only ever
+-- returns published rows; drafts stay behind the admin API.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  title text NOT NULL,
+  excerpt text NOT NULL DEFAULT '',
+  body text NOT NULL DEFAULT '',
+  cover_url text,
+  author_name text,
+  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
+  published_at timestamptz,
+  created_by uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS blog_posts_pub_idx ON blog_posts (published_at DESC) WHERE status = 'published';
