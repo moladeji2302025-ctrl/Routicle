@@ -21226,3 +21226,136 @@ a.sp-card:hover .sp-link svg {
   size: 9.5in 4.125in;
   margin: 0;
 }
+
+/* ============================================================
+   Creative Suite hub — one tool per page now, this is the landing card grid.
+   Reuses .suite-tabs/.suite-tab (the same pattern the AI Suite's own picker
+   and the Business/Creative split already use) rather than a new component.
+   ============================================================ */
+
+.cs-hub-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+/* Scoped to the hub's grid specifically — .suite-tab is shared with the
+   top-level Business/Creative picker in SuiteLayout, which keeps its own
+   flex-start alignment untouched. */
+.cs-hub-grid .suite-tab {
+  position: relative;
+  align-items: center;
+}
+
+.suite-tab .cs-hub-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.suite-tab:hover .cs-hub-chevron {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.suite-tab .cs-hub-lock {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--brand-purple);
+}
+
+.cs-hub-tab-locked {
+  opacity: 0.72;
+}
+
+.cs-hub-draft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0 4px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+}
+
+.cs-hub-draft-mark {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  color: var(--brand-violet);
+}
+
+.cs-hub-draft-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cs-hub-draft strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.cs-hub-draft span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ---- "jump to the next tool" row at the end of the pack ---- */
+
+.cs-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 30px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.cs-next-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cs-next-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---- Palette Lab's "on the brand" preview ---- */
+
+.pl-brandpreview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 40px 20px;
+  border-radius: 13px;
+}
+
+.pl-brandpreview-mark {
+  width: 64px;
+  height: 64px;
+}
+
+.pl-brandpreview-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.pl-brandpreview strong {
+  font-size: 16px;
+  font-weight: 700;
+}

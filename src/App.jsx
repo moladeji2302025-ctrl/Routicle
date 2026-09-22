@@ -54,7 +54,12 @@ import BlogPostPage from './pages/BlogPostPage'
 import UpdatesPage from './pages/UpdatesPage'
 import SuiteLayout from './pages/suite/SuiteLayout'
 import BusinessSuitePage from './pages/suite/BusinessSuitePage'
-import CreativeSuitePage from './pages/suite/CreativeSuitePage'
+import CreativeSuiteHub from './pages/suite/creative/CreativeSuiteHub'
+import LogoMakerPage from './pages/suite/creative/LogoMakerPage'
+import PaletteLabPage from './pages/suite/creative/PaletteLabPage'
+import BrandGuidePage from './pages/suite/creative/BrandGuidePage'
+import StationeryPage from './pages/suite/creative/StationeryPage'
+import FeaturedTemplatesPage from './pages/suite/creative/FeaturedTemplatesPage'
 import StudioProfilePage from './pages/suite/StudioProfilePage'
 import ProjectPage from './pages/suite/ProjectPage'
 import DocumentPage from './pages/suite/DocumentPage'
@@ -125,7 +130,12 @@ export default function App() {
               <Route path="business/studio" element={<StudioProfilePage />} />
               <Route path="business/:id" element={<ProjectPage />} />
               <Route path="business/:id/doc/:docId" element={<DocumentPage />} />
-              <Route path="creative" element={<CreativeSuitePage />} />
+              <Route path="creative" element={<CreativeSuiteHub />} />
+              <Route path="creative/logo" element={<LogoMakerPage />} />
+              <Route path="creative/palette" element={<PaletteLabPage />} />
+              <Route path="creative/brand-guide" element={<BrandGuidePage />} />
+              <Route path="creative/stationery" element={<StationeryPage />} />
+              <Route path="creative/templates" element={<FeaturedTemplatesPage />} />
             </Route>
             <Route path="/invite/:id" element={<InvitePage />} />
             <Route path="/admin" element={<AdminLayout />}>
