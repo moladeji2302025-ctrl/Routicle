@@ -4,6 +4,7 @@ import resources from '../_lib/handlers/publicResources.js'
 import sitemap from '../_lib/handlers/sitemap.js'
 import newsletter from '../_lib/handlers/newsletter.js'
 import blog from '../_lib/handlers/publicBlog.js'
+import contact from '../_lib/handlers/contact.js'
 import { withCors } from '../_lib/cors.js'
 
 /**
@@ -11,16 +12,16 @@ import { withCors } from '../_lib/cors.js'
  * /api/public/blog and /api/public/sitemap (served at /sitemap.xml). All only ever expose published
  * rows; drafts stay behind the admin API.
  *
- * /api/public/newsletter is the one write: a logged-out visitor signing up
- * for email updates. It is the only route here that accepts POST.
+ * /api/public/newsletter and /api/public/contact are the writes: a
+ * logged-out visitor signing up for email updates, or sending the Contact form.
  */
-const ROUTES = { updates, resources, sitemap, newsletter, blog }
+const ROUTES = { updates, resources, sitemap, newsletter, blog, contact }
 
 export default withCors(['GET', 'POST'], async function handler(req, res) {
   const route = ROUTES[req.query?.resource]
   if (!route) {
     return send(res, 404, { error: `Unknown public route: ${req.query?.resource}` })
   }
-  if (req.method === 'POST' && route !== newsletter) return send(res, 405, { error: 'Method not allowed' })
+  if (req.method === 'POST' && route !== newsletter && route !== contact) return send(res, 405, { error: 'Method not allowed' })
   return route(req, res)
 })

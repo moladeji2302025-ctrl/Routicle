@@ -19081,3 +19081,295 @@ a.sp-card:hover .sp-link svg {
     max-height: none;
   }
 }
+
+/* ---- Contact page: the real form ---- */
+
+.sp-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px;
+  text-align: left;
+}
+
+.sp-honey {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.sp-contact-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.sp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.sp-field input,
+.sp-field select,
+.sp-field textarea {
+  padding: 10px 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-base);
+  color: var(--text);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 400;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s ease;
+}
+
+.sp-field input:focus,
+.sp-field select:focus,
+.sp-field textarea:focus {
+  border-color: var(--brand-purple);
+}
+
+.sp-mail-alt {
+  margin-top: 20px;
+  padding: 32px;
+}
+
+.sp-mail-alt .sp-mail-address {
+  font-size: clamp(20px, 3.4vw, 30px);
+}
+
+.sp-contact-sent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 56px 32px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.sp-contact-sent svg {
+  color: #2f9e63;
+}
+
+.sp-contact-sent h3 {
+  margin: 0;
+  font-size: 19px;
+  color: var(--text);
+}
+
+.sp-contact-sent p {
+  max-width: 440px;
+}
+
+/* ---- Admin: customer care inbox ---- */
+
+.adm-support {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.adm-support-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.adm-filter-row {
+  display: flex;
+  gap: 6px;
+}
+
+.adm-filter {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.adm-filter-on {
+  background: var(--brand-violet);
+  border-color: var(--brand-violet);
+  color: #fff;
+}
+
+.adm-tickets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: calc(100vh - 320px);
+  overflow-y: auto;
+}
+
+.adm-ticket {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  text-align: left;
+  transition: border-color 0.15s ease;
+}
+
+.adm-ticket:hover {
+  border-color: var(--brand-purple);
+}
+
+.adm-ticket-on {
+  border-color: var(--brand-violet);
+  background: color-mix(in srgb, var(--brand-violet) 10%, var(--surface-2));
+}
+
+.adm-ticket-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.adm-ticket-subject {
+  font-size: 13.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-ticket-meta {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.adm-status-open {
+  color: var(--brand-violet);
+}
+
+.adm-status-pending {
+  color: #b98900;
+}
+
+.adm-status-closed {
+  color: #2f9e63;
+}
+
+.adm-support-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 320px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-2);
+}
+
+.adm-thread-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.adm-thread-head h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.adm-thread-head p {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.adm-thread-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.adm-msg {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.adm-msg p {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+
+.adm-msg-in {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.adm-msg-out {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--brand-violet) 16%, transparent);
+}
+
+.adm-msg-meta {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.adm-reply {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.adm-reply textarea {
+  padding: 10px 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-base);
+  color: var(--text);
+  font: inherit;
+  font-size: 13.5px;
+  resize: vertical;
+}
+
+.adm-reply button {
+  align-self: flex-end;
+}
+
+@media (max-width: 900px) {
+  .adm-support {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-tickets {
+    max-height: 320px;
+  }
+}

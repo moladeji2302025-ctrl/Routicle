@@ -221,17 +221,108 @@ function Brand({ page }) {
   )
 }
 
+const CONTACT_CATEGORIES = [
+  { id: 'general', label: 'A general question' },
+  { id: 'complaint', label: 'A complaint' },
+  { id: 'billing', label: 'Billing' },
+  { id: 'creator', label: "I'm a creator" },
+  { id: 'press', label: 'Press or partnership' },
+]
+
+function ContactForm() {
+  const { currentUser } = useApp()
+  const [form, setForm] = useState({ name: currentUser?.name || '', email: currentUser?.email || '', subject: '', message: '', category: 'general', company: '' })
+  const [status, setStatus] = useState('idle') // idle | sending | sent
+  const [error, setError] = useState('')
+
+  function set(key, value) {
+    setForm((f) => ({ ...f, [key]: value }))
+  }
+
+  async function submit(e) {
+    e.preventDefault()
+    setError('')
+    if (form.message.trim().length < 10) return setError('Say a little more — at least a sentence.')
+    setStatus('sending')
+    try {
+      await api.submitContact(form)
+      setStatus('sent')
+    } catch (err) {
+      setError(err.message)
+      setStatus('idle')
+    }
+  }
+
+  if (status === 'sent') {
+    return (
+      <div className="sp-card sp-contact-sent">
+        <Check />
+        <h3>Message sent</h3>
+        <p>We got it, and sent a receipt to {form.email}. A person will get back to you at that address.</p>
+      </div>
+    )
+  }
+
+  return (
+    <form className="sp-card sp-contact-form" onSubmit={submit}>
+      {/* Off-screen for a real visitor; a bot that fills every field fills this too. */}
+      <label className="sp-honey" aria-hidden="true">
+        Company
+        <input type="text" tabIndex={-1} autoComplete="off" value={form.company} onChange={(e) => set('company', e.target.value)} />
+      </label>
+
+      <div className="sp-contact-row">
+        <label className="sp-field">
+          <span>Name</span>
+          <input value={form.name} onChange={(e) => set('name', e.target.value)} maxLength={120} />
+        </label>
+        <label className="sp-field">
+          <span>Email</span>
+          <input type="email" required value={form.email} onChange={(e) => set('email', e.target.value)} maxLength={200} />
+        </label>
+      </div>
+
+      <label className="sp-field">
+        <span>What's this about</span>
+        <select value={form.category} onChange={(e) => set('category', e.target.value)}>
+          {CONTACT_CATEGORIES.map((c) => (
+            <option key={c.id} value={c.id}>{c.label}</option>
+          ))}
+        </select>
+      </label>
+
+      <label className="sp-field">
+        <span>Subject</span>
+        <input required value={form.subject} onChange={(e) => set('subject', e.target.value)} maxLength={160} />
+      </label>
+
+      <label className="sp-field">
+        <span>Message</span>
+        <textarea required rows={5} value={form.message} onChange={(e) => set('message', e.target.value)} maxLength={5000} />
+      </label>
+
+      {error && <p className="settings-error">{error}</p>}
+
+      <div className="sp-actions">
+        <button type="submit" className="sp-btn sp-btn-primary" disabled={status === 'sending'}>
+          {status === 'sending' ? 'Sending…' : 'Send message'} <Arrow />
+        </button>
+      </div>
+    </form>
+  )
+}
+
 function Contact({ page }) {
   const [copied, copy] = useCopy()
   return (
     <>
       <Section>
-        <div className="sp-card sp-mail">
-          <span className="sp-mail-label">Email us</span>
+        <ContactForm />
+        <div className="sp-card sp-mail sp-mail-alt">
+          <span className="sp-mail-label">Or email us directly</span>
           <a className="sp-mail-address" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
           <p>{page.note}</p>
           <div className="sp-actions">
-            <a className="sp-btn sp-btn-primary" href={`mailto:${CONTACT_EMAIL}`}>Write to us <Arrow /></a>
             <button type="button" className="sp-btn sp-btn-ghost" onClick={() => copy(CONTACT_EMAIL)}>
               {copied === CONTACT_EMAIL ? <><Check /> Copied</> : 'Copy address'}
             </button>

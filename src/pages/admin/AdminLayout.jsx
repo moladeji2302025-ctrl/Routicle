@@ -50,6 +50,10 @@ const GROUPS = [
     ],
   },
   {
+    label: 'Customer care',
+    items: [{ to: '/admin/support', label: 'Inbox', icon: BellIcon, roles: ['admin', 'support'] }],
+  },
+  {
     label: 'People',
     items: [{ to: '/admin/users', label: 'People', icon: UsersIcon, roles: ['admin', 'sales', 'support'] }],
   },

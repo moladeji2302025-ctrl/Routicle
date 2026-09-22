@@ -313,6 +313,10 @@ export function fetchUpdates(limit) {
 }
 
 /** The public blog: the list, or one post by its slug. */
+export function submitContact(data) {
+  return request('/public/contact', { method: 'POST', body: JSON.stringify(data) })
+}
+
 export function fetchBlogPosts() {
   return request('/public/blog')
 }
@@ -481,6 +485,26 @@ export function fetchAdminUsers(q) {
 
 export function grantAdmin(userId, role = 'admin') {
   return request('/admin/users', { method: 'POST', body: JSON.stringify({ userId, role }) })
+}
+
+export function fetchAdminSupport({ status, q } = {}) {
+  const params = new URLSearchParams()
+  if (status) params.set('status', status)
+  if (q) params.set('q', q)
+  const qs = params.toString()
+  return request(`/admin/support${qs ? `?${qs}` : ''}`)
+}
+
+export function fetchAdminSupportTicket(id) {
+  return request(`/admin/support?id=${encodeURIComponent(id)}`)
+}
+
+export function replyAdminSupport(ticketId, body) {
+  return request('/admin/support', { method: 'POST', body: JSON.stringify({ ticketId, body }) })
+}
+
+export function patchAdminSupport(data) {
+  return request('/admin/support', { method: 'PATCH', body: JSON.stringify(data) })
 }
 
 export function fetchAdminBlog() {

@@ -47,6 +47,7 @@ import AdminContentPage from './pages/admin/AdminContentPage'
 import AdminEmailPage from './pages/admin/AdminEmailPage'
 import AdminActivityPage from './pages/admin/AdminActivityPage'
 import AdminBlogPage from './pages/admin/AdminBlogPage'
+import AdminSupportPage from './pages/admin/AdminSupportPage'
 import BlogPostPage from './pages/BlogPostPage'
 import UpdatesPage from './pages/UpdatesPage'
 import SuiteLayout from './pages/suite/SuiteLayout'
@@ -134,6 +135,7 @@ export default function App() {
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="email" element={<AdminEmailPage />} />
               <Route path="blog" element={<AdminBlogPage />} />
+              <Route path="support" element={<AdminSupportPage />} />
               <Route path="activity" element={<AdminActivityPage />} />
             </Route>
             <Route path="/about" element={<StaticPage slug="about" />} />
