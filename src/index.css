@@ -21477,6 +21477,21 @@ a.sp-card:hover .sp-link svg {
   cursor: grabbing;
 }
 
+/* The bezier/curve handle on each edge — smaller, diamond, amber, so it's
+   never confused with a corner handle even when they end up close together. */
+.mks-handle-curve {
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 3px;
+  border-color: #d97a2b;
+  transform: rotate(45deg);
+}
+
+.mks-handle-curve:active {
+  cursor: grabbing;
+}
+
 .mks-hint {
   margin: 10px 0 0;
   font-size: 12px;

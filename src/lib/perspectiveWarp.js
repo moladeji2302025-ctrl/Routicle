@@ -137,6 +137,152 @@ export function warpToQuad(sourceCanvas, quad, destW, destH) {
 }
 
 /**
+ * Which two corner indices bound each edge, and in which direction — shared
+ * by rendering (`coonsPoint`) and interaction (handle position + drag math)
+ * so both always agree on what "this edge's curve" means. Order: top
+ * (0->1), right (1->2), bottom (3->2, so its parameter runs the same
+ * direction as top's), left (0->3, so its parameter runs the same
+ * direction as right's) — the pairing the Coons patch formula assumes.
+ */
+export const EDGE_PAIRS = [[0, 1], [1, 2], [3, 2], [0, 3]]
+
+/** The bezier handle's position for one edge, `bulge` fractions of the edge's own length off its midpoint. */
+export function edgeControlPoint(a, b, bulge) {
+  const mx = (a.x + b.x) / 2
+  const my = (a.y + b.y) / 2
+  const dx = b.x - a.x
+  const dy = b.y - a.y
+  const len = Math.hypot(dx, dy) || 1
+  const nx = -dy / len
+  const ny = dx / len
+  return { x: mx + nx * bulge * len, y: my + ny * bulge * len }
+}
+
+/** Inverse of `edgeControlPoint`: the bulge fraction a dragged point `p` represents for edge a->b. */
+export function bulgeFromPoint(a, b, p) {
+  const mx = (a.x + b.x) / 2
+  const my = (a.y + b.y) / 2
+  const dx = b.x - a.x
+  const dy = b.y - a.y
+  const len = Math.hypot(dx, dy) || 1
+  const nx = -dy / len
+  const ny = dx / len
+  return ((p.x - mx) * nx + (p.y - my) * ny) / len
+}
+
+export function quadBezier(p0, c, p1, t) {
+  const mt = 1 - t
+  return { x: mt * mt * p0.x + 2 * mt * t * c.x + t * t * p1.x, y: mt * mt * p0.y + 2 * mt * t * c.y + t * t * p1.y }
+}
+
+/** Points tracing one edge's curve from `a` to `b`, for drawing the on-screen guide. */
+export function edgeCurvePoints(a, b, bulge, steps = 14) {
+  const c = edgeControlPoint(a, b, bulge)
+  const pts = []
+  for (let i = 0; i <= steps; i += 1) pts.push(quadBezier(a, c, b, i / steps))
+  return pts
+}
+
+/**
+ * A Coons patch: the destination point for source-space (u, v) given the
+ * quad's 4 corners and each edge's bulge. Each edge is a quadratic bezier
+ * from corner to corner through `edgeControlPoint`; with every bulge at 0
+ * that control point sits exactly on the straight edge's midpoint, which
+ * collapses each bezier to a straight line and this formula to plain
+ * bilinear quad interpolation — so a flat quad warps identically to before.
+ */
+function coonsPoint(quad, bulges, u, v) {
+  const [p0, p1, p2, p3] = quad
+  const cTop = edgeControlPoint(p0, p1, bulges[0])
+  const cRight = edgeControlPoint(p1, p2, bulges[1])
+  const cBottom = edgeControlPoint(p3, p2, bulges[2])
+  const cLeft = edgeControlPoint(p0, p3, bulges[3])
+
+  const t = quadBezier(p0, cTop, p1, u)
+  const b = quadBezier(p3, cBottom, p2, u)
+  const l = quadBezier(p0, cLeft, p3, v)
+  const r = quadBezier(p1, cRight, p2, v)
+
+  const blend = (key) => (1 - v) * t[key] + v * b[key] + (1 - u) * l[key] + u * r[key]
+  const corner = (key) =>
+    (1 - u) * (1 - v) * p0[key] + u * (1 - v) * p1[key] + (1 - u) * v * p3[key] + u * v * p2[key]
+
+  return { x: blend('x') - corner('x'), y: blend('y') - corner('y') }
+}
+
+/**
+ * Warps `sourceCanvas` into a curved-edge quad — `quad`'s 4 corners plus one
+ * bulge fraction per edge (`bulges`, same order as `EDGE_PAIRS`, 0 = dead
+ * straight). Since a single homography can only ever produce straight
+ * edges, this subdivides the source into a `grid`x`grid` mesh, finds each
+ * cell's 4 destination corners via the Coons patch above, and warps each
+ * small cell with the same per-cell homography `warpToQuad` uses for the
+ * whole image — fine enough to look like a smooth curve, coarse enough to
+ * redraw live while dragging.
+ */
+export function warpMesh(sourceCanvas, quad, bulges, destW, destH, grid = 16) {
+  const straight = bulges.every((b) => Math.abs(b) < 0.001)
+  if (straight) return warpToQuad(sourceCanvas, quad, destW, destH)
+
+  const sw = sourceCanvas.width
+  const sh = sourceCanvas.height
+  const src = sourceCanvas.getContext('2d').getImageData(0, 0, sw, sh).data
+
+  const out = document.createElement('canvas')
+  out.width = destW
+  out.height = destH
+  const octx = out.getContext('2d')
+  const buffer = octx.createImageData(destW, destH)
+
+  const cols = grid
+  const rows = Math.max(4, Math.round(grid * 0.7))
+
+  for (let j = 0; j < rows; j += 1) {
+    const v0 = j / rows
+    const v1 = (j + 1) / rows
+    for (let i = 0; i < cols; i += 1) {
+      const u0 = i / cols
+      const u1 = (i + 1) / cols
+
+      const srcCorners = [{ x: u0 * sw, y: v0 * sh }, { x: u1 * sw, y: v0 * sh }, { x: u1 * sw, y: v1 * sh }, { x: u0 * sw, y: v1 * sh }]
+      const dstCorners = [coonsPoint(quad, bulges, u0, v0), coonsPoint(quad, bulges, u1, v0), coonsPoint(quad, bulges, u1, v1), coonsPoint(quad, bulges, u0, v1)]
+
+      const forward = computeHomography(srcCorners, dstCorners)
+      const backward = invert3(forward)
+
+      const xs = dstCorners.map((p) => p.x)
+      const ys = dstCorners.map((p) => p.y)
+      const minX = Math.max(0, Math.floor(Math.min(...xs)))
+      const maxX = Math.min(destW, Math.ceil(Math.max(...xs)) + 1)
+      const minY = Math.max(0, Math.floor(Math.min(...ys)))
+      const maxY = Math.min(destH, Math.ceil(Math.max(...ys)) + 1)
+
+      for (let y = minY; y < maxY; y += 1) {
+        for (let x = minX; x < maxX; x += 1) {
+          const [sxw, syw, sww] = multmv(backward, [x + 0.5, y + 0.5, 1])
+          const sx = sxw / sww
+          const sy = syw / sww
+          // Cell bounds are approximate once the surface curves, so samples
+          // are also checked against the cell's own source rectangle — this
+          // keeps neighbouring cells from bleeding into each other at edges.
+          if (sx < u0 * sw - 1 || sx > u1 * sw + 1 || sy < v0 * sh - 1 || sy > v1 * sh + 1) continue
+          const px = sample(src, sw, sh, sx, sy)
+          if (!px) continue
+          const ri = (y * destW + x) * 4
+          buffer.data[ri] = px[0]
+          buffer.data[ri + 1] = px[1]
+          buffer.data[ri + 2] = px[2]
+          buffer.data[ri + 3] = px[3]
+        }
+      }
+    }
+  }
+
+  octx.putImageData(buffer, 0, 0)
+  return out
+}
+
+/**
  * A centred, undistorted rectangle sized to the design's own aspect ratio
  * (width / height) — the "auto-fit" starting placement. Without matching the
  * asset's real proportions here, a wide lockup or a tall stack starts out

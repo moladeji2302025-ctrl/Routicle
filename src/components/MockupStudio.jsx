@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  warpToQuad, defaultQuad, rasterizeSvg, svgAspect, processDesign, translateQuad, scaleQuad, rotateQuad,
+  warpMesh, defaultQuad, rasterizeSvg, svgAspect, processDesign, translateQuad, scaleQuad, rotateQuad,
+  EDGE_PAIRS, edgeControlPoint, bulgeFromPoint, edgeCurvePoints,
 } from '../lib/perspectiveWarp'
 import { downloadBlob } from '../lib/logoPack'
 import { UploadIcon, DownloadIcon, CopyIcon, TrashIcon, PlusIcon } from './icons'
@@ -23,6 +24,7 @@ function freshLayer(assetId, quad) {
     id: uid(),
     assetId,
     quad,
+    bulges: [0, 0, 0, 0],
     blendMode: 'multiply',
     opacity: 0.92,
     brightness: 1,
@@ -60,7 +62,7 @@ export default function MockupStudio({ pack, name }) {
       const raw = rawCacheRef.current.get(layer.assetId)
       if (!raw) continue
       const processed = processDesign(raw, layer)
-      const warped = warpToQuad(processed, layer.quad, canvas.width, canvas.height)
+      const warped = warpMesh(processed, layer.quad, layer.bulges, canvas.width, canvas.height)
       ctx.save()
       ctx.globalAlpha = layer.opacity
       ctx.globalCompositeOperation = layer.blendMode
@@ -149,6 +151,14 @@ export default function MockupStudio({ pack, name }) {
     window.addEventListener('pointerup', endDrag)
   }
 
+  function startEdgeDrag(e, index) {
+    e.preventDefault()
+    e.stopPropagation()
+    dragRef.current = { mode: 'edge', index }
+    window.addEventListener('pointermove', onDrag)
+    window.addEventListener('pointerup', endDrag)
+  }
+
   // The SVG guide sits visually above the canvas but, in some browsers,
   // pointer events don't reliably hit-test through its `pointer-events: none`
   // root even when a child opts back in — so "click inside the shape to move
@@ -157,7 +167,7 @@ export default function MockupStudio({ pack, name }) {
   function startStageDrag(e) {
     if (!selected) return
     const p = toCanvasPoint(e)
-    if (!pointInQuad(p, selected.quad)) return
+    if (!pointInQuad(p, shapeOutline(selected.quad, selected.bulges))) return
     e.preventDefault()
     dragRef.current = { mode: 'move', last: p }
     window.addEventListener('pointermove', onDrag)
@@ -170,6 +180,11 @@ export default function MockupStudio({ pack, name }) {
     const p = toCanvasPoint(e)
     if (d.mode === 'corner') {
       updateSelected((l) => ({ quad: l.quad.map((pt, idx) => (idx === d.index ? p : pt)) }))
+    } else if (d.mode === 'edge') {
+      const [a, b] = EDGE_PAIRS[d.index]
+      updateSelected((l) => ({
+        bulges: l.bulges.map((bulge, idx) => (idx === d.index ? bulgeFromPoint(l.quad[a], l.quad[b], p) : bulge)),
+      }))
     } else {
       const dx = p.x - d.last.x
       const dy = p.y - d.last.y
@@ -186,13 +201,18 @@ export default function MockupStudio({ pack, name }) {
 
   function autoFit() {
     if (!canvasSize.w) return
-    updateSelected((l) => ({ quad: defaultQuad(canvasSize.w, canvasSize.h, aspectOf(l.assetId)) }))
+    updateSelected((l) => ({ quad: defaultQuad(canvasSize.w, canvasSize.h, aspectOf(l.assetId)), bulges: [0, 0, 0, 0] }))
+  }
+
+  function straightenEdges() {
+    updateSelected({ bulges: [0, 0, 0, 0] })
   }
 
   function setAsset(assetId) {
     updateSelected((l) => ({
       assetId,
       quad: canvasSize.w ? defaultQuad(canvasSize.w, canvasSize.h, aspectOf(assetId)) : l.quad,
+      bulges: [0, 0, 0, 0],
     }))
   }
 
@@ -324,8 +344,12 @@ export default function MockupStudio({ pack, name }) {
                 >
                   Flip ↕
                 </button>
+                <button type="button" className="settings-btn" onClick={straightenEdges}>Straighten edges</button>
               </div>
-              <p className="mks-hint" style={{ margin: '4px 0 0' }}>Drag inside the outline to move it, or its corners to warp it.</p>
+              <p className="mks-hint" style={{ margin: '4px 0 0' }}>
+                Drag inside the outline to move it, its corners to warp it, or the diamond on each
+                edge to bend that side — for a curved surface like a mug or a bottle.
+              </p>
 
               <span className="settings-stack-label" style={{ marginTop: 16 }}>Look</span>
               <select className="settings-input" value={selected.blendMode} onChange={(e) => updateSelected({ blendMode: e.target.value })}>
@@ -386,8 +410,19 @@ export default function MockupStudio({ pack, name }) {
             {ready && selected && (
               <>
                 <svg className="mks-guide" viewBox={`0 0 ${canvasSize.w} ${canvasSize.h}`} preserveAspectRatio="none">
-                  <polygon points={selected.quad.map((p) => `${p.x},${p.y}`).join(' ')} />
+                  <polygon points={shapeOutline(selected.quad, selected.bulges).map((p) => `${p.x},${p.y}`).join(' ')} />
                 </svg>
+                {EDGE_PAIRS.map(([a, b], i) => {
+                  const p = edgeControlPoint(selected.quad[a], selected.quad[b], selected.bulges[i])
+                  return (
+                    <div
+                      key={i}
+                      className="mks-handle mks-handle-curve"
+                      style={{ left: `${(p.x / canvasSize.w) * 100}%`, top: `${(p.y / canvasSize.h) * 100}%` }}
+                      onPointerDown={(e) => startEdgeDrag(e, i)}
+                    />
+                  )
+                })}
                 {selected.quad.map((p, i) => (
                   <div
                     key={i}
@@ -414,6 +449,15 @@ export default function MockupStudio({ pack, name }) {
 
 function clamp(v, min, max) {
   return Math.min(max, Math.max(min, v))
+}
+
+function shapeOutline(quad, bulges) {
+  const [p0, p1, p2, p3] = quad
+  const top = edgeCurvePoints(p0, p1, bulges[0])
+  const right = edgeCurvePoints(p1, p2, bulges[1])
+  const bottom = edgeCurvePoints(p3, p2, bulges[2]).reverse()
+  const left = edgeCurvePoints(p0, p3, bulges[3]).reverse()
+  return [...top, ...right.slice(1), ...bottom.slice(1), ...left.slice(1)]
 }
 
 function pointInQuad(pt, quad) {
