@@ -194,7 +194,7 @@ export default function AppHomePage() {
       recentlyViewed
         .map((id) => approved.find((i) => String(i.id) === String(id)))
         .filter(Boolean)
-        .slice(0, 6),
+        .slice(0, 5),
     [recentlyViewed, approved]
   )
 
@@ -249,7 +249,7 @@ export default function AppHomePage() {
   return (
     <div className="app-home">
       <h1 className="app-home-greeting app-rise" style={{ animationDelay: '0ms' }}>
-        {greeting()}, {currentUser?.name?.split(' ')[0] || 'there'}
+        {greeting()}, <span className="app-name-flow">{currentUser?.name?.split(' ')[0] || 'there'}</span>
       </h1>
       <p className="app-home-sub app-rise" style={{ animationDelay: '70ms' }}>
         {approved.length} finished piece{approved.length === 1 ? '' : 's'} in the library right now
@@ -317,23 +317,6 @@ export default function AppHomePage() {
           )
         })}
       </div>
-
-      {recentItems.length > 0 && (
-        <section className="app-section app-rise" style={{ animationDelay: '350ms' }}>
-          <div className="app-section-head">
-            <h2>Pick up where you left off</h2>
-          </div>
-          <div className="app-rail">
-            {recentItems.map((item) => (
-              <Link key={item.id} to={`/design/${item.id}`} className="app-rail-card">
-                <Thumb item={item} alt="" />
-                <span className="app-rail-title">{item.title}</span>
-                <span className="app-rail-sub">{item.creator}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
 
       <div className="app-split app-rise" style={{ animationDelay: '420ms' }}>
         <div className="app-split-side">
@@ -427,6 +410,26 @@ export default function AppHomePage() {
       </section>
         </div>
       </div>
+
+      {recentItems.length > 0 && (
+        <section className="app-section app-rise" style={{ animationDelay: '460ms' }}>
+          <div className="app-section-head">
+            <h2>Pick up where you left off</h2>
+          </div>
+          <div className="app-rail">
+            {recentItems.map((item) => (
+              <Link key={item.id} to={`/design/${item.id}`} className="app-rail-card">
+                <Thumb item={item} alt="" />
+                <span className="app-rail-title">{item.title}</span>
+                <span className="app-rail-sub">{item.creator}</span>
+              </Link>
+            ))}
+          </div>
+          <Link to="/recents" className="app-section-more">
+            See everything you've viewed <ChevronRightIcon size={13} color="currentColor" />
+          </Link>
+        </section>
+      )}
 
       <section className="app-section app-section-wide app-rise" style={{ animationDelay: '490ms' }}>
         <div className="app-section-head">

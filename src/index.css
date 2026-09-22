@@ -5796,6 +5796,21 @@ a:hover {
   color: var(--app-text);
 }
 
+/* A link under a section, styled like the "Browse all" in its header. */
+.app-section-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-text-muted);
+}
+
+.app-section-more:hover {
+  color: var(--app-text);
+}
+
 /* Horizontal rail — scrolls rather than wrapping, so a long library doesn't
    push the rest of the dashboard off the screen. */
 .app-rail {
@@ -17644,12 +17659,11 @@ button.sp-card:hover {
 .sp-btn-primary {
   background: var(--brand-violet);
   color: #fff;
-  box-shadow: 0 10px 26px -14px var(--brand-violet);
 }
 
 .sp-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 30px -14px var(--brand-violet);
+  background: color-mix(in srgb, var(--brand-violet) 88%, #000);
 }
 
 .sp-btn-ghost {
@@ -17765,7 +17779,6 @@ a.sp-card:hover .sp-link svg {
   border-radius: 13px;
   background: var(--brand-violet);
   color: #fff;
-  box-shadow: 0 10px 24px -12px var(--brand-violet);
 }
 
 .sp-chips {
@@ -18346,7 +18359,6 @@ a.sp-card:hover .sp-link svg {
   font-size: 14px;
   font-weight: 800;
   color: #fff;
-  box-shadow: 0 10px 22px -12px var(--brand-violet);
 }
 
 .sp-point h3 {
@@ -18474,5 +18486,29 @@ a.sp-card:hover .sp-link svg {
   .sp *::after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* The greeting's name: the same violet-to-pink gradient as the accent word on
+   the information pages, but drifting slowly across the letters. The gradient
+   is twice as wide as the text and slides back and forth, so it never jumps. */
+.app-name-flow {
+  background: linear-gradient(100deg, var(--brand-violet) 0%, var(--brand-purple) 30%, #e58ad9 50%, var(--brand-purple) 70%, var(--brand-violet) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: app-name-flow 6s ease-in-out infinite alternate;
+}
+
+@keyframes app-name-flow {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-name-flow {
+    animation: none;
+    background-position: 30% 50%;
   }
 }

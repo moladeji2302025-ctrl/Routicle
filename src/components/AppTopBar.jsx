@@ -15,6 +15,7 @@ const LABELS = {
   following: 'Following',
   collections: 'Collections',
   downloads: 'Downloads',
+  recents: 'Recents',
   suite: 'AI Suite',
   business: 'Business Suite',
   creative: 'Creative Suite',

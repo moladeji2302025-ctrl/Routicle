@@ -30,6 +30,7 @@ import DeveloperSettings from './pages/settings/DeveloperSettings'
 import CollectionsPage from './pages/CollectionsPage'
 import FollowingPage from './pages/FollowingPage'
 import DownloadsPage from './pages/DownloadsPage'
+import RecentsPage from './pages/RecentsPage'
 import ProjectsPage from './pages/ProjectsPage'
 import WorkspacesPage from './pages/WorkspacesPage'
 import ResourcesPage from './pages/ResourcesPage'
@@ -104,6 +105,7 @@ export default function App() {
             <Route path="/collections" element={<CollectionsPage />} />
             <Route path="/following" element={<FollowingPage />} />
             <Route path="/downloads" element={<DownloadsPage />} />
+            <Route path="/recents" element={<RecentsPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/workspaces" element={<WorkspacesPage />} />
             <Route path="/resources" element={<ResourcesPage />} />

@@ -15,7 +15,7 @@ const THEME_KEY = 'routicle_app_theme'
 const SETTINGS_KEY = 'routicle_settings_v1'
 const ACTIVE_TEAM_KEY = 'routicle_active_team_id'
 const RECENT_KEY = 'routicle_recently_viewed'
-const RECENT_LIMIT = 12
+const RECENT_LIMIT = 50
 const CATEGORY_IDS = CATEGORIES.map((c) => c.id)
 
 function parseTeamMetadata(raw) {
