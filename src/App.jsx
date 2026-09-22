@@ -15,6 +15,8 @@ import BecomeCreatorPage from './pages/BecomeCreatorPage'
 import CreatorUploadPage from './pages/CreatorUploadPage'
 import CreatorDashboardPage from './pages/CreatorDashboardPage'
 import CreatorProfilePage from './pages/CreatorProfilePage'
+import PersonProfilePage from './pages/PersonProfilePage'
+import PeopleSearchPage from './pages/PeopleSearchPage'
 import SettingsPage from './pages/SettingsPage'
 import ProfileSettings from './pages/settings/ProfileSettings'
 import SecuritySettings from './pages/settings/SecuritySettings'
@@ -99,6 +101,8 @@ export default function App() {
             <Route path="/upload" element={<CreatorUploadPage />} />
             <Route path="/dashboard" element={<CreatorDashboardPage />} />
             <Route path="/creator/:id" element={<CreatorProfilePage />} />
+            <Route path="/people" element={<PeopleSearchPage />} />
+            <Route path="/people/:id" element={<PersonProfilePage />} />
             <Route path="/settings" element={<SettingsPage />}>
               <Route index element={<Navigate to="/settings/profile" replace />} />
               <Route path="profile" element={<ProfileSettings />} />

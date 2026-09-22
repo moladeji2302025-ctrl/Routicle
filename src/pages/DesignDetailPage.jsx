@@ -36,10 +36,11 @@ export default function DesignDetailPage() {
     )
   }
 
-  const creator = getCreatorByName(item.creator)
+  const mockCreator = getCreatorByName(item.creator)
+  const profileHref = item.isLive && item.creatorUserId ? `/people/${item.creatorUserId}` : mockCreator ? `/creator/${mockCreator.id}` : null
   const tier = requiredTier(item)
   const decision = evaluateDownload(item, effectiveViewer(currentUser, activeTeam))
-  const appreciated = currentUser?.appreciatedItemIds.includes(item.id)
+  const appreciated = item.isLive ? Boolean(item.isLiked) : currentUser?.appreciatedItemIds.includes(item.id)
 
   function handleShare() {
     const url = window.location.href
@@ -131,13 +132,22 @@ export default function DesignDetailPage() {
 
         <h1 className="detail-title">{item.title}</h1>
 
-        <Link to={creator ? `/creator/${creator.id}` : '#'} className="detail-creator">
-          <img src={item.avatar} alt={item.creator} className="detail-creator-avatar" />
-          <div>
-            <div className="detail-creator-name">{item.creator}</div>
-            {creator && <div className="detail-creator-specialty">{creator.specialty}</div>}
-          </div>
-        </Link>
+        {profileHref ? (
+          <Link to={profileHref} className="detail-creator">
+            <img src={item.avatar} alt={item.creator} className="detail-creator-avatar" />
+            <div>
+              <div className="detail-creator-name">{item.creator}</div>
+              {mockCreator && <div className="detail-creator-specialty">{mockCreator.specialty}</div>}
+            </div>
+          </Link>
+        ) : (
+          <span className="detail-creator detail-creator-plain">
+            <img src={item.avatar} alt={item.creator} className="detail-creator-avatar" />
+            <div>
+              <div className="detail-creator-name">{item.creator}</div>
+            </div>
+          </span>
+        )}
 
         <p className="detail-description">
           A {TIERS[tier].label.toLowerCase()}-tier {categoryLabel(item.category).toLowerCase()} piece

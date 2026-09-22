@@ -13,6 +13,7 @@ import {
   UploadIcon,
   PlusIcon,
   UsersIcon,
+  UserIcon,
   SettingsIcon,
   GridIcon,
   BookmarkIcon,
@@ -38,6 +39,7 @@ const NAV_GROUPS = [
       { label: 'Explore', to: '/explore', icon: SearchIcon },
       { label: 'Categories', to: '/categories', icon: GridIcon },
       { label: 'Following', to: '/following', icon: UsersIcon },
+      { label: 'People', to: '/people', icon: UserIcon },
     ],
   },
   {

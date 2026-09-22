@@ -7,6 +7,8 @@ import blog from '../_lib/handlers/publicBlog.js'
 import contact from '../_lib/handlers/contact.js'
 import leadsUnsubscribe from '../_lib/handlers/leadsUnsubscribe.js'
 import settings from '../_lib/handlers/publicSettings.js'
+import profile from '../_lib/handlers/publicProfile.js'
+import people from '../_lib/handlers/publicPeople.js'
 import { withCors } from '../_lib/cors.js'
 
 /**
@@ -17,7 +19,7 @@ import { withCors } from '../_lib/cors.js'
  * /api/public/newsletter and /api/public/contact are the writes: a
  * logged-out visitor signing up for email updates, or sending the Contact form.
  */
-const ROUTES = { updates, resources, sitemap, newsletter, blog, contact, 'leads-unsubscribe': leadsUnsubscribe, settings }
+const ROUTES = { updates, resources, sitemap, newsletter, blog, contact, 'leads-unsubscribe': leadsUnsubscribe, settings, profile, people }
 
 export default withCors(['GET', 'POST'], async function handler(req, res) {
   const route = ROUTES[req.query?.resource]

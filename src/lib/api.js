@@ -733,3 +733,25 @@ export function updateComment({ id, body, rating }) {
 export function deleteComment(id) {
   return request(`/library/comments?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
+
+/* ------------------------------------------------------------ appreciations */
+
+export function likeItemRemote(contentItemId) {
+  return request('/library/appreciations', { method: 'POST', body: JSON.stringify({ contentItemId }) })
+}
+
+export function unlikeItemRemote(contentItemId) {
+  return request(`/library/appreciations?contentItemId=${encodeURIComponent(contentItemId)}`, { method: 'DELETE' })
+}
+
+/* ----------------------------------------------------------- public people */
+
+/** A real public profile — a creator or a plain signed-up account, by their account id. */
+export function fetchPersonProfile(id) {
+  return request(`/public/profile?id=${encodeURIComponent(id)}`)
+}
+
+/** Name search across every account, creators and ordinary users alike. */
+export function searchPeople(q) {
+  return request(`/public/people?q=${encodeURIComponent(q)}`)
+}

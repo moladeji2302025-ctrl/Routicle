@@ -229,10 +229,22 @@ export default function CommentsPanel({ itemId }) {
             <ul className="cm-list">
               {comments.map((c) => (
                 <li key={c.id} className="cm-item">
-                  <Avatar name={c.authorName} image={c.authorImage} />
+                  {c.authorUserId ? (
+                    <Link to={`/people/${c.authorUserId}`} className="cm-author-link">
+                      <Avatar name={c.authorName} image={c.authorImage} />
+                    </Link>
+                  ) : (
+                    <Avatar name={c.authorName} image={c.authorImage} />
+                  )}
                   <div className="cm-item-body">
                     <div className="cm-item-head">
-                      <strong>{c.authorName}</strong>
+                      {c.authorUserId ? (
+                        <Link to={`/people/${c.authorUserId}`} className="cm-author-link">
+                          <strong>{c.authorName}</strong>
+                        </Link>
+                      ) : (
+                        <strong>{c.authorName}</strong>
+                      )}
                       {c.rating && <Stars value={c.rating} size={13} />}
                       <span className="cm-when">
                         {when(c.createdAt)}

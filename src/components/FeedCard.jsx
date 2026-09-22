@@ -11,9 +11,14 @@ const watermarkUrl =
 export default function FeedCard({ item }) {
   const { currentUser, toggleAppreciate, toggleSave } = useApp()
   const navigate = useNavigate()
-  const creator = getCreatorByName(item.creator)
+  // Real content carries its own creator account id to link to; demo/mock
+  // items fall back to the local mock creator lookup they've always used.
+  const mockCreator = getCreatorByName(item.creator)
+  const profileHref = item.isLive && item.creatorUserId ? `/people/${item.creatorUserId}` : mockCreator ? `/creator/${mockCreator.id}` : null
 
-  const appreciated = currentUser?.appreciatedItemIds.includes(item.id)
+  // A live item's liked state comes from the server (it has to survive a
+  // refresh); a demo item has no backing row, so it still reads the local toggle.
+  const appreciated = item.isLive ? Boolean(item.isLiked) : currentUser?.appreciatedItemIds.includes(item.id)
   const saved = currentUser?.savedItemIds.includes(item.id)
 
   function requireAuth(action) {
@@ -78,10 +83,17 @@ export default function FeedCard({ item }) {
           </div>
         </div>
         <div className="caption-bottom-row">
-          <Link to={creator ? `/creator/${creator.id}` : '#'} className="caption-creator">
-            <img src={item.avatar} alt={item.creator} className="avatar" />
-            <span className="creator-name">{item.creator}</span>
-          </Link>
+          {profileHref ? (
+            <Link to={profileHref} className="caption-creator">
+              <img src={item.avatar} alt={item.creator} className="avatar" />
+              <span className="creator-name">{item.creator}</span>
+            </Link>
+          ) : (
+            <span className="caption-creator caption-creator-plain">
+              <img src={item.avatar} alt={item.creator} className="avatar" />
+              <span className="creator-name">{item.creator}</span>
+            </span>
+          )}
           {item.fileTypes.length > 0 && (
             <div className="filetype-row">
               {item.fileTypes.map((ft) => (

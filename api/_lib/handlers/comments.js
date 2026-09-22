@@ -33,6 +33,10 @@ function shape(row, viewerId, viewerIsAdmin) {
     rating: row.rating,
     authorName: row.author_name,
     authorImage: row.author_image,
+    // The commenter's own account id — lets the client link their name and
+    // avatar to a real profile page. Comments are already public reads, so
+    // this exposes nothing beyond what the name and avatar already show.
+    authorUserId: row.user_id,
     createdAt: row.created_at,
     editedAt: row.edited_at,
     isMine: Boolean(viewerId) && row.user_id === viewerId,

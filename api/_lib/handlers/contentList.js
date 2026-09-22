@@ -1,54 +1,36 @@
 import { sql } from '../db.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
-import { publicPreviewUrl } from '../s3.js'
-
-function toFeedShape(row) {
-  return {
-    id: row.id,
-    image: publicPreviewUrl(row.thumbnail_key),
-    // A smaller WebP copy for display only, when the uploader's browser could
-    // make one. The download is always the original source.
-    imageWebp: row.thumbnail_webp_key ? publicPreviewUrl(row.thumbnail_webp_key) : null,
-    avatar: '/images/a1.jpg',
-    title: row.title,
-    creator: row.creator_name,
-    // No creator email and no storage keys in a public projection: the first is
-    // harvestable, and the second names the paywalled objects directly. Only
-    // the file labels go out, which fileTypes already implies.
-    sourceFiles: (row.source_object_keys || []).map((f) => ({ label: f.label })),
-    // The column is still `department`; only the wire format was renamed.
-    // Renaming it in Postgres is a migration against live rows and changes
-    // nothing anyone can see.
-    category: row.department,
-    appreciations: row.appreciation_count,
-    views: row.download_count,
-    fileTypes: row.file_types || [],
-    free: row.is_free,
-    hasVideo: Boolean(row.preview_video_key),
-    moderationStatus: row.moderation_status,
-    behindTheDesign: row.behind_the_design || '',
-    description: row.description || '',
-    isLive: true,
-  }
-}
+import { getSession } from '../auth.js'
+import { toFeedShape } from '../contentShape.js'
 
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['GET'])) return
 
+    // Reading is public, but knowing who's asking is what marks a row as
+    // liked by them — so the session is read, not required.
+    const session = await getSession(req)
+    const viewerId = session?.user?.id || null
+
     const category = req.query.category
     const rows = category
       ? await sql`
-          SELECT ci.*, c.name AS creator_name, c.email AS creator_email
+          SELECT ci.*, c.name AS creator_name, c.email AS creator_email, cu.id AS creator_user_id,
+                 (ia.user_id IS NOT NULL) AS is_liked
           FROM content_items ci
           JOIN creators c ON c.id = ci.creator_id
+          LEFT JOIN neon_auth."user" cu ON lower(cu.email) = lower(c.email)
+          LEFT JOIN item_appreciations ia ON ia.content_item_id = ci.id AND ia.user_id = ${viewerId}
           WHERE ci.moderation_status = 'approved' AND ci.department = ${category}
           ORDER BY ci.created_at DESC
         `
       : await sql`
-          SELECT ci.*, c.name AS creator_name, c.email AS creator_email
+          SELECT ci.*, c.name AS creator_name, c.email AS creator_email, cu.id AS creator_user_id,
+                 (ia.user_id IS NOT NULL) AS is_liked
           FROM content_items ci
           JOIN creators c ON c.id = ci.creator_id
+          LEFT JOIN neon_auth."user" cu ON lower(cu.email) = lower(c.email)
+          LEFT JOIN item_appreciations ia ON ia.content_item_id = ci.id AND ia.user_id = ${viewerId}
           WHERE ci.moderation_status = 'approved'
           ORDER BY ci.created_at DESC
         `

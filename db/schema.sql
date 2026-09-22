@@ -48,6 +48,16 @@ CREATE TABLE downloads (
   downloaded_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- One row per (user, item) like — real persistence for what was previously a
+-- client-only "appreciate" toggle that reverted on every refresh.
+CREATE TABLE IF NOT EXISTS item_appreciations (
+  user_id text NOT NULL,
+  content_item_id uuid NOT NULL REFERENCES content_items(id) ON DELETE CASCADE,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, content_item_id)
+);
+CREATE INDEX IF NOT EXISTS idx_item_appreciations_item ON item_appreciations (content_item_id);
+
 CREATE INDEX idx_downloads_item ON downloads(content_item_id);
 CREATE INDEX idx_downloads_user ON downloads(user_email);
 

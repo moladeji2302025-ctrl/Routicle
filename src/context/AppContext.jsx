@@ -956,24 +956,58 @@ export function AppProvider({ children }) {
         orgClient.organization.setActive({ organizationId: teamId }).catch(() => {})
       },
 
+      /**
+       * Likes/un-likes an item. A live item is backed by real Postgres
+       * (item_appreciations) — optimistic here, with a rollback if the write
+       * fails — because a like has to actually survive a refresh to mean
+       * anything, which is exactly what was broken before: this used to be
+       * local-only state for every item, live or not.
+       */
       toggleAppreciate(itemId) {
-        let has = false
-        setState((prev) => {
-          if (!prev.currentUser) return prev
-          has = prev.currentUser.appreciatedItemIds.includes(itemId)
-          const appreciatedItemIds = has
-            ? prev.currentUser.appreciatedItemIds.filter((id) => id !== itemId)
-            : [...prev.currentUser.appreciatedItemIds, itemId]
-          const contentItems = prev.contentItems.map((item) =>
+        const isLiveItem = liveContentItems.some((item) => String(item.id) === String(itemId))
+
+        if (isLiveItem) {
+          const item = liveContentItems.find((it) => String(it.id) === String(itemId))
+          const has = Boolean(item?.isLiked)
+          setLiveContentItems((prev) =>
+            prev.map((it) =>
+              String(it.id) === String(itemId)
+                ? { ...it, isLiked: !has, appreciations: it.appreciations + (has ? -1 : 1) }
+                : it
+            )
+          )
+          const call = has ? api.unlikeItemRemote(itemId) : api.likeItemRemote(itemId)
+          call.catch((err) => {
+            console.error('toggleAppreciate sync failed', err)
+            setLiveContentItems((prev) =>
+              prev.map((it) =>
+                String(it.id) === String(itemId)
+                  ? { ...it, isLiked: has, appreciations: it.appreciations + (has ? 1 : -1) }
+                  : it
+              )
+            )
+          })
+          return
+        }
+
+        // Demo/mock items have no backing row, so this stays a local-only
+        // toggle — but routed through updateUser (not a bespoke setState) so
+        // it writes into the cached profile like every other local toggle
+        // here does, rather than the divergent path that used to make even
+        // this survive-a-refresh guarantee silently not hold.
+        const user = stateRef.current.currentUser
+        if (!user) return
+        const has = user.appreciatedItemIds.includes(itemId)
+        updateUser((u) => ({
+          ...u,
+          appreciatedItemIds: has ? u.appreciatedItemIds.filter((id) => id !== itemId) : [...u.appreciatedItemIds, itemId],
+        }))
+        setState((prev) => ({
+          ...prev,
+          contentItems: prev.contentItems.map((item) =>
             item.id === itemId ? { ...item, appreciations: item.appreciations + (has ? -1 : 1) } : item
-          )
-          return { ...prev, currentUser: { ...prev.currentUser, appreciatedItemIds }, contentItems }
-        })
-        setLiveContentItems((prev) =>
-          prev.map((item) =>
-            String(item.id) === String(itemId) ? { ...item, appreciations: item.appreciations + (has ? -1 : 1) } : item
-          )
-        )
+          ),
+        }))
       },
 
       /**

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
-import { getCreatorByName } from '../../data/creators'
 import { squareImageDataUrl } from '../../utils/image'
 import { Feedback } from '../../components/settings/SettingsControls'
 import { UserIcon, PenIcon } from '../../components/icons'
@@ -35,8 +34,6 @@ export default function ProfileSettings() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
-
-  const creator = getCreatorByName(currentUser.name)
 
   const dirty =
     form.name !== (currentUser.name || '') ||
@@ -275,11 +272,9 @@ export default function ProfileSettings() {
         <button type="submit" className="settings-btn settings-btn-primary" disabled={saving || !dirty}>
           {saving ? 'Saving…' : 'Save changes'}
         </button>
-        {creator && (
-          <Link to={`/creator/${creator.id}`} className="settings-btn">
-            View public profile
-          </Link>
-        )}
+        <Link to={`/people/${currentUser.id}`} className="settings-btn">
+          View public profile
+        </Link>
       </div>
     </form>
   )

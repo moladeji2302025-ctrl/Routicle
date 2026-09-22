@@ -300,17 +300,19 @@ export default function TeamPage() {
         <div className="team-member-list">
           {teamMembers.map((m) => (
             <div key={m.id} className="team-member-row">
-              {m.user?.image ? (
-                <img src={m.user.image} alt="" className="team-member-avatar" />
-              ) : (
-                <span className="team-member-avatar team-member-avatar-fallback">
-                  <UserIcon size={14} color="currentColor" />
-                </span>
-              )}
-              <div className="team-member-info">
-                <span className="team-member-name">{m.user?.name || m.user?.email}</span>
-                <span className="team-member-email">{m.user?.email}</span>
-              </div>
+              <Link to={m.userId ? `/people/${m.userId}` : '#'} className="team-member-identity">
+                {m.user?.image ? (
+                  <img src={m.user.image} alt="" className="team-member-avatar" />
+                ) : (
+                  <span className="team-member-avatar team-member-avatar-fallback">
+                    <UserIcon size={14} color="currentColor" />
+                  </span>
+                )}
+                <div className="team-member-info">
+                  <span className="team-member-name">{m.user?.name || m.user?.email}</span>
+                  <span className="team-member-email">{m.user?.email}</span>
+                </div>
+              </Link>
               <span className="account-menu-badge">{ROLE_LABEL[m.role] || m.role}</span>
               {canManage && m.role !== 'owner' && m.userId !== currentUser.id && (
                 <button

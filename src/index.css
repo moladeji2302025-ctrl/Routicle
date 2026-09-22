@@ -1618,6 +1618,10 @@ a:hover {
   min-width: 0;
 }
 
+.caption-creator-plain {
+  cursor: default;
+}
+
 .avatar {
   width: 20px;
   height: 20px;
@@ -2012,6 +2016,10 @@ a:hover {
   align-items: center;
   gap: 10px;
   margin-bottom: 20px;
+}
+
+.detail-creator-plain {
+  cursor: default;
 }
 
 .detail-creator-avatar {
@@ -5680,6 +5688,20 @@ a:hover {
 
 .team-member-row:hover {
   background: var(--app-hover);
+}
+
+.team-member-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.team-member-identity:hover .team-member-name {
+  text-decoration: underline;
 }
 
 .team-member-avatar {
@@ -12778,6 +12800,16 @@ html {
 }
 
 /* ---- avatars ---- */
+
+.cm-author-link {
+  color: inherit;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.cm-author-link:hover {
+  text-decoration: underline;
+}
 
 .cm-avatar {
   flex-shrink: 0;
@@ -21799,4 +21831,94 @@ a.sp-card:hover .sp-link svg {
   flex: 1;
   font-size: 12px;
   padding: 6px 8px;
+}
+
+/* ============================================================
+   Person profile — avatar-as-button (the lightbox is the one place a
+   profile picture is a second click target, per the standing rule that it
+   only works on the profile page itself) and the fallback icon avatar.
+   ============================================================ */
+
+.creator-profile-avatar-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.creator-profile-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.photo-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: rgba(10, 10, 14, 0.82);
+  cursor: zoom-out;
+}
+
+.photo-lightbox img {
+  max-width: min(80vw, 560px);
+  max-height: 80vh;
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+/* ---- people search ---- */
+
+.people-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.people-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  border: 1px solid var(--border, oklch(0.92 0.003 90));
+  border-radius: 14px;
+  text-align: center;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.people-card:hover {
+  border-color: var(--brand-violet);
+  transform: translateY(-2px);
+}
+
+.people-card-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.people-card-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.people-card-name {
+  font-size: 13.5px;
+  font-weight: 600;
 }
