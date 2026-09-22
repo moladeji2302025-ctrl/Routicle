@@ -1013,7 +1013,7 @@ export default function DocumentRenderer({ doc, onChange = () => {}, editable = 
       <MetaContext.Provider value={{ style, pageWidth, coverOnly: mode === 'cover' }}>
         <DocProvider doc={doc} onChange={onChange} editable={editable}>
           <div
-            className={`dt-doc dt-style-${style.id} dt-heads-${style.heads} ${doc.kind === 'proposal' ? 'dt-prop' : ''} ${mode === 'cover' ? 'dt-only-cover' : ''} ${style.id === 'branded' ? 'dt-headfont-body' : ''}`}
+            className={`dt-doc dt-style-${style.id} dt-heads-${style.heads} dt-genre-${style.cover} ${doc.kind === 'proposal' ? 'dt-prop' : ''} ${mode === 'cover' ? 'dt-only-cover' : ''} ${style.id === 'branded' ? 'dt-headfont-body' : ''}`}
             style={{ ...styleVars(style, doc.accent), zoom: scale }}
           >
             {body}

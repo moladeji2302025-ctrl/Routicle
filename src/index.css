@@ -20072,3 +20072,322 @@ a.sp-card:hover .sp-link svg {
 .dt-h-mono { display: flex; align-items: baseline; gap: 10px; }
 .dt-h-mono::before { content: '>'; color: var(--dt-accent); font-family: var(--dt-body); font-weight: 700; font-size: 24px; }
 .dt-h-mono h2 { font-family: var(--dt-body); font-size: 24px; font-weight: 700; letter-spacing: 0.01em; text-transform: uppercase; }
+
+/* ============================================================
+   The cover and the section headings picked up real genre variety;
+   everything after them — pricing cards, the timeline, staff, tables,
+   notes — still drew from one neutral, colour-mixed-grey design system
+   regardless of style. This is the rest of it: the same six genre
+   families as the cover archetypes (dt-genre-<cover>, set alongside
+   dt-style-<id> on the outer wrapper) now reach the whole document, not
+   just its first page. Reference styles (bleed/split/top — Branded and
+   its siblings) are left as they were: they're the baseline others are
+   judged against.
+   ============================================================ */
+
+/* ---- Tier A — terminal / glitch / foil: dark, technical, quietly rich ---- */
+
+.dt-genre-terminal .dt-table-head,
+.dt-genre-glitch .dt-table-head,
+.dt-genre-foil .dt-table-head,
+.dt-genre-terminal .dt-pack-head,
+.dt-genre-glitch .dt-pack-head,
+.dt-genre-foil .dt-pack-head,
+.dt-genre-terminal .dt-phase-num,
+.dt-genre-glitch .dt-phase-num,
+.dt-genre-foil .dt-phase-num,
+.dt-genre-terminal .dt-gantt-ticks span,
+.dt-genre-glitch .dt-gantt-ticks span,
+.dt-genre-foil .dt-gantt-ticks span,
+.dt-genre-terminal .dt-avatar,
+.dt-genre-glitch .dt-avatar,
+.dt-genre-foil .dt-avatar {
+  background: var(--dt-ink);
+  color: var(--dt-page);
+  font-family: var(--dt-body);
+}
+.dt-genre-terminal .dt-pack-featured .dt-pack-head,
+.dt-genre-glitch .dt-pack-featured .dt-pack-head,
+.dt-genre-foil .dt-pack-featured .dt-pack-head {
+  background: var(--dt-accent);
+  color: var(--dt-accent-ink);
+}
+.dt-genre-terminal .dt-gantt-bar-alt,
+.dt-genre-glitch .dt-gantt-bar-alt,
+.dt-genre-foil .dt-gantt-bar-alt {
+  background: color-mix(in srgb, var(--dt-ink) 80%, var(--dt-accent) 20%);
+}
+.dt-genre-terminal .dt-pack,
+.dt-genre-glitch .dt-pack,
+.dt-genre-foil .dt-pack {
+  border: 1px solid color-mix(in srgb, var(--dt-ink) 22%, transparent);
+}
+.dt-genre-terminal .dt-note,
+.dt-genre-glitch .dt-note,
+.dt-genre-foil .dt-note {
+  background: var(--dt-ink);
+  color: var(--dt-page);
+  clip-path: none;
+}
+.dt-genre-terminal .dt-note b,
+.dt-genre-glitch .dt-note b,
+.dt-genre-foil .dt-note b {
+  color: var(--dt-accent);
+}
+
+/* ---- Tier B — poster / stacked / diagonal: bold, graphic, square-cut ---- */
+
+.dt-genre-poster .dt-table-head,
+.dt-genre-stacked .dt-table-head,
+.dt-genre-diagonal .dt-table-head,
+.dt-genre-poster .dt-pack-head,
+.dt-genre-stacked .dt-pack-head,
+.dt-genre-diagonal .dt-pack-head,
+.dt-genre-poster .dt-avatar,
+.dt-genre-stacked .dt-avatar,
+.dt-genre-diagonal .dt-avatar,
+.dt-genre-poster .dt-gantt-ticks span,
+.dt-genre-stacked .dt-gantt-ticks span,
+.dt-genre-diagonal .dt-gantt-ticks span {
+  background: var(--dt-ink);
+  color: var(--dt-page);
+  border-radius: 0;
+  font-weight: 700;
+}
+.dt-genre-poster .dt-pack-featured .dt-pack-head,
+.dt-genre-stacked .dt-pack-featured .dt-pack-head,
+.dt-genre-diagonal .dt-pack-featured .dt-pack-head {
+  background: var(--dt-accent);
+  color: var(--dt-accent-ink);
+}
+.dt-genre-poster .dt-pack,
+.dt-genre-stacked .dt-pack,
+.dt-genre-diagonal .dt-pack {
+  border: 2px solid var(--dt-ink);
+  border-radius: 0;
+}
+.dt-genre-poster .dt-gantt-track,
+.dt-genre-stacked .dt-gantt-track,
+.dt-genre-diagonal .dt-gantt-track,
+.dt-genre-poster .dt-gantt-bar,
+.dt-genre-stacked .dt-gantt-bar,
+.dt-genre-diagonal .dt-gantt-bar,
+.dt-genre-poster .dt-phase-num,
+.dt-genre-stacked .dt-phase-num,
+.dt-genre-diagonal .dt-phase-num,
+.dt-genre-poster .dt-note,
+.dt-genre-stacked .dt-note,
+.dt-genre-diagonal .dt-note,
+.dt-genre-poster .dt-block,
+.dt-genre-stacked .dt-block,
+.dt-genre-diagonal .dt-block {
+  border-radius: 0;
+}
+.dt-genre-poster .dt-gantt-bar-alt,
+.dt-genre-stacked .dt-gantt-bar-alt,
+.dt-genre-diagonal .dt-gantt-bar-alt {
+  background: var(--dt-ink);
+}
+.dt-genre-poster .dt-note,
+.dt-genre-stacked .dt-note,
+.dt-genre-diagonal .dt-note {
+  clip-path: none;
+  border: 2px solid var(--dt-ink);
+  background: var(--dt-page);
+  color: var(--dt-ink);
+  font-style: normal;
+}
+
+/* ---- Tier C — torn / sticker / halftone: soft, rounded, hand-made ---- */
+
+.dt-genre-torn .dt-pack,
+.dt-genre-sticker .dt-pack,
+.dt-genre-halftone .dt-pack {
+  border-radius: 22px;
+  box-shadow: 0 14px 30px -20px color-mix(in srgb, var(--dt-ink) 45%, transparent);
+}
+.dt-genre-torn .dt-pack-head,
+.dt-genre-sticker .dt-pack-head,
+.dt-genre-halftone .dt-pack-head {
+  border-radius: 0;
+}
+.dt-genre-torn .dt-avatar,
+.dt-genre-sticker .dt-avatar,
+.dt-genre-halftone .dt-avatar,
+.dt-genre-torn .dt-table-row,
+.dt-genre-sticker .dt-table-row,
+.dt-genre-halftone .dt-table-row,
+.dt-genre-torn .dt-gantt-bar,
+.dt-genre-sticker .dt-gantt-bar,
+.dt-genre-halftone .dt-gantt-bar,
+.dt-genre-torn .dt-gantt-track,
+.dt-genre-sticker .dt-gantt-track,
+.dt-genre-halftone .dt-gantt-track,
+.dt-genre-torn .dt-phase-num,
+.dt-genre-sticker .dt-phase-num,
+.dt-genre-halftone .dt-phase-num,
+.dt-genre-torn .dt-block,
+.dt-genre-sticker .dt-block,
+.dt-genre-halftone .dt-block {
+  border-radius: 999px;
+}
+.dt-genre-torn .dt-table-head,
+.dt-genre-sticker .dt-table-head,
+.dt-genre-halftone .dt-table-head,
+.dt-genre-torn .dt-gantt-ticks span,
+.dt-genre-sticker .dt-gantt-ticks span,
+.dt-genre-halftone .dt-gantt-ticks span {
+  border-radius: 999px;
+  padding-left: 18px;
+}
+.dt-genre-torn .dt-note,
+.dt-genre-sticker .dt-note,
+.dt-genre-halftone .dt-note {
+  clip-path: none;
+  border-radius: 20px;
+}
+
+/* ---- Tier D — blueprint / grid: technical, outlined, ruled everywhere ---- */
+
+.dt-genre-blueprint .dt-page:not(.dt-cover),
+.dt-genre-grid .dt-page:not(.dt-cover) {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--dt-accent) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--dt-accent) 8%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.dt-genre-blueprint .dt-table-head,
+.dt-genre-grid .dt-table-head,
+.dt-genre-blueprint .dt-gantt-ticks span,
+.dt-genre-grid .dt-gantt-ticks span {
+  background: var(--dt-page);
+  color: var(--dt-ink);
+  border: 1.5px solid var(--dt-ink);
+  border-radius: 0;
+}
+.dt-genre-blueprint .dt-pack,
+.dt-genre-grid .dt-pack {
+  border: 1.5px solid var(--dt-ink);
+  background: var(--dt-page);
+  border-radius: 0;
+}
+.dt-genre-blueprint .dt-pack-head,
+.dt-genre-grid .dt-pack-head {
+  background: var(--dt-page);
+  border-bottom: 1.5px solid var(--dt-ink);
+  border-radius: 0;
+}
+.dt-genre-blueprint .dt-pack-featured .dt-pack-head,
+.dt-genre-grid .dt-pack-featured .dt-pack-head {
+  background: var(--dt-accent);
+  color: var(--dt-accent-ink);
+}
+.dt-genre-blueprint .dt-avatar,
+.dt-genre-grid .dt-avatar {
+  background: var(--dt-page);
+  border: 1.5px solid var(--dt-ink);
+  color: var(--dt-ink);
+  border-radius: 0;
+}
+.dt-genre-blueprint .dt-gantt-track,
+.dt-genre-grid .dt-gantt-track {
+  background: var(--dt-page);
+  border: 1px solid color-mix(in srgb, var(--dt-ink) 35%, transparent);
+  border-radius: 0;
+}
+.dt-genre-blueprint .dt-phase-num,
+.dt-genre-grid .dt-phase-num,
+.dt-genre-blueprint .dt-block,
+.dt-genre-grid .dt-block {
+  background: var(--dt-page);
+  border: 1.5px solid var(--dt-accent);
+  color: var(--dt-ink);
+  border-radius: 0;
+}
+.dt-genre-blueprint .dt-note,
+.dt-genre-grid .dt-note {
+  clip-path: none;
+  background: var(--dt-page);
+  border: 1.5px solid var(--dt-accent);
+  color: var(--dt-ink);
+  font-style: normal;
+}
+
+/* ---- Tier E — masthead / frame / minimal: editorial, hairline, quiet ---- */
+
+.dt-genre-masthead .dt-table-head,
+.dt-genre-frame .dt-table-head,
+.dt-genre-minimal .dt-table-head {
+  background: transparent;
+  color: var(--dt-ink);
+  border-bottom: 2px solid var(--dt-ink);
+  border-radius: 0;
+  padding-left: 0;
+}
+.dt-genre-masthead .dt-table-row,
+.dt-genre-frame .dt-table-row,
+.dt-genre-minimal .dt-table-row {
+  background: transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--dt-ink) 22%, transparent);
+  border-radius: 0;
+  padding-left: 0;
+}
+.dt-genre-masthead .dt-pack,
+.dt-genre-frame .dt-pack,
+.dt-genre-minimal .dt-pack {
+  background: transparent;
+  border-top: 3px solid var(--dt-ink);
+  border-radius: 0;
+}
+.dt-genre-masthead .dt-pack-head,
+.dt-genre-frame .dt-pack-head,
+.dt-genre-minimal .dt-pack-head {
+  background: transparent;
+  font-family: var(--dt-display);
+  font-style: italic;
+}
+.dt-genre-masthead .dt-pack-featured .dt-pack-head,
+.dt-genre-frame .dt-pack-featured .dt-pack-head,
+.dt-genre-minimal .dt-pack-featured .dt-pack-head {
+  background: transparent;
+  color: var(--dt-accent);
+}
+.dt-genre-masthead .dt-avatar,
+.dt-genre-frame .dt-avatar,
+.dt-genre-minimal .dt-avatar {
+  background: transparent;
+  border: 1px solid var(--dt-ink);
+  color: var(--dt-ink);
+  font-family: var(--dt-display);
+  font-style: italic;
+}
+.dt-genre-masthead .dt-gantt-ticks span,
+.dt-genre-frame .dt-gantt-ticks span,
+.dt-genre-minimal .dt-gantt-ticks span {
+  background: transparent;
+  color: var(--dt-ink);
+  border-bottom: 1px solid var(--dt-ink);
+  border-radius: 0;
+}
+.dt-genre-masthead .dt-gantt-bar-alt,
+.dt-genre-frame .dt-gantt-bar-alt,
+.dt-genre-minimal .dt-gantt-bar-alt {
+  background: color-mix(in srgb, var(--dt-ink) 65%, transparent);
+}
+.dt-genre-masthead .dt-block,
+.dt-genre-frame .dt-block,
+.dt-genre-minimal .dt-block {
+  background: transparent;
+  border-top: 3px solid var(--dt-ink);
+  border-radius: 0;
+}
+
+/* ---- Contract/brief clause headings: the same seven head archetypes,
+   drawn on .dt-clause-h since ClauseDoc doesn't use the shared Heading(). ---- */
+
+.dt-heads-tab .dt-clause-h { display: flex; align-items: center; gap: 9px; }
+.dt-heads-tab .dt-clause-h::before { content: ''; width: 8px; height: 8px; flex-shrink: 0; border-radius: 2px; background: var(--dt-accent); }
+.dt-heads-boxed .dt-clause-h { display: inline-block; border: 1.5px solid var(--dt-ink); padding: 5px 11px; }
+.dt-heads-mono .dt-clause-h { font-family: var(--dt-body); text-transform: uppercase; letter-spacing: 0.02em; }
+.dt-heads-ghost .dt-clause-h { color: var(--dt-accent); }
+.dt-heads-rule .dt-clause-h { padding-bottom: 8px; border-bottom: 2px solid var(--dt-accent); display: inline-block; }
