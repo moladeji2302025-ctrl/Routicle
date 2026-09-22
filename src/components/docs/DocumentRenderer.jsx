@@ -34,9 +34,12 @@ function Wordmark({ className = '' }) {
 
 function Heading({ n, far, children }) {
   const { style } = useDocMeta()
+  // 'ghost' reuses the same section number as 'numbered', just drawn as a
+  // huge pale watermark behind the heading instead of a small accent label.
+  const showNum = style.heads === 'numbered' || style.heads === 'ghost'
   return (
     <div className={`dt-h dt-h-${style.heads}${far ? ' dt-h-far' : ''}`}>
-      {style.heads === 'numbered' && n != null && <span className="dt-h-num">{String(n).padStart(2, '0')}</span>}
+      {showNum && n != null && <span className="dt-h-num">{String(n).padStart(2, '0')}</span>}
       <h2>{children}</h2>
       {style.heads === 'rule' && <span className="dt-h-bar" />}
     </div>
@@ -115,7 +118,20 @@ function titleRoom(cover, pageWidth) {
     case 'split':
       return pageWidth * 0.62 - 90
     case 'frame':
+    case 'poster':
       return pageWidth - 150
+    case 'masthead':
+      return pageWidth - 140
+    case 'grid':
+      // Swiss-style restraint: small, precise type, not the page-filling
+      // giant word stack every other archetype uses. dt-cover-grid also
+      // forces this with !important, since a font that hasn't finished
+      // loading yet would otherwise flash at the default huge size.
+      return pageWidth * 0.34
+    case 'sticker':
+      // The title sits inside a rotated blob well short of the page edge —
+      // the default room measures against the full page and overflows it.
+      return pageWidth * 0.5
     default:
       return pageWidth - 80
   }

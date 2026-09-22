@@ -19813,3 +19813,262 @@ a.sp-card:hover .sp-link svg {
 .dt-style-inv-dashboard .dt-inv-totals td { color: var(--dt-accent-ink); border-bottom-color: color-mix(in srgb, var(--dt-accent-ink) 25%, transparent); }
 .dt-style-inv-dashboard .dt-inv-grand th,
 .dt-style-inv-dashboard .dt-inv-grand td { font-size: 20px; border-bottom: none; }
+
+/* ============================================================
+   Twelve more cover archetypes (documentStyles.js: cover), on top of
+   bleed/split/top/frame/minimal above. Each is a real composition change —
+   a slash, a torn edge, a terminal window, a stacked poster — not a recolour.
+   None of this touches Cover()'s JSX: every archetype restyles the same
+   three elements (.dt-cover-mark, .dt-cover-title-wrap, .dt-cover-bottom)
+   inside .dt-cover-main, the way bleed/split/top/frame/minimal already do.
+   ============================================================ */
+
+/* ---- Diagonal: a bold slash cuts across the lower page ---- */
+
+.dt-cover-diagonal .dt-cover-main { position: relative; overflow: hidden; }
+.dt-cover-diagonal .dt-cover-main::before {
+  content: '';
+  position: absolute;
+  inset: -5% -10%;
+  background: var(--dt-accent);
+  clip-path: polygon(0 62%, 100% 34%, 100% 100%, 0 100%);
+}
+.dt-cover-diagonal .dt-cover-mark,
+.dt-cover-diagonal .dt-cover-title-wrap,
+.dt-cover-diagonal .dt-cover-bottom { position: relative; z-index: 1; }
+.dt-cover-diagonal .dt-cover-title-wrap { margin: 0 0 auto; }
+.dt-cover-diagonal .dt-cover-bottom { color: var(--dt-accent-ink); }
+
+/* ---- Poster: a thick rule frames the title like a gig poster ---- */
+
+.dt-cover-poster .dt-cover-main { margin: 26px; padding: 40px 34px 30px; border: 4px solid var(--dt-ink); }
+.dt-cover-poster .dt-cover-mark { font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; }
+.dt-cover-poster .dt-cover-title-wrap { border-top: 1.5px solid var(--dt-ink); border-bottom: 1.5px solid var(--dt-ink); padding: 22px 0; }
+.dt-cover-poster .dt-cover-bottom { margin-top: auto; }
+
+/* ---- Stacked: each word is its own full-width colour bar ---- */
+
+.dt-cover-stacked .dt-cover-main { padding: 0; justify-content: flex-start; }
+.dt-cover-stacked .dt-cover-mark { padding: 22px 38px 0; }
+.dt-cover-stacked .dt-cover-title-wrap { margin: 20px 0 0; }
+.dt-cover-stacked .dt-cover-title span {
+  padding: 6px 38px;
+  background: var(--dt-accent);
+  color: var(--dt-accent-ink);
+}
+.dt-cover-stacked .dt-cover-title span:nth-child(even) {
+  background: var(--dt-ink);
+  color: var(--dt-page);
+}
+.dt-cover-stacked .dt-cover-bottom { padding: 22px 38px; margin-top: auto; }
+
+/* ---- Blueprint: a technical grid, outlined type, coordinate meta ---- */
+
+.dt-cover-blueprint .dt-cover-main {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--dt-accent) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--dt-accent) 18%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.dt-cover-blueprint .dt-cover-mark { font-family: var(--dt-body); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dt-accent); }
+.dt-cover-blueprint .dt-cover-title { color: color-mix(in srgb, var(--dt-ink) 12%, var(--dt-page)); -webkit-text-stroke: 2px var(--dt-accent); }
+.dt-cover-blueprint .dt-cover-bottom { align-self: flex-start; font-family: var(--dt-body); font-size: 11px; padding: 12px 14px; border: 1px solid var(--dt-accent); }
+
+/* ---- Halftone: a dot-pattern wash behind the type ---- */
+
+.dt-cover-halftone .dt-cover-main {
+  background-image: radial-gradient(color-mix(in srgb, var(--dt-accent) 55%, transparent) 1.6px, transparent 1.6px);
+  background-size: 10px 10px;
+}
+.dt-cover-halftone .dt-cover-title-wrap { background: var(--dt-page); padding: 18px 0; }
+.dt-cover-halftone .dt-cover-mark { background: var(--dt-page); display: inline-block; padding: 4px 10px; }
+.dt-cover-halftone .dt-cover-bottom { background: var(--dt-page); padding: 14px 0; }
+
+/* ---- Terminal: a dark code-editor window, a command-line title ---- */
+
+.dt-cover-terminal { background: var(--dt-ink); }
+.dt-cover-terminal .dt-cover-main { padding: 0; }
+.dt-cover-terminal .dt-cover-mark {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px 16px 54px;
+  position: relative;
+  background: color-mix(in srgb, var(--dt-ink) 85%, white 8%);
+  color: color-mix(in srgb, var(--dt-page) 70%, transparent);
+  font-family: var(--dt-body);
+  font-size: 12px;
+}
+.dt-cover-terminal .dt-cover-mark::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e5484d;
+  box-shadow: 16px 0 0 #f2b90c, 32px 0 0 #2f9e63;
+}
+.dt-cover-terminal .dt-cover-title-wrap { margin: auto 0; padding: 0 38px; }
+.dt-cover-terminal .dt-cover-title { color: var(--dt-accent); }
+.dt-cover-terminal .dt-cover-title span:first-child::before { content: '> '; color: color-mix(in srgb, var(--dt-page) 40%, transparent); }
+.dt-cover-terminal .dt-cover-bottom { padding: 20px 38px; color: color-mix(in srgb, var(--dt-page) 65%, transparent); font-family: var(--dt-body); }
+
+/* ---- Masthead: a magazine nameplate, ruled top and bottom ---- */
+
+.dt-cover-masthead .dt-cover-mark { font-size: 13px; letter-spacing: 0.28em; text-transform: uppercase; text-align: center; }
+.dt-cover-masthead .dt-cover-title-wrap {
+  margin: 18px 0 auto;
+  padding: 22px 0;
+  border-top: 3px solid var(--dt-ink);
+  border-bottom: 3px solid var(--dt-ink);
+}
+.dt-cover-masthead .dt-cover-title { text-align: center; }
+.dt-cover-masthead .dt-cover-bottom { text-align: center; }
+
+/* ---- Foil: a dark ground, a shimmering gradient title ---- */
+
+.dt-cover-foil { background: var(--dt-ink); }
+.dt-cover-foil .dt-cover-mark { color: var(--dt-accent); }
+.dt-cover-foil .dt-cover-title-wrap { border-top: 1px solid var(--dt-accent); border-bottom: 1px solid var(--dt-accent); padding: 26px 0; }
+.dt-cover-foil .dt-cover-title {
+  /* Mixed well past the accent's own brightness, so a dark, muted accent
+     still shimmers — the point is a bright sweep, not the accent's true hue. */
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--dt-accent) 55%, white 45%) 0%,
+    color-mix(in srgb, var(--dt-accent) 70%, white 30%) 25%,
+    white 50%,
+    color-mix(in srgb, var(--dt-accent) 70%, white 30%) 75%,
+    color-mix(in srgb, var(--dt-accent) 55%, white 45%) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dt-cover-foil .dt-cover-bottom { color: color-mix(in srgb, var(--dt-page) 70%, transparent); }
+
+/* ---- Torn: two colour blocks meet at a jagged torn edge ---- */
+
+.dt-cover-torn .dt-cover-main { position: relative; }
+.dt-cover-torn .dt-cover-main::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 46%;
+  background: var(--dt-accent);
+  clip-path: polygon(0% 12px, 4% 0, 8% 14px, 12% 2px, 16% 16px, 20% 3px, 24% 15px, 28% 1px, 32% 13px, 36% 4px, 40% 17px, 44% 2px, 48% 14px, 52% 0, 56% 15px, 60% 3px, 64% 16px, 68% 1px, 72% 14px, 76% 5px, 80% 17px, 84% 2px, 88% 15px, 92% 0, 96% 13px, 100% 4px, 100% 100%, 0 100%);
+}
+.dt-cover-torn .dt-cover-mark,
+.dt-cover-torn .dt-cover-title-wrap { position: relative; }
+.dt-cover-torn .dt-cover-bottom { position: relative; color: var(--dt-accent-ink); padding-top: 34px; }
+
+/* ---- Grid: Swiss restraint — small type, ruled grid, huge air ---- */
+
+.dt-cover-grid .dt-cover-main {
+  position: relative;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--dt-ink) 22%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--dt-ink) 22%, transparent) 1px, transparent 1px);
+  background-size: 100% 33.33%, 25% 100%;
+}
+/* A solid colour block fills the top-left grid cell — the one anchor a
+   Swiss-style poster always has, so the page reads as designed, not empty. */
+.dt-cover-grid .dt-cover-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 25%;
+  height: 33.33%;
+  background: var(--dt-accent);
+}
+.dt-cover-grid .dt-cover-title { font-size: 46px !important; line-height: 1.08 !important; color: var(--dt-ink); }
+.dt-cover-grid .dt-cover-title-wrap { margin: 0; align-self: flex-end; text-align: right; max-width: 62%; }
+.dt-cover-grid .dt-cover-mark {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  padding: 10px 14px;
+  color: var(--dt-accent-ink);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+.dt-cover-grid .dt-cover-bottom { align-self: flex-start; margin-top: auto; }
+
+/* ---- Sticker: a rounded blob, tilted, holding the whole cover ---- */
+
+.dt-cover-sticker { display: flex; align-items: center; justify-content: center; }
+.dt-cover-sticker .dt-cover-main {
+  flex: none;
+  width: 86%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--dt-accent);
+  border-radius: 48% 52% 54% 46% / 46% 48% 52% 54%;
+  transform: rotate(-3deg);
+  box-shadow: 0 20px 50px -20px color-mix(in srgb, var(--dt-ink) 45%, transparent);
+  padding: 60px 50px;
+}
+.dt-cover-sticker .dt-cover-mark,
+.dt-cover-sticker .dt-cover-title,
+.dt-cover-sticker .dt-cover-bottom { color: var(--dt-accent-ink); text-align: center; transform: rotate(3deg); }
+
+/* ---- Glitch: a dark ground, scanlines, an RGB-split title ---- */
+
+.dt-cover-glitch { background: var(--dt-ink); }
+.dt-cover-glitch .dt-cover-main { position: relative; overflow: hidden; }
+.dt-cover-glitch .dt-cover-main::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 3px);
+  pointer-events: none;
+}
+.dt-cover-glitch .dt-cover-mark { position: relative; color: color-mix(in srgb, var(--dt-page) 60%, transparent); }
+.dt-cover-glitch .dt-cover-title {
+  position: relative;
+  color: var(--dt-page);
+  text-shadow: 3px 0 var(--dt-accent), -3px 0 color-mix(in srgb, var(--dt-accent) 35%, cyan 65%);
+}
+.dt-cover-glitch .dt-cover-bottom { position: relative; color: color-mix(in srgb, var(--dt-page) 55%, transparent); }
+
+/* ============================================================
+   Four more section-heading archetypes (documentStyles.js: heads), on top
+   of plain/rule/numbered above.
+   ============================================================ */
+
+/* ---- Tab: a small colour tag before the heading ---- */
+
+.dt-h-tab { display: flex; align-items: center; gap: 10px; }
+.dt-h-tab::before { content: ''; width: 10px; height: 10px; flex-shrink: 0; border-radius: 2px; background: var(--dt-accent); }
+
+/* ---- Ghost: a huge pale section number behind the heading ---- */
+
+.dt-h-ghost { position: relative; padding-top: 30px; }
+.dt-h-ghost .dt-h-num {
+  position: absolute;
+  top: -16px;
+  left: -4px;
+  font-family: var(--dt-display);
+  font-size: 92px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--dt-accent) 14%, transparent);
+  z-index: 0;
+}
+.dt-h-ghost h2 { position: relative; z-index: 1; }
+
+/* ---- Boxed: a ruled box with a small corner mark ---- */
+
+.dt-h-boxed { position: relative; border: 1.5px solid var(--dt-ink); padding: 16px 18px; }
+.dt-h-boxed::before { content: ''; position: absolute; top: -1.5px; left: -1.5px; width: 12px; height: 12px; border-top: 2.5px solid var(--dt-accent); border-left: 2.5px solid var(--dt-accent); }
+.dt-h-boxed h2 { font-size: 32px; }
+
+/* ---- Mono: a monospace command-line heading ---- */
+
+.dt-h-mono { display: flex; align-items: baseline; gap: 10px; }
+.dt-h-mono::before { content: '>'; color: var(--dt-accent); font-family: var(--dt-body); font-weight: 700; font-size: 24px; }
+.dt-h-mono h2 { font-family: var(--dt-body); font-size: 24px; font-weight: 700; letter-spacing: 0.01em; text-transform: uppercase; }
