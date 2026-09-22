@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useCreativeDraft } from '../../../lib/creativeDraft'
-import { PenIcon, SlidersIcon, BookmarkIcon, CardIcon, GridIcon, ChevronRightIcon } from '../../../components/icons'
+import { PenIcon, SlidersIcon, BookmarkIcon, CardIcon, GridIcon, ImageIcon, ChevronRightIcon } from '../../../components/icons'
 
 export default function CreativeSuiteHub() {
   const [draft] = useCreativeDraft()
@@ -40,6 +40,13 @@ export default function CreativeSuiteHub() {
       blurb: "Drop the brand into a creator's frame — social posts, decks, one-pagers.",
       needsMark: true,
     },
+    {
+      to: '/suite/creative/mockup',
+      icon: ImageIcon,
+      label: 'Mockup Studio',
+      blurb: 'Drop the mark onto a real photo — a mug, a wall, a shirt — warped and blended to sit like it belongs there.',
+      needsMark: true,
+    },
   ]
 
   return (
@@ -48,7 +55,7 @@ export default function CreativeSuiteHub() {
         <div>
           <h2>Creative Suite</h2>
           <p className="settings-section-desc">
-            Five tools, one brand. Build the mark once in Logo Maker — everything else here is generated from it.
+            Six tools, one brand. Build the mark once in Logo Maker — everything else here is generated from it.
           </p>
         </div>
       </div>

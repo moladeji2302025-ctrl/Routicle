@@ -21359,3 +21359,126 @@ a.sp-card:hover .sp-link svg {
   font-size: 16px;
   font-weight: 700;
 }
+
+/* ============================================================
+   Mockup Studio — a real uploaded photo, a logo-pack asset warped onto it
+   by dragging its four corners, then blended in with the surface.
+   ============================================================ */
+
+.mks-assets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px;
+}
+
+.mks-asset {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.mks-asset svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.mks-asset:hover {
+  border-color: var(--brand-violet);
+}
+
+.mks-asset-active {
+  border-color: var(--brand-violet);
+  background: color-mix(in srgb, var(--brand-violet) 12%, var(--surface-2));
+}
+
+.mks-stage-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.mks-stage {
+  position: relative;
+  width: 100%;
+  border-radius: 13px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  touch-action: none;
+  user-select: none;
+}
+
+.mks-stage-idle {
+  display: flex;
+  min-height: 320px;
+}
+
+.mks-stage canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mks-stage-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px;
+}
+
+.mks-stage-empty p {
+  margin: 0;
+  font-size: 13px;
+  max-width: 240px;
+}
+
+.mks-guide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mks-guide polygon {
+  fill: none;
+  stroke: var(--brand-violet);
+  stroke-width: 2;
+  stroke-dasharray: 8 6;
+  vector-effect: non-scaling-stroke;
+}
+
+.mks-handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--brand-violet);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  cursor: grab;
+}
+
+.mks-handle:active {
+  cursor: grabbing;
+}
+
+.mks-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}

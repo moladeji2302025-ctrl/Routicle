@@ -60,6 +60,7 @@ import PaletteLabPage from './pages/suite/creative/PaletteLabPage'
 import BrandGuidePage from './pages/suite/creative/BrandGuidePage'
 import StationeryPage from './pages/suite/creative/StationeryPage'
 import FeaturedTemplatesPage from './pages/suite/creative/FeaturedTemplatesPage'
+import MockupStudioPage from './pages/suite/creative/MockupStudioPage'
 import StudioProfilePage from './pages/suite/StudioProfilePage'
 import ProjectPage from './pages/suite/ProjectPage'
 import DocumentPage from './pages/suite/DocumentPage'
@@ -136,6 +137,7 @@ export default function App() {
               <Route path="creative/brand-guide" element={<BrandGuidePage />} />
               <Route path="creative/stationery" element={<StationeryPage />} />
               <Route path="creative/templates" element={<FeaturedTemplatesPage />} />
+              <Route path="creative/mockup" element={<MockupStudioPage />} />
             </Route>
             <Route path="/invite/:id" element={<InvitePage />} />
             <Route path="/admin" element={<AdminLayout />}>
