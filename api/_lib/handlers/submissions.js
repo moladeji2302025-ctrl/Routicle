@@ -66,7 +66,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
       // The moderation queue, including creator email addresses. Admin only.
-      const admin = await requireAdmin(req, res)
+      const admin = await requireAdmin(req, res, ['moderator'])
       if (!admin) return
 
       const status = req.query.status || 'pending'

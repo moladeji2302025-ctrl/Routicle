@@ -1,4 +1,4 @@
-import { getSession, isAdminUser } from '../auth.js'
+import { getSession, staffRole } from '../auth.js'
 import { send, methodGuard, withErrorHandling } from '../http.js'
 
 /**
@@ -28,9 +28,11 @@ export default async function handler(req, res) {
       })
     }
 
-    const isAdmin = await isAdminUser(session.user)
+    const role = await staffRole(session.user)
+    const isAdmin = role !== null
     send(res, 200, {
       isAdmin,
+      role,
       user: { id: session.user.id, email: session.user.email, name: session.user.name },
       reason: isAdmin
         ? undefined

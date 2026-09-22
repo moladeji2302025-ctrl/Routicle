@@ -45,7 +45,7 @@ const SAMPLES = {
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['GET', 'POST', 'DELETE'])) return
-    const admin = await requireAdmin(req, res)
+    const admin = await requireAdmin(req, res, ['marketing'])
     if (!admin) return
     await run(req, res, admin)
   })

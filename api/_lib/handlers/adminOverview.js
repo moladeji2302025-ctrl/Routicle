@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['GET'])) return
 
-    const admin = await requireAdmin(req, res)
+    const admin = await requireAdmin(req, res, ['marketing', 'sales', 'support', 'moderator'])
     if (!admin) return
 
     const [

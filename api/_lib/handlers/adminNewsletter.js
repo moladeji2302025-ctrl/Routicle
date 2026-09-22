@@ -44,7 +44,7 @@ function validate(body) {
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['GET', 'POST'])) return
-    const admin = await requireAdmin(req, res)
+    const admin = await requireAdmin(req, res, ['marketing'])
     if (!admin) return
     await run(req, res, admin)
   })

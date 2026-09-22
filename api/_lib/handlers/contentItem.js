@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     if (req.method === 'PATCH') {
       // Flipping an item to free removes its paywall. Admin only — this was
       // open to anyone, so the whole library could be unlocked item by item.
-      const admin = await requireAdmin(req, res)
+      const admin = await requireAdmin(req, res, ['moderator'])
       if (!admin) return
 
       const { isFree } = req.body || {}

@@ -190,8 +190,11 @@ export function AppProvider({ children }) {
    * nothing.
    */
   const [isPlatformAdmin, setIsPlatformAdmin] = useState(false)
+  // 'admin' | 'marketing' | 'sales' | 'support' | 'moderator' | null. Any of them
+  // is staff (isPlatformAdmin); only 'admin' gets the premium view below.
+  const [adminRole, setAdminRole] = useState(null)
   const isPlatformAdminRef = useRef(false)
-  isPlatformAdminRef.current = isPlatformAdmin
+  isPlatformAdminRef.current = adminRole === 'admin'
   // Why admin was refused, surfaced in the console's gate so a misconfiguration
   // is readable without opening devtools.
   const [adminReason, setAdminReason] = useState('')
@@ -281,7 +284,7 @@ export function AppProvider({ children }) {
   // when the server has already said this session is an admin. Firing it for
   // everyone meant a 403 and a console error on every page load.
   const refreshPending = useCallback(() => {
-    if (!isPlatformAdmin) {
+    if (adminRole !== 'admin' && adminRole !== 'moderator') {
       setLivePendingSubmissions([])
       return
     }
@@ -391,16 +394,19 @@ export function AppProvider({ children }) {
   useEffect(() => {
     if (!state.currentUser?.id) {
       setIsPlatformAdmin(false)
+      setAdminRole(null)
       return
     }
     api
       .fetchAdminSession()
-      .then(({ isAdmin, reason }) => {
+      .then(({ isAdmin, role, reason }) => {
         setIsPlatformAdmin(!!isAdmin)
+        setAdminRole(isAdmin ? role || 'admin' : null)
         setAdminReason(reason || '')
       })
       .catch((err) => {
         setIsPlatformAdmin(false)
+        setAdminRole(null)
         setAdminReason(err.message)
       })
   }, [state.currentUser?.id])
@@ -1124,7 +1130,7 @@ export function AppProvider({ children }) {
   // rights independently; this only stops the interface from asking.
   const adminView = useMemo(() => {
     const u = state.currentUser
-    if (!u || !isPlatformAdmin) return u
+    if (!u || adminRole !== 'admin') return u
     return {
       ...u,
       role: 'express',
@@ -1134,7 +1140,7 @@ export function AppProvider({ children }) {
       billingMode: 'monthly',
       credits: { image: 9999, video: 9999 },
     }
-  }, [state.currentUser, isPlatformAdmin])
+  }, [state.currentUser, adminRole])
 
   const value = useMemo(
     () => ({
@@ -1151,6 +1157,7 @@ export function AppProvider({ children }) {
       teamMembers,
       subscription,
       isPlatformAdmin,
+      adminRole,
       adminReason,
       recentlyViewed,
       recordView,
@@ -1169,6 +1176,7 @@ export function AppProvider({ children }) {
       teamMembers,
       subscription,
       isPlatformAdmin,
+      adminRole,
       adminReason,
       recentlyViewed,
       recordView,

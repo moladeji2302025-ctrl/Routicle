@@ -99,30 +99,56 @@ function bootstrapEmails() {
     .filter(Boolean)
 }
 
-export async function isAdminUser(user) {
-  if (!user) return false
-  const email = (user.email || '').toLowerCase()
-  if (email && bootstrapEmails().includes(email)) return true
+/**
+ * Who works on the platform, and in what capacity. `admin` can do everything;
+ * the others are departments that see only their own part of the console.
+ * A bootstrap email is always a full admin.
+ */
+export const STAFF_ROLES = ['admin', 'marketing', 'sales', 'support', 'moderator']
 
-  const rows = await sql`SELECT 1 FROM platform_admins WHERE user_id = ${user.id} LIMIT 1`
-  return rows.length > 0
+/** The staff role for a user id, or null when they are not staff. */
+export async function staffRoleById(userId) {
+  if (!userId) return null
+  const rows = await sql`
+    SELECT u.email, a.role
+    FROM neon_auth."user" u
+    LEFT JOIN platform_admins a ON a.user_id = u.id
+    WHERE u.id = ${userId} LIMIT 1
+  `
+  if (!rows[0]) return null
+  const email = (rows[0].email || '').toLowerCase()
+  if (email && bootstrapEmails().includes(email)) return 'admin'
+  return STAFF_ROLES.includes(rows[0].role) ? rows[0].role : null
+}
+
+export async function staffRole(user) {
+  return user ? staffRoleById(user.id) : null
+}
+
+/** Full admin only. Departments are staff, not admins. */
+export async function isAdminUser(user) {
+  return (await staffRole(user)) === 'admin'
 }
 
 /**
  * The same check by user id alone, for entitlement code that only has an id.
- * Admins hold every premium feature: this is what lets the platform's own
- * operators test and run the product without buying a plan.
+ * A full admin holds every premium feature, which is what lets the platform's
+ * operators run the product without buying a plan. Department staff do not.
  */
 export async function isAdminId(userId) {
-  if (!userId) return false
-  const rows = await sql`
-    SELECT u.email, EXISTS (SELECT 1 FROM platform_admins a WHERE a.user_id = u.id) AS granted
-    FROM neon_auth."user" u WHERE u.id = ${userId} LIMIT 1
-  `
-  if (!rows[0]) return false
-  if (rows[0].granted) return true
-  const email = (rows[0].email || '').toLowerCase()
-  return Boolean(email) && bootstrapEmails().includes(email)
+  return (await staffRoleById(userId)) === 'admin'
+}
+
+/** Records something an admin did, for the Activity log. Never throws. */
+export async function logAdmin(actor, action, target, detail) {
+  try {
+    await sql`
+      INSERT INTO admin_audit_log (actor_id, actor_email, action, target, detail)
+      VALUES (${actor?.id || null}, ${actor?.email || null}, ${action}, ${target || null}, ${detail ? JSON.stringify(detail) : null})
+    `
+  } catch (err) {
+    console.error('audit log failed', err.message)
+  }
 }
 
 /** Resolves to the session user, or sends 401 and resolves to null. */
@@ -136,12 +162,17 @@ export async function requireUser(req, res) {
 }
 
 /** Resolves to the session user when they are an admin, or sends 401/403 and resolves to null. */
-export async function requireAdmin(req, res) {
+export async function requireAdmin(req, res, allowedRoles = []) {
   const user = await requireUser(req, res)
   if (!user) return null
-  if (!(await isAdminUser(user))) {
+  const role = await staffRole(user)
+  if (!role) {
     send(res, 403, { error: 'Admin access required' })
     return null
   }
-  return user
+  if (role !== 'admin' && !allowedRoles.includes(role)) {
+    send(res, 403, { error: `Your ${role} role can't do that. Ask an admin.` })
+    return null
+  }
+  return { ...user, adminRole: role }
 }

@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react'
 import * as api from '../../lib/api'
-import { UserIcon } from '../../components/icons'
+import { useApp } from '../../context/AppContext'
+import { UserIcon, SearchIcon } from '../../components/icons'
+import { ROLE_LABEL } from './AdminLayout'
 
 const TIER_LABEL = { free: 'Free', standard: 'Standard', express: 'Express' }
+const ROLES = ['admin', 'marketing', 'sales', 'support', 'moderator']
 
 export default function AdminUsersPage() {
+  const { adminRole, currentUser } = useApp()
+  const canEdit = adminRole === 'admin'
+
   const [users, setUsers] = useState(null)
   const [query, setQuery] = useState('')
   const [error, setError] = useState('')
@@ -31,12 +37,12 @@ export default function AdminUsersPage() {
     return () => clearTimeout(t)
   }, [query])
 
-  async function toggleAdmin(user) {
+  async function setRole(user, role) {
     setBusyId(user.id)
     setError('')
     try {
-      if (user.isAdmin) await api.revokeAdmin(user.id)
-      else await api.grantAdmin(user.id)
+      if (role === '') await api.revokeAdmin(user.id)
+      else await api.grantAdmin(user.id, role)
       await load(query.trim())
     } catch (err) {
       setError(err.message)
@@ -45,23 +51,37 @@ export default function AdminUsersPage() {
     }
   }
 
+  const staff = (users || []).filter((u) => u.staffRole)
+
   return (
     <section className="admin-section">
-      <h2>People</h2>
-      <p className="settings-section-desc">
-        Everyone with an account. Granting admin gives full access to this console and every
-        endpoint behind it.
-      </p>
+      <header className="adm-page-head">
+        <h2>People</h2>
+        <p>
+          {canEdit
+            ? 'Everyone with an account, and who on the team can do what. A role opens only that department’s pages; Admin opens everything.'
+            : 'Everyone with an account. You can look people up here; changes are made by an admin.'}
+        </p>
+      </header>
 
-      <div className="settings-inline-form">
+      {users && (
+        <div className="adm-kpis">
+          <div className="adm-kpi"><strong>{users.length}</strong><span>Accounts shown</span></div>
+          <div className="adm-kpi"><strong>{users.filter((u) => u.isCreator).length}</strong><span>Creators</span></div>
+          <div className="adm-kpi"><strong>{users.filter((u) => u.tier !== 'free').length}</strong><span>On a paid plan</span></div>
+          <div className="adm-kpi"><strong>{staff.length}</strong><span>On the team</span></div>
+        </div>
+      )}
+
+      <label className="adm-search">
+        <SearchIcon size={15} color="currentColor" />
         <input
           type="search"
-          className="settings-input"
           value={query}
-          placeholder="Search by name or email…"
+          placeholder="Search by name or email"
           onChange={(e) => setQuery(e.target.value)}
         />
-      </div>
+      </label>
 
       {error && <p className="settings-error">{error}</p>}
 
@@ -70,38 +90,45 @@ export default function AdminUsersPage() {
       ) : users.length === 0 ? (
         <p className="explore-empty">No accounts match that search.</p>
       ) : (
-        <div className="download-list">
+        <ul className="adm-people">
           {users.map((u) => (
-            <div key={u.id} className="download-row">
+            <li key={u.id} className="adm-person">
               {u.image ? (
-                <img src={u.image} alt="" className="settings-list-avatar" />
+                <img src={u.image} alt="" className="adm-avatar" />
               ) : (
-                <span className="settings-list-avatar settings-avatar-fallback">
-                  <UserIcon size={14} color="currentColor" />
+                <span className="adm-avatar adm-avatar-fallback">
+                  <UserIcon size={15} color="currentColor" />
                 </span>
               )}
-              <div className="download-info">
-                <span className="download-title">{u.name || u.email}</span>
-                <span className="download-meta">
-                  {u.email} · joined {new Date(u.createdAt).toLocaleDateString()}
+              <div className="adm-person-main">
+                <span className="adm-person-name">{u.name || u.email || 'Unnamed'}</span>
+                <span className="adm-person-meta">
+                  {u.email ? `${u.email} · ` : ''}joined {new Date(u.createdAt).toLocaleDateString()}
                 </span>
               </div>
 
-              <span className="settings-pill">{TIER_LABEL[u.tier] || u.tier}</span>
-              {u.isCreator && <span className="settings-pill">Creator</span>}
-              {u.isAdmin && <span className="admin-pill-strong">Admin</span>}
+              <span className="adm-chip">{TIER_LABEL[u.tier] || u.tier}</span>
+              {u.isCreator && <span className="adm-chip">Creator</span>}
+              {u.staffRole && <span className="adm-chip adm-chip-strong">{ROLE_LABEL[u.staffRole]}</span>}
 
-              <button
-                type="button"
-                className={u.isAdmin ? 'settings-btn settings-btn-danger' : 'settings-btn'}
-                disabled={busyId === u.id}
-                onClick={() => toggleAdmin(u)}
-              >
-                {busyId === u.id ? '…' : u.isAdmin ? 'Revoke admin' : 'Make admin'}
-              </button>
-            </div>
+              {canEdit && (
+                <select
+                  className="adm-select"
+                  value={u.staffRole || ''}
+                  disabled={busyId === u.id || u.id === currentUser?.id}
+                  aria-label={`Role for ${u.name || u.email}`}
+                  title={u.id === currentUser?.id ? 'You can’t change your own role' : undefined}
+                  onChange={(e) => setRole(u, e.target.value)}
+                >
+                  <option value="">No team role</option>
+                  {ROLES.map((r) => (
+                    <option key={r} value={r}>{ROLE_LABEL[r]}</option>
+                  ))}
+                </select>
+              )}
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </section>
   )

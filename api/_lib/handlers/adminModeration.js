@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['POST'])) return
 
-    const admin = await requireAdmin(req, res)
+    const admin = await requireAdmin(req, res, ['moderator'])
     if (!admin) return
 
     const { id, action, note } = req.body || {}

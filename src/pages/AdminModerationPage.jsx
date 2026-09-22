@@ -3,15 +3,15 @@ import { useApp } from '../context/AppContext'
 import { categoryLabel } from '../data/categories'
 
 export default function AdminModerationPage() {
-  const { currentUser, pendingSubmissions, contentItems, moderateSubmission, markItemFree } = useApp()
+  const { adminRole, pendingSubmissions, contentItems, moderateSubmission, markItemFree } = useApp()
   const navigate = useNavigate()
 
-  if (!currentUser?.isAdmin) {
+  if (adminRole !== 'admin' && adminRole !== 'moderator') {
     return (
       <div className="dashboard-page dashboard-gate">
-        <h1>Admins only</h1>
-        <p>Grant yourself admin from the Account page's demo controls to preview this screen.</p>
-        <button type="button" className="btn-hero-secondary" onClick={() => navigate('/account')}>Go to Account</button>
+        <h1>Moderators only</h1>
+        <p>Your role doesn't include the moderation queue. Ask an admin if you need it.</p>
+        <button type="button" className="btn-hero-secondary" onClick={() => navigate('/admin')}>Back to the console</button>
       </div>
     )
   }

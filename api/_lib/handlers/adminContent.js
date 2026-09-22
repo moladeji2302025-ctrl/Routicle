@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
     if (!methodGuard(req, res, ['GET', 'PATCH', 'DELETE'])) return
 
-    const admin = await requireAdmin(req, res)
+    const admin = await requireAdmin(req, res, ['moderator'])
     if (!admin) return
 
     if (req.method === 'GET') {

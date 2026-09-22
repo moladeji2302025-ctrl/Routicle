@@ -461,8 +461,12 @@ export function fetchAdminUsers(q) {
   return request(`/admin/users${q ? `?q=${encodeURIComponent(q)}` : ''}`)
 }
 
-export function grantAdmin(userId) {
-  return request('/admin/users', { method: 'POST', body: JSON.stringify({ userId }) })
+export function grantAdmin(userId, role = 'admin') {
+  return request('/admin/users', { method: 'POST', body: JSON.stringify({ userId, role }) })
+}
+
+export function fetchAdminAudit(limit = 100) {
+  return request(`/admin/audit?limit=${limit}`)
 }
 
 export function revokeAdmin(userId) {
