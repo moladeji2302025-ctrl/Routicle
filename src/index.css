@@ -19373,3 +19373,93 @@ a.sp-card:hover .sp-link svg {
     max-height: 320px;
   }
 }
+
+/* ---- Admin: modals, leads form, misc shared with the new pages ---- */
+
+.adm-chip-danger {
+  border-color: transparent;
+  background: #e5484d;
+  color: #fff;
+}
+
+.adm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 10, 14, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.adm-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.adm-modal h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.adm-manage-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+
+.adm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.adm-lead-add {
+  gap: 12px;
+}
+
+.adm-lead-add-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-lead-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.adm-lead-toolbar .adm-search {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 220px;
+}
+
+/* ---- The maintenance banner, when an admin sets one ---- */
+
+.maint-banner {
+  padding: 10px 20px;
+  background: var(--brand-violet);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.4;
+}

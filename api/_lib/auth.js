@@ -76,10 +76,17 @@ export async function getSession(req) {
 
     // Read identity from our own tables rather than the token body, so a claim
     // set that drifts from the database can't grant access to the wrong row.
-    const rows = await sql`SELECT id, email, name, image FROM neon_auth."user" WHERE id = ${userId} LIMIT 1`
+    // banned/banExpires/banReason are Better Auth's own admin-plugin columns,
+    // already on this table; a suspended account is blocked here rather than
+    // relying on that plugin being wired up in the Neon Auth console.
+    const rows = await sql`SELECT id, email, name, image, banned, "banExpires", "banReason" FROM neon_auth."user" WHERE id = ${userId} LIMIT 1`
     if (rows.length === 0) return null
 
-    return { user: rows[0] }
+    const row = rows[0]
+    const stillBanned = row.banned && (!row.banExpires || new Date(row.banExpires) > new Date())
+    if (stillBanned) return { user: null, banned: true, banReason: row.banReason || null }
+
+    return { user: { id: row.id, email: row.email, name: row.name, image: row.image } }
   } catch (err) {
     // Expired or tampered tokens land here; that's a normal 401, not a fault.
     if (err?.code !== 'ERR_JWT_EXPIRED') console.error('JWT verification failed:', err.message)
@@ -154,7 +161,11 @@ export async function logAdmin(actor, action, target, detail) {
 /** Resolves to the session user, or sends 401 and resolves to null. */
 export async function requireUser(req, res) {
   const session = await getSession(req)
-  if (!session) {
+  if (session?.banned) {
+    send(res, 403, { error: session.banReason ? `This account is suspended: ${session.banReason}` : 'This account has been suspended.' })
+    return null
+  }
+  if (!session?.user) {
     send(res, 401, { error: 'Sign in required' })
     return null
   }

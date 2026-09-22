@@ -33,6 +33,11 @@ async function usedThisMonth(userId) {
   return n
 }
 
+async function aiImagesOn() {
+  const rows = await sql`SELECT value FROM app_settings WHERE key = 'aiImagesEnabled'`
+  return rows[0] ? rows[0].value !== false : true
+}
+
 export default async function generateImage(req, res, user) {
   if (!methodGuard(req, res, ['GET', 'POST'])) return
 
@@ -49,6 +54,9 @@ export default async function generateImage(req, res, user) {
   }
   if (!enabled) {
     return send(res, 503, { error: "AI images aren't switched on yet. You can upload your own photo in the meantime." })
+  }
+  if (!admin && !(await aiImagesOn())) {
+    return send(res, 503, { error: 'AI image generation is paused right now. Try again shortly.' })
   }
   if (used >= allowance) {
     return send(res, 429, { error: `You've used all ${allowance} AI images for this month. They reset on the 1st.` })

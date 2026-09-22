@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import GoogleIcon from '../components/GoogleIcon'
+import * as api from '../lib/api'
 
 export default function SignUpPage() {
   const { signUpWithEmail, signInWithGoogle } = useApp()
@@ -12,6 +13,21 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+
+  // The admin's "new sign-ups" switch. Checked once on load: this stops the
+  // form being used, not the account itself (Neon Auth issues the account,
+  // and this app has no way to add a server-side gate in front of it).
+  const [signupsEnabled, setSignupsEnabled] = useState(true)
+  useEffect(() => {
+    let live = true
+    api
+      .fetchPublicSettings()
+      .then(({ signupsEnabled: on }) => live && setSignupsEnabled(on !== false))
+      .catch(() => {})
+    return () => {
+      live = false
+    }
+  }, [])
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -34,6 +50,18 @@ export default function SignUpPage() {
     } catch (err) {
       setError(err.message || 'Google sign-up failed.')
     }
+  }
+
+  if (!signupsEnabled) {
+    return (
+      <div className="auth-page">
+        <div className="auth-card">
+          <h1 className="auth-title">Sign-ups are paused</h1>
+          <p className="auth-subtitle">New accounts aren't being created right now. Check back shortly.</p>
+          <Link to="/signin" className="auth-oauth-btn" style={{ justifyContent: 'center' }}>Already have an account? Sign in</Link>
+        </div>
+      </div>
+    )
   }
 
   return (

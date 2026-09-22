@@ -3,6 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import AppShell from './AppShell'
+import MaintenanceBanner from './MaintenanceBanner'
 import { useApp } from '../context/AppContext'
 
 export default function Layout() {
@@ -36,6 +37,7 @@ export default function Layout() {
   // Every signed-out page, including the homepage, gets the marketing site's navbar/footer chrome.
   return (
     <div className="page">
+      <MaintenanceBanner />
       <Navbar />
       <main className="page-main">
         <Outlet />

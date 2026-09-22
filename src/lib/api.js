@@ -487,6 +487,65 @@ export function grantAdmin(userId, role = 'admin') {
   return request('/admin/users', { method: 'POST', body: JSON.stringify({ userId, role }) })
 }
 
+export function fetchAdminSettings() {
+  return request('/admin/settings')
+}
+
+export function saveAdminSetting(key, value) {
+  return request('/admin/settings', { method: 'PATCH', body: JSON.stringify({ key, value }) })
+}
+
+export function fetchPublicSettings() {
+  return request('/public/settings')
+}
+
+export function grantAdminPlan(userId, tier, months) {
+  return request('/admin/users', { method: 'PATCH', body: JSON.stringify({ userId, action: 'grant-plan', tier, months }) })
+}
+
+export function revokeAdminPlan(userId) {
+  return request('/admin/users', { method: 'PATCH', body: JSON.stringify({ userId, action: 'revoke-plan' }) })
+}
+
+export function suspendAdminUser(userId, reason) {
+  return request('/admin/users', { method: 'PATCH', body: JSON.stringify({ userId, action: 'suspend', reason }) })
+}
+
+export function unsuspendAdminUser(userId) {
+  return request('/admin/users', { method: 'PATCH', body: JSON.stringify({ userId, action: 'unsuspend' }) })
+}
+
+export function fetchAdminLeads({ status, q } = {}) {
+  const params = new URLSearchParams()
+  if (status) params.set('status', status)
+  if (q) params.set('q', q)
+  const qs = params.toString()
+  return request(`/admin/leads${qs ? `?${qs}` : ''}`)
+}
+
+export function addAdminLead(data) {
+  return request('/admin/leads', { method: 'POST', body: JSON.stringify({ op: 'add', ...data }) })
+}
+
+export function importAdminLeads(rows) {
+  return request('/admin/leads', { method: 'POST', body: JSON.stringify({ op: 'import', rows }) })
+}
+
+export function sendAdminLeadOutreach({ leadId, leadIds, subject, body }) {
+  return request('/admin/leads', {
+    method: 'POST',
+    body: JSON.stringify(leadIds ? { op: 'send-batch', leadIds, subject, body } : { op: 'send', leadId, subject, body }),
+  })
+}
+
+export function patchAdminLead(data) {
+  return request('/admin/leads', { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export function deleteAdminLead(id) {
+  return request(`/admin/leads?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
 export function fetchAdminSupport({ status, q } = {}) {
   const params = new URLSearchParams()
   if (status) params.set('status', status)

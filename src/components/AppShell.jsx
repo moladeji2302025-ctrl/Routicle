@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import MaintenanceBanner from './MaintenanceBanner'
 import AppTopBar from './AppTopBar'
 import AppCursor from './AppCursor'
 import {
@@ -247,6 +248,7 @@ export default function AppShell() {
       </aside>
 
       <div className="app-main-col">
+        <MaintenanceBanner />
         <AppTopBar collapsed={collapsed} onToggleSidebar={handleSidebarButton} />
         <main className="app-main">
           <Outlet />

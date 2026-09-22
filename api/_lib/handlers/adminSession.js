@@ -18,7 +18,14 @@ export default async function handler(req, res) {
     const hasBearer = /^Bearer\s+\S/i.test(req.headers?.authorization || '')
 
     const session = await getSession(req)
-    if (!session) {
+    if (session?.banned) {
+      return send(res, 200, {
+        isAdmin: false,
+        user: null,
+        reason: session.banReason ? `This account is suspended: ${session.banReason}` : 'This account has been suspended.',
+      })
+    }
+    if (!session?.user) {
       return send(res, 200, {
         isAdmin: false,
         user: null,
