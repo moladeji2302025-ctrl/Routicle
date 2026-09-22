@@ -17898,8 +17898,13 @@ div.dt-e-multi {
 
 .sp-nav-on,
 .sp-nav-on:hover {
-  background: var(--text);
-  color: var(--surface);
+  /* Fixed brand colours, not var(--text)/var(--surface) inverted: those are
+     re-scoped from --app-text/--app-bg inside the signed-in app shell,
+     gated behind a [data-theme='dark'] attribute JS sets after mount — a
+     two-hop indirection that could paint this pill mid-transition, before
+     the cascade settles, with background and text nearly the same colour. */
+  background: var(--brand-violet);
+  color: #fff;
 }
 
 /* ------------------------------------------------------------------ hero */
