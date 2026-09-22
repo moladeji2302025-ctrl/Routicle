@@ -257,7 +257,6 @@ export default function LogoMakerPage() {
               <Link to="/suite/creative/brand-guide" className="settings-btn">Brand Guide <ChevronRightIcon size={13} color="currentColor" /></Link>
               <Link to="/suite/creative/stationery" className="settings-btn">Stationery <ChevronRightIcon size={13} color="currentColor" /></Link>
               <Link to="/suite/creative/templates" className="settings-btn">Featured Templates <ChevronRightIcon size={13} color="currentColor" /></Link>
-              <Link to="/suite/creative/mockup" className="settings-btn">3D Mockups <ChevronRightIcon size={13} color="currentColor" /></Link>
             </div>
           </div>
         </>
