@@ -21460,6 +21460,7 @@ a.sp-card:hover .sp-link svg {
   vector-effect: non-scaling-stroke;
 }
 
+
 .mks-handle {
   position: absolute;
   width: 18px;
@@ -21481,4 +21482,168 @@ a.sp-card:hover .sp-link svg {
   font-size: 12px;
   color: var(--text-muted);
   text-align: center;
+}
+
+/* ---- layer list ---- */
+
+.mks-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mks-layer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.mks-layer:hover {
+  border-color: var(--brand-violet);
+}
+
+.mks-layer-active {
+  border-color: var(--brand-violet);
+  background: color-mix(in srgb, var(--brand-violet) 10%, var(--surface-2));
+}
+
+.mks-layer-name {
+  font-size: 13px;
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mks-layer-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.mks-layer-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.mks-layer-actions button:hover {
+  background: var(--surface-3, rgba(0, 0, 0, 0.06));
+  color: var(--text);
+}
+
+.mks-layer-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px dashed var(--border);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.mks-layer-add:hover {
+  border-color: var(--brand-violet);
+  color: var(--brand-violet);
+}
+
+/* ---- placement controls ---- */
+
+.mks-transform-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mks-stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-2);
+}
+
+.mks-stepper span {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+
+.mks-stepper button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mks-stepper button:hover {
+  background: var(--brand-violet);
+  color: #fff;
+}
+
+.mks-toggle-on {
+  border-color: var(--brand-violet) !important;
+  background: color-mix(in srgb, var(--brand-violet) 14%, var(--surface-2)) !important;
+  color: var(--brand-violet) !important;
+}
+
+/* ---- recolour row ---- */
+
+.mks-tint-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.mks-tint-row span {
+  flex: 1;
+}
+
+.mks-tint-row input[type='color'] {
+  width: 30px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.mks-tint-row input[type='color']:disabled {
+  opacity: 0.4;
+  cursor: default;
 }

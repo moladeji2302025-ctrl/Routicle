@@ -136,10 +136,20 @@ export function warpToQuad(sourceCanvas, quad, destW, destH) {
   return out
 }
 
-/** A centred rectangle, sized as a fraction of the canvas — a sane starting quad to drag from. */
-export function defaultQuad(canvasW, canvasH, widthFrac = 0.42, aspect = 0.72) {
-  const qw = canvasW * widthFrac
-  const qh = qw * aspect
+/**
+ * A centred, undistorted rectangle sized to the design's own aspect ratio
+ * (width / height) — the "auto-fit" starting placement. Without matching the
+ * asset's real proportions here, a wide lockup or a tall stack starts out
+ * stretched into whatever generic box came before it.
+ */
+export function defaultQuad(canvasW, canvasH, aspect = 1, widthFrac = 0.46) {
+  let qw = canvasW * widthFrac
+  let qh = qw / aspect
+  const maxH = canvasH * 0.8
+  if (qh > maxH) {
+    qh = maxH
+    qw = qh * aspect
+  }
   const cx = canvasW / 2
   const cy = canvasH / 2
   return [
@@ -148,6 +158,71 @@ export function defaultQuad(canvasW, canvasH, widthFrac = 0.42, aspect = 0.72) {
     { x: cx + qw / 2, y: cy + qh / 2 },
     { x: cx - qw / 2, y: cy + qh / 2 },
   ]
+}
+
+/** width / height of an SVG's own viewBox — read straight from the markup, no image load needed. */
+export function svgAspect(svg) {
+  const m = /viewBox="0 0 ([\d.]+) ([\d.]+)"/.exec(svg)
+  if (!m) return 1
+  return Number(m[1]) / Number(m[2])
+}
+
+function quadCentroid(quad) {
+  const x = quad.reduce((s, p) => s + p.x, 0) / quad.length
+  const y = quad.reduce((s, p) => s + p.y, 0) / quad.length
+  return { x, y }
+}
+
+export function translateQuad(quad, dx, dy) {
+  return quad.map((p) => ({ x: p.x + dx, y: p.y + dy }))
+}
+
+/** Scales the quad by `factor` around its own centroid — works on any quad, distorted or not. */
+export function scaleQuad(quad, factor) {
+  const c = quadCentroid(quad)
+  return quad.map((p) => ({ x: c.x + (p.x - c.x) * factor, y: c.y + (p.y - c.y) * factor }))
+}
+
+/** Rotates the quad by `deg` degrees around its own centroid. */
+export function rotateQuad(quad, deg) {
+  const c = quadCentroid(quad)
+  const rad = (deg * Math.PI) / 180
+  const cos = Math.cos(rad)
+  const sin = Math.sin(rad)
+  return quad.map((p) => {
+    const dx = p.x - c.x
+    const dy = p.y - c.y
+    return { x: c.x + dx * cos - dy * sin, y: c.y + dx * sin + dy * cos }
+  })
+}
+
+/**
+ * Bakes brightness, contrast, a flat recolour and a mirror into a copy of
+ * `raw` — cheap, synchronous canvas work, so it can run on every control
+ * change without re-rasterising the source SVG.
+ */
+export function processDesign(raw, { tint = '', brightness = 1, contrast = 1, flipH = false, flipV = false } = {}) {
+  const canvas = document.createElement('canvas')
+  canvas.width = raw.width
+  canvas.height = raw.height
+  const ctx = canvas.getContext('2d')
+
+  ctx.save()
+  ctx.filter = `brightness(${brightness}) contrast(${contrast})`
+  ctx.translate(flipH ? canvas.width : 0, flipV ? canvas.height : 0)
+  ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1)
+  ctx.drawImage(raw, 0, 0)
+  ctx.restore()
+
+  if (tint) {
+    ctx.save()
+    ctx.globalCompositeOperation = 'source-in'
+    ctx.fillStyle = tint
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.restore()
+  }
+
+  return canvas
 }
 
 /** Rasterises an SVG string (as produced by `buildLogoPack`) to a canvas at `scale`x its viewBox size. */
