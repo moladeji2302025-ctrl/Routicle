@@ -20981,3 +20981,248 @@ a.sp-card:hover .sp-link svg {
     break-after: auto;
   }
 }
+
+/* ============================================================
+   Stationery kit: a business card (front/back), letterhead and envelope,
+   in the same pack/palette/typeface as the brand guide. Printed at true
+   physical size via CSS named pages — one @page rule per item type, not
+   everything squeezed onto A4 — again through window.print(), no PDF
+   library.
+   ============================================================ */
+
+.sk-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  font-family: var(--sk-font);
+}
+
+.sk-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.sk-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.sk-item figcaption {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.sk-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* A percentage max-height/width on the svg below only resolves against a
+     definite height here — without this, an .sk-mark placed inside a sized
+     wrapper div (rather than sized itself) stays auto-height, the percentage
+     is ignored, and the mark paints at its full native SVG size instead. */
+  height: 100%;
+  width: 100%;
+}
+
+.sk-mark svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* ---- business card: 3.5 x 2in, shown at 2x for legibility on screen ---- */
+
+.sk-card {
+  position: relative;
+  width: 3.5in;
+  height: 2in;
+  padding: 0.28in;
+  background: var(--sk-paper);
+  color: var(--sk-ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 14px 30px -16px rgba(0, 0, 0, 0.35);
+  zoom: 2;
+}
+
+.sk-card-mark {
+  height: 0.5in;
+  width: 0.5in;
+}
+
+.sk-card-text {
+  position: absolute;
+  left: 0.28in;
+  bottom: 0.26in;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sk-card-text strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sk-card-text span {
+  font-size: 10px;
+  opacity: 0.65;
+}
+
+.sk-card-back {
+  background: var(--sk-ink);
+  color: var(--sk-paper);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.24in;
+  text-align: center;
+}
+
+.sk-card-back-mark {
+  height: 0.42in;
+  width: 0.42in;
+  margin-bottom: 8px;
+}
+
+.sk-card-back-mark svg * {
+  fill: var(--sk-paper) !important;
+}
+
+.sk-card-back-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.sk-card-back-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+  font-size: 9px;
+  opacity: 0.75;
+}
+
+/* ---- letterhead: A4, same page convention as the rest of the suite ---- */
+
+.sk-letter {
+  display: flex;
+  flex-direction: column;
+  width: 397px;
+  height: 561.5px;
+  padding: 32px 30px;
+  background: var(--sk-paper);
+  color: var(--sk-ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 12px 30px -18px rgba(0, 0, 0, 0.3);
+}
+
+.sk-letter-head {
+  display: flex;
+}
+
+.sk-letter-logo {
+  height: 36px;
+  width: auto; /* base .sk-mark now claims width: 100%; this stays flush-left instead of stretching the row */
+  justify-content: flex-start;
+}
+
+.sk-letter-rule {
+  height: 1px;
+  margin: 16px 0 0;
+  background: color-mix(in srgb, var(--sk-ink) 18%, transparent);
+}
+
+.sk-letter-body {
+  flex: 1;
+}
+
+.sk-letter-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--sk-ink) 18%, transparent);
+  font-size: 9px;
+  opacity: 0.65;
+}
+
+/* ---- envelope: US #10, 9.5 x 4.125in ---- */
+
+.sk-envelope {
+  position: relative;
+  width: 9.5in;
+  height: 4.125in;
+  background: var(--sk-paper);
+  color: var(--sk-ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 12px 30px -18px rgba(0, 0, 0, 0.3);
+  zoom: 0.75;
+}
+
+.sk-envelope-return {
+  position: absolute;
+  top: 0.4in;
+  left: 0.4in;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.sk-envelope-return .sk-mark {
+  height: 0.4in;
+  width: 0.4in;
+}
+
+@media print {
+  .sk-wrap {
+    display: block;
+  }
+
+  .sk-item {
+    margin-bottom: 0;
+  }
+
+  .sk-card,
+  .sk-letter,
+  .sk-envelope {
+    zoom: 1 !important;
+    box-shadow: none !important;
+    break-after: page;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .sk-page-card {
+    page: skcard;
+  }
+
+  .sk-page-letter {
+    page: skletter;
+    width: 794px;
+    height: 1123px;
+  }
+
+  .sk-page-envelope {
+    page: skenvelope;
+  }
+}
+
+@page skcard {
+  size: 3.5in 2in;
+  margin: 0;
+}
+
+@page skletter {
+  size: A4;
+  margin: 0;
+}
+
+@page skenvelope {
+  size: 9.5in 4.125in;
+  margin: 0;
+}

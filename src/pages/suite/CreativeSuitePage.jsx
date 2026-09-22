@@ -6,6 +6,7 @@ import FontPicker from '../../components/FontPicker'
 import MarkEditor from '../../components/MarkEditor'
 import PaletteLab from '../../components/PaletteLab'
 import BrandGuide from '../../components/BrandGuide'
+import StationeryKit from '../../components/StationeryKit'
 import FeaturedTemplates from './FeaturedTemplates'
 
 const FORMATS = [
@@ -19,6 +20,8 @@ const slug = (s) => (s || 'brand').toLowerCase().replace(/[^a-z0-9]+/g, '-').rep
 export default function CreativeSuitePage() {
   const fileRef = useRef(null)
   const [showGuide, setShowGuide] = useState(false)
+  const [showStationery, setShowStationery] = useState(false)
+  const [contact, setContact] = useState({ person: '', title: '', phone: '', email: '', website: '', address: '' })
   const [preview, setPreview] = useState('')
   const [trace, setTrace] = useState(null)
   const [tracing, setTracing] = useState(false)
@@ -279,6 +282,62 @@ export default function CreativeSuitePage() {
                 </button>
               </div>
               <BrandGuide pack={pack} name={name} tagline={tagline} palette={palette} font={font} />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Step five: a matching business card, letterhead and envelope — same
+          pack, same palette, same typeface, printed at real physical size. */}
+      {trace && (
+        <>
+          <div className="suite-section-head" style={{ marginTop: 10 }}>
+            <div>
+              <h2>5. Stationery</h2>
+              <p className="settings-section-desc">A business card, letterhead and envelope, printed at true size.</p>
+            </div>
+            <button type="button" className="settings-btn settings-btn-primary" onClick={() => setShowStationery((v) => !v)}>
+              {showStationery ? 'Hide stationery' : 'Generate stationery'}
+            </button>
+          </div>
+
+          {showStationery && (
+            <div className="bg-wrap">
+              <div className="cs-panel dt-screen-only" style={{ width: '100%', maxWidth: 720 }}>
+                <h3>Contact details</h3>
+                <div className="admin-form-row">
+                  <label className="settings-field">
+                    <span className="settings-field-label">Name</span>
+                    <input className="settings-input" value={contact.person} onChange={(e) => setContact((c) => ({ ...c, person: e.target.value }))} placeholder="Your name" />
+                  </label>
+                  <label className="settings-field">
+                    <span className="settings-field-label">Title</span>
+                    <input className="settings-input" value={contact.title} onChange={(e) => setContact((c) => ({ ...c, title: e.target.value }))} placeholder="Creative Director" />
+                  </label>
+                  <label className="settings-field">
+                    <span className="settings-field-label">Phone</span>
+                    <input className="settings-input" value={contact.phone} onChange={(e) => setContact((c) => ({ ...c, phone: e.target.value }))} />
+                  </label>
+                  <label className="settings-field">
+                    <span className="settings-field-label">Email</span>
+                    <input className="settings-input" value={contact.email} onChange={(e) => setContact((c) => ({ ...c, email: e.target.value }))} />
+                  </label>
+                  <label className="settings-field">
+                    <span className="settings-field-label">Website</span>
+                    <input className="settings-input" value={contact.website} onChange={(e) => setContact((c) => ({ ...c, website: e.target.value }))} />
+                  </label>
+                  <label className="settings-field">
+                    <span className="settings-field-label">Address</span>
+                    <input className="settings-input" value={contact.address} onChange={(e) => setContact((c) => ({ ...c, address: e.target.value }))} />
+                  </label>
+                </div>
+              </div>
+              <div className="bg-toolbar dt-screen-only">
+                <button type="button" className="settings-btn settings-btn-primary" onClick={() => window.print()}>
+                  Print / PDF
+                </button>
+              </div>
+              <StationeryKit pack={pack} name={name} tagline={tagline} palette={palette} font={font} contact={contact} />
             </div>
           )}
         </>
