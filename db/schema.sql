@@ -247,3 +247,32 @@ CREATE TABLE IF NOT EXISTS blog_posts (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS blog_posts_pub_idx ON blog_posts (published_at DESC) WHERE status = 'published';
+
+-- ---------------------------------------------------------------------------
+-- Customer care: the Contact form's submissions as tickets, with the reply
+-- thread. category is free-form on the client but constrained here; complaints
+-- and billing issues are just categories on the same table.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS support_tickets (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email text NOT NULL,
+  name text,
+  subject text NOT NULL,
+  category text NOT NULL DEFAULT 'general' CHECK (category IN ('general', 'complaint', 'billing', 'creator', 'press')),
+  status text NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'pending', 'closed')),
+  assignee_email text,
+  user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS support_tickets_status_idx ON support_tickets (status, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS support_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  ticket_id uuid NOT NULL REFERENCES support_tickets(id) ON DELETE CASCADE,
+  direction text NOT NULL CHECK (direction IN ('in', 'out')),
+  body text NOT NULL,
+  author_email text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS support_messages_ticket_idx ON support_messages (ticket_id, created_at);
