@@ -317,3 +317,23 @@ CREATE TABLE IF NOT EXISTS app_settings (
 -- Plan grants (subscriptions.provider = 'admin-grant') and account suspension
 -- reuse existing columns: subscriptions.provider, and Better Auth's own
 -- neon_auth."user".banned / "banReason" / "banExpires". No new columns needed.
+
+-- Admin-curated background photos for Mockup Studio (Creative Suite) — every
+-- user warps their own logo onto these, so the image itself is the only
+-- per-template asset; image_key is an object key in the public
+-- routicle-previews bucket (routicle-previews CORS is public-GET so the
+-- client can draw it onto a canvas without tainting it).
+CREATE TABLE IF NOT EXISTS mockup_templates (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  category text NOT NULL DEFAULT 'other',
+  image_key text NOT NULL,
+  width integer,
+  height integer,
+  is_published boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_by uuid REFERENCES neon_auth."user"(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_mockup_templates_category ON mockup_templates (category, sort_order);

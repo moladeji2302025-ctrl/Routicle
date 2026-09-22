@@ -13,6 +13,7 @@ import {
   SettingsIcon,
   PenIcon,
   BriefcaseIcon,
+  ImageIcon,
 } from '../../components/icons'
 
 export const ROLE_LABEL = {
@@ -40,6 +41,7 @@ const GROUPS = [
     items: [
       { to: '/admin/content', label: 'Library', icon: FolderIcon, roles: ['admin', 'moderator'] },
       { to: '/admin/moderation', label: 'Moderation', icon: GridIcon, roles: ['admin', 'moderator'] },
+      { to: '/admin/mockups', label: 'Mockup templates', icon: ImageIcon, roles: ['admin'] },
     ],
   },
   {

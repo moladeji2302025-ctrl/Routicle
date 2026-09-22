@@ -3,6 +3,7 @@ import collections from '../_lib/handlers/collections.js'
 import downloads from '../_lib/handlers/downloads.js'
 import comments from '../_lib/handlers/comments.js'
 import templates from '../_lib/handlers/templates.js'
+import mockups from '../_lib/handlers/libraryMockups.js'
 import { withCors } from '../_lib/cors.js'
 
 /**
@@ -10,7 +11,7 @@ import { withCors } from '../_lib/cors.js'
  * file under /api as its own deployed function and the plan allows twelve, so
  * related endpoints share a dispatcher rather than each costing a slot.
  */
-const ROUTES = { collections, downloads, comments, templates }
+const ROUTES = { collections, downloads, comments, templates, mockups }
 
 export default withCors(['GET', 'POST', 'PATCH', 'DELETE'], async function handler(req, res) {
   const route = ROUTES[req.query?.resource]

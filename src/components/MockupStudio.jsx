@@ -4,7 +4,13 @@ import {
   EDGE_PAIRS, edgeControlPoint, bulgeFromPoint, edgeCurvePoints,
 } from '../lib/perspectiveWarp'
 import { downloadBlob } from '../lib/logoPack'
+import { fetchMockupTemplates } from '../lib/api'
 import { UploadIcon, DownloadIcon, CopyIcon, TrashIcon, PlusIcon } from './icons'
+
+const TEMPLATE_CATEGORY_LABEL = {
+  mug: 'Mugs', tshirt: 'T-shirts', cap: 'Caps', tote: 'Totes & bags', box: 'Boxes & packages',
+  book: 'Books', billboard: 'Billboards', other: 'Other',
+}
 
 const BLEND_MODES = [
   { id: 'multiply', label: 'Multiply', hint: 'Ink sinks into the surface — right for most mockups.' },
@@ -47,6 +53,13 @@ export default function MockupStudio({ pack, name }) {
   const [layers, setLayers] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [error, setError] = useState('')
+  const [templates, setTemplates] = useState(null)
+
+  useEffect(() => {
+    fetchMockupTemplates()
+      .then(({ templates: rows }) => setTemplates(rows))
+      .catch(() => setTemplates([]))
+  }, [])
 
   const assets = ASSET_ORDER.map((id) => pack.find((a) => a.id === id)).filter(Boolean)
   const selected = layers.find((l) => l.id === selectedId) || null
@@ -106,6 +119,21 @@ export default function MockupStudio({ pack, name }) {
     return asset ? svgAspect(asset.svg) : 1
   }
 
+  function applyScene(img) {
+    const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height))
+    const w = Math.round(img.width * scale)
+    const h = Math.round(img.height * scale)
+    sceneImgRef.current = img
+    canvasRef.current.width = w
+    canvasRef.current.height = h
+    setCanvasSize({ w, h })
+    const assetId = assets[0]?.id || 'primary'
+    const layer = freshLayer(assetId, defaultQuad(w, h, aspectOf(assetId)))
+    setLayers([layer])
+    setSelectedId(layer.id)
+    setReady(true)
+  }
+
   async function onScene(e) {
     const file = e.target.files?.[0]
     e.target.value = ''
@@ -117,22 +145,20 @@ export default function MockupStudio({ pack, name }) {
     setError('')
     const url = URL.createObjectURL(file)
     const img = new Image()
-    img.onload = () => {
-      const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height))
-      const w = Math.round(img.width * scale)
-      const h = Math.round(img.height * scale)
-      sceneImgRef.current = img
-      canvasRef.current.width = w
-      canvasRef.current.height = h
-      setCanvasSize({ w, h })
-      const assetId = assets[0]?.id || 'primary'
-      const layer = freshLayer(assetId, defaultQuad(w, h, aspectOf(assetId)))
-      setLayers([layer])
-      setSelectedId(layer.id)
-      setReady(true)
-    }
+    img.onload = () => applyScene(img)
     img.onerror = () => setError('That photo could not be read.')
     img.src = url
+  }
+
+  function chooseTemplate(t) {
+    setError('')
+    const img = new Image()
+    // The templates bucket is on a different host, so this needs an explicit
+    // CORS request — without it the canvas taints and Save PNG throws.
+    img.crossOrigin = 'anonymous'
+    img.onload = () => applyScene(img)
+    img.onerror = () => setError('That template photo could not be loaded.')
+    img.src = t.image
   }
 
   function toCanvasPoint(e) {
@@ -263,6 +289,34 @@ export default function MockupStudio({ pack, name }) {
             <span>A mug, a wall, a shirt, a shopfront — anything with a flat-ish surface to place the mark on.</span>
           </button>
           <input id="mks-scene-input" type="file" accept="image/*" hidden onChange={onScene} />
+
+          {templates && templates.length > 0 && (
+            <>
+              <span className="settings-stack-label" style={{ marginTop: 14 }}>Or pick a template</span>
+              <div className="mks-templates">
+                {Object.entries(
+                  templates.reduce((by, t) => {
+                    ;(by[t.category] ||= []).push(t)
+                    return by
+                  }, {})
+                ).map(([cat, rows]) => (
+                  <div key={cat} className="mks-template-group">
+                    <span>{TEMPLATE_CATEGORY_LABEL[cat] || cat}</span>
+                    <div className="mks-template-row">
+                      {rows.map((t) => (
+                        <button key={t.id} type="button" className="mks-template" onClick={() => chooseTemplate(t)} title={t.title}>
+                          {/* crossOrigin here has to match chooseTemplate's Image() below — loading
+                              the same URL once without it and once with it makes the browser serve
+                              a cached non-CORS response for the second request, which then fails. */}
+                          <img src={t.image} alt="" loading="lazy" crossOrigin="anonymous" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
           {ready && (
             <>

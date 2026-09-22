@@ -44,6 +44,7 @@ import AdminUpdatesPage from './pages/admin/AdminUpdatesPage'
 import AdminResourcesPage from './pages/admin/AdminResourcesPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminContentPage from './pages/admin/AdminContentPage'
+import AdminMockupsPage from './pages/admin/AdminMockupsPage'
 import AdminEmailPage from './pages/admin/AdminEmailPage'
 import AdminActivityPage from './pages/admin/AdminActivityPage'
 import AdminBlogPage from './pages/admin/AdminBlogPage'
@@ -145,6 +146,7 @@ export default function App() {
               <Route path="updates" element={<AdminUpdatesPage />} />
               <Route path="content" element={<AdminContentPage />} />
               <Route path="moderation" element={<AdminModerationPage />} />
+              <Route path="mockups" element={<AdminMockupsPage />} />
               <Route path="resources" element={<AdminResourcesPage />} />
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="email" element={<AdminEmailPage />} />

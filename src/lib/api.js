@@ -190,6 +190,11 @@ export function useTemplate(itemId, organizationId) {
   return request('/library/templates', { method: 'POST', body: JSON.stringify({ itemId, organizationId }) })
 }
 
+/** Admin-curated background photos for Mockup Studio — a mug, a shirt, a box, a billboard. */
+export function fetchMockupTemplates() {
+  return request('/library/mockups')
+}
+
 export function fetchImageAllowance() {
   return request('/suite/generate-image')
 }
@@ -477,6 +482,34 @@ export function patchResource(data) {
 
 export function deleteResource(id) {
   return request(`/admin/resources?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+export function fetchAdminMockups() {
+  return request('/admin/mockups')
+}
+
+/** A URL to upload a template photo straight to storage — call before createAdminMockup. */
+export function presignAdminMockup({ fileName, contentType, size }) {
+  return request('/admin/mockups?op=presign', { method: 'POST', body: JSON.stringify({ fileName, contentType, size }) })
+}
+
+export async function uploadAdminMockupPhoto(file) {
+  const { uploadUrl, imageKey } = await presignAdminMockup({ fileName: file.name, contentType: file.type, size: file.size })
+  const res = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file })
+  if (!res.ok) throw new Error(`Upload of ${file.name} failed (${res.status})`)
+  return imageKey
+}
+
+export function createAdminMockup(data) {
+  return request('/admin/mockups', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export function patchAdminMockup(data) {
+  return request('/admin/mockups', { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export function deleteAdminMockup(id) {
+  return request(`/admin/mockups?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 export function fetchAdminUsers(q) {
