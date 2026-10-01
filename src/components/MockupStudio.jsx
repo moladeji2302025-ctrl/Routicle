@@ -54,6 +54,10 @@ export default function MockupStudio({ pack, name }) {
   const [selectedId, setSelectedId] = useState(null)
   const [error, setError] = useState('')
   const [templates, setTemplates] = useState(null)
+  // Hides the corner/curve handles and the dashed guide so the stage shows
+  // exactly what Save PNG will produce — those are DOM overlays, never
+  // baked into the canvas itself, so this is purely a visibility toggle.
+  const [previewMode, setPreviewMode] = useState(false)
 
   useEffect(() => {
     fetchMockupTemplates()
@@ -191,7 +195,7 @@ export default function MockupStudio({ pack, name }) {
   // it" is decided here instead, against the stage's own pointer events
   // (which are known-reliable, since the corner handles already rely on them).
   function startStageDrag(e) {
-    if (!selected) return
+    if (!selected || previewMode) return
     const p = toCanvasPoint(e)
     if (!pointInQuad(p, shapeOutline(selected.quad, selected.bulges))) return
     e.preventDefault()
@@ -442,6 +446,13 @@ export default function MockupStudio({ pack, name }) {
               </label>
 
               <div className="settings-inline-actions" style={{ marginTop: 16 }}>
+                <button
+                  type="button"
+                  className={previewMode ? 'settings-btn mks-toggle-on' : 'settings-btn'}
+                  onClick={() => setPreviewMode((v) => !v)}
+                >
+                  {previewMode ? 'Back to editing' : 'Preview'}
+                </button>
                 <button type="button" className="settings-btn settings-btn-primary" onClick={download}>
                   <DownloadIcon size={15} color="currentColor" />
                   Save PNG
@@ -461,7 +472,7 @@ export default function MockupStudio({ pack, name }) {
             onPointerDown={startStageDrag}
           >
             <canvas ref={canvasRef} />
-            {ready && selected && (
+            {ready && selected && !previewMode && (
               <>
                 <svg className="mks-guide" viewBox={`0 0 ${canvasSize.w} ${canvasSize.h}`} preserveAspectRatio="none">
                   <polygon points={shapeOutline(selected.quad, selected.bulges).map((p) => `${p.x},${p.y}`).join(' ')} />
@@ -487,6 +498,7 @@ export default function MockupStudio({ pack, name }) {
                 ))}
               </>
             )}
+            {ready && previewMode && <span className="mks-preview-badge">Preview</span>}
             {!ready && (
               <div className="mks-stage-empty">
                 <UploadIcon size={26} color="currentColor" />
@@ -494,7 +506,11 @@ export default function MockupStudio({ pack, name }) {
               </div>
             )}
           </div>
-          <p className="mks-hint">The selected layer's outline is shown — pick a layer on the left to edit it.</p>
+          <p className="mks-hint">
+            {previewMode
+              ? "This is exactly what Save PNG will produce. Click “Back to editing” to keep adjusting."
+              : "The selected layer's outline is shown — pick a layer on the left to edit it."}
+          </p>
         </div>
       </div>
     </div>
