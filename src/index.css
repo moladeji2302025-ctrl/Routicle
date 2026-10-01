@@ -2721,6 +2721,65 @@ a:hover {
   color: var(--text-muted);
 }
 
+/* ---- renewal-terms confirmation (California ARL) ---- */
+
+.pricing-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 10, 14, 0.5);
+}
+
+.pricing-confirm {
+  width: 100%;
+  max-width: 420px;
+  padding: 28px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+}
+
+.pricing-confirm h2 {
+  margin: 0 0 14px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.pricing-confirm p {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.pricing-confirm-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 4px 0 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--border, oklch(0.92 0.003 90));
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.pricing-confirm-check input {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.pricing-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 @media (max-width: 900px) {
   .pricing-grid {
     grid-template-columns: 1fr;

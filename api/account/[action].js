@@ -42,11 +42,37 @@ export default withCors(['GET', 'POST'], async function handler(req, res) {
   })
 })
 
+const MIN_AGE = 13
+
+/**
+ * Whole-years age as of today (UTC), from a YYYY-MM-DD string. Doesn't just
+ * subtract years: someone born 12 years and 11 months ago must still count
+ * as 12, not 13, so the month/day are checked too.
+ */
+function ageFromDob(dob) {
+  const d = new Date(`${dob}T00:00:00Z`)
+  if (Number.isNaN(d.getTime())) return null
+  const now = new Date()
+  let age = now.getUTCFullYear() - d.getUTCFullYear()
+  const hadBirthdayThisYear =
+    now.getUTCMonth() > d.getUTCMonth() || (now.getUTCMonth() === d.getUTCMonth() && now.getUTCDate() >= d.getUTCDate())
+  if (!hadBirthdayThisYear) age -= 1
+  return age
+}
+
 /**
  * Whether this account has been through the welcome flow. Kept on the server
  * because the browser can't be trusted to remember: a new device, a cleared
  * cache or a private window has no saved profile, and used to look like a
  * brand-new account. POST marks it done, once and for good.
+ *
+ * This is also where the COPPA age check lives, since Neon Auth creates the
+ * account row itself (outside any SQL this app controls) before onboarding
+ * ever runs — there's no earlier server-side moment to check age against.
+ * An account that turns out to be under 13 gets banned here, the same
+ * mechanism Settings already uses for suspension, rather than merely
+ * declining to mark onboarding done: a banned account can't sign back in
+ * and try again, where an unfinished-onboarding one could.
  */
 async function onboarding(req, res) {
   if (!methodGuard(req, res, ['GET', 'POST'])) return
@@ -54,7 +80,31 @@ async function onboarding(req, res) {
   if (!user) return
 
   if (req.method === 'POST') {
-    await sql`INSERT INTO onboarding_done (user_id) VALUES (${user.id}) ON CONFLICT (user_id) DO NOTHING`
+    const dob = String(req.body?.dateOfBirth || '').trim()
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
+      return send(res, 400, { error: 'A date of birth is required.' })
+    }
+    const age = ageFromDob(dob)
+    if (age === null || age < 0 || age > 130) {
+      return send(res, 400, { error: "That date of birth doesn't look right." })
+    }
+
+    if (age < MIN_AGE) {
+      await sql`
+        UPDATE neon_auth."user"
+        SET banned = true, "banReason" = 'under_minimum_age', "banExpires" = NULL
+        WHERE id = ${user.id}
+      `
+      return send(res, 403, {
+        error: 'You need to be 13 or older to use Routicle. This account has been deactivated.',
+        underAge: true,
+      })
+    }
+
+    await sql`
+      INSERT INTO onboarding_done (user_id, date_of_birth) VALUES (${user.id}, ${dob})
+      ON CONFLICT (user_id) DO UPDATE SET date_of_birth = COALESCE(onboarding_done.date_of_birth, EXCLUDED.date_of_birth)
+    `
     return send(res, 200, { done: true })
   }
   const rows = await sql`SELECT 1 FROM onboarding_done WHERE user_id = ${user.id} LIMIT 1`

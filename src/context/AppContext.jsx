@@ -789,7 +789,7 @@ export function AppProvider({ children }) {
        * closed tab or a declined card can't leave someone on a plan they
        * didn't pay for.
        */
-      async startSubscriptionCheckout({ tier, cadence, returnUrl }) {
+      async startSubscriptionCheckout({ tier, cadence, returnUrl, acceptedRenewalTerms }) {
         const user = stateRef.current.currentUser
         if (!user) throw new Error('Sign in first')
         const { authorizationUrl } = await api.startCheckout({
@@ -799,6 +799,7 @@ export function AppProvider({ children }) {
           billingCycle: cadence,
           organizationId: activeTeamId || undefined,
           returnUrl,
+          acceptedRenewalTerms,
         })
         return authorizationUrl
       },
@@ -829,7 +830,23 @@ export function AppProvider({ children }) {
        * categories picked become the browsing filter, and the path decides
        * whether the creator route is offered next.
        */
-      async completeOnboarding({ path, name, website, role, goals, categories, heard, tier }) {
+      async completeOnboarding({ path, name, website, role, goals, categories, heard, tier, dateOfBirth }) {
+        // Age is checked server-side (COPPA) before anything below is applied
+        // locally — awaited and allowed to throw, rather than the fire-and-forget
+        // `.catch(console.error)` this used to be, so a rejection can't leave the
+        // UI thinking onboarding succeeded for an account the server just banned.
+        try {
+          await api.markOnboardingDone(dateOfBirth)
+        } catch (err) {
+          if (err.underAge) {
+            await authClient.signOut().catch(() => {})
+            throw err
+          }
+          // Any other failure (offline, a transient 500) shouldn't trap someone
+          // in the welcome flow — the server catches up next time it's asked.
+          console.error('onboarding save failed', err)
+        }
+
         const allCategories = CATEGORY_IDS
         const muted = allCategories.filter((id) => !categories.includes(id))
 
@@ -841,8 +858,6 @@ export function AppProvider({ children }) {
           onboarding: { role, goals, heard, path, tier, completedAt: Date.now() },
           needsOnboarding: false,
         }))
-        // Remembered on the server so no other device asks again.
-        api.markOnboardingDone().catch((err) => console.error('onboarding save failed', err))
 
         // Turning every category off would leave an empty library, so an
         // all-off answer is treated as no preference rather than a total mute.

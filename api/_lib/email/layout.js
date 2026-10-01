@@ -19,6 +19,18 @@
  * arrives looking broken.
  */
 
+/**
+ * CAN-SPAM requires a real physical mailing address on every marketing
+ * email. There's no real address on file yet, so this is a visible
+ * placeholder rather than a fabricated one — set COMPANY_MAILING_ADDRESS in
+ * the environment to a real registered business address or PO box before
+ * any marketing email goes out. (Mirrored client-side in
+ * src/data/staticPages.js's COMPANY_ADDRESS, for the Privacy Policy page.)
+ */
+const MAILING_ADDRESS =
+  process.env.COMPANY_MAILING_ADDRESS ||
+  'Mailing address not yet set — add a real registered business address or PO box here before launch.'
+
 const BRAND = '#6750de'
 const INK = '#16161a'
 const MUTED = '#5a5a63'
@@ -122,10 +134,14 @@ function htmlToText(html) {
 export function renderEmail({ heading, preheader = '', blocks = [], unsubscribeUrl = '', reason = '' }) {
   const body = blocks.map(blockHtml).join('\n')
 
+  // The address is CAN-SPAM's requirement for *commercial* email specifically,
+  // which is exactly what `unsubscribeUrl` already marks: it's only ever set
+  // on the newsletter broadcast template, never on a transactional/notification one.
   const footerLines = [
     reason && escapeHtml(reason),
     unsubscribeUrl &&
       `<a href="${escapeHtml(unsubscribeUrl)}" style="color:${FAINT};text-decoration:underline">Unsubscribe</a>`,
+    unsubscribeUrl && escapeHtml(MAILING_ADDRESS),
   ].filter(Boolean)
 
   const html = `<!doctype html>
@@ -155,6 +171,7 @@ ${body}
     '—',
     reason,
     unsubscribeUrl && `Unsubscribe: ${unsubscribeUrl}`,
+    unsubscribeUrl && MAILING_ADDRESS,
   ]
     .filter((line, i, all) => line !== false && line !== undefined && line !== null && !(line === '' && all[i - 1] === ''))
     .join('\n')

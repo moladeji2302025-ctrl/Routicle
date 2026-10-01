@@ -66,6 +66,20 @@ const PLAN_BLURB = {
   express: 'Adds video projects and 60 seconds of AI video a month.',
 }
 
+/** Whole-years age as of today, from a YYYY-MM-DD string — mirrors the server's own check. */
+function ageFromDob(dob) {
+  const d = new Date(`${dob}T00:00:00`)
+  if (Number.isNaN(d.getTime())) return null
+  const now = new Date()
+  let age = now.getFullYear() - d.getFullYear()
+  const hadBirthdayThisYear =
+    now.getMonth() > d.getMonth() || (now.getMonth() === d.getMonth() && now.getDate() >= d.getDate())
+  if (!hadBirthdayThisYear) age -= 1
+  return age
+}
+
+const MIN_AGE = 13
+
 export default function OnboardingPage() {
   const navigate = useNavigate()
   const { currentUser, settings, theme, completeOnboarding } = useApp()
@@ -75,6 +89,16 @@ export default function OnboardingPage() {
   const [phase, setPhase] = useState('in')
   const [saving, setSaving] = useState(false)
   const timerRef = useRef(null)
+
+  // The age check has to come before anything else in this flow can be
+  // reached — including "Skip for now" in the header below, which otherwise
+  // bypasses the whole wizard without ever asking anything. So this isn't one
+  // of the six wizard steps: nothing past it, not even skipping, renders
+  // until a valid, 13-or-older date of birth is entered.
+  const [dob, setDob] = useState('')
+  const [dobTouched, setDobTouched] = useState(false)
+  const [ageGatePassed, setAgeGatePassed] = useState(false)
+  const [rejected, setRejected] = useState(false)
 
   const [form, setForm] = useState({
     path: '',
@@ -162,13 +186,101 @@ export default function OnboardingPage() {
     setSaving(true)
     const tier = tierOverride === undefined ? form.tier : tierOverride
     try {
-      await completeOnboarding({ ...form, tier })
-    } finally {
+      await completeOnboarding({ ...form, tier, dateOfBirth: dob })
+    } catch (err) {
       setSaving(false)
+      if (err.underAge) {
+        setRejected(true)
+        return
+      }
+      // Any other error: completeOnboarding already applied local state and
+      // logged it, so this flow still finishes rather than stranding someone.
     }
+    setSaving(false)
     if (tier && tier !== 'free') navigate('/pricing')
     else if (form.path === 'sell') navigate('/become-creator')
     else navigate('/')
+  }
+
+  const dobAge = dob ? ageFromDob(dob) : null
+  const dobInvalid = dobTouched && dob && (dobAge === null || dobAge < 0 || dobAge > 130)
+  const dobTooYoung = dobTouched && dob && dobAge !== null && dobAge >= 0 && dobAge < MIN_AGE
+
+  if (rejected) {
+    return (
+      <div className="onb">
+        <main className="onb-main">
+          <div className="onb-stage">
+            <h1 className="onb-title">You need to be 13 or older to use Routicle</h1>
+            <p className="onb-sub">
+              This is required under children's privacy law (COPPA) in the US. The account you just created has been
+              deactivated and can't be signed back into.
+            </p>
+            <button type="button" className="onb-next" style={{ marginTop: 24 }} onClick={() => navigate('/')}>
+              Back to Routicle
+            </button>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  if (!ageGatePassed) {
+    return (
+      <div className="onb">
+        <header className="onb-top">
+          <img
+            src={theme === 'dark' ? '/brand/routicle-mark-white.svg' : '/brand/routicle-mark-black.svg'}
+            alt=""
+            className="onb-mark"
+          />
+        </header>
+        <main className="onb-main">
+          <div className="onb-stage">
+            <h1 className="onb-title onb-item" style={{ '--i': 0 }}>When were you born?</h1>
+            <p className="onb-sub onb-item" style={{ '--i': 1 }}>
+              Routicle needs this once, to confirm you're old enough to have an account. It's never shown on your
+              profile or anywhere else.
+            </p>
+            <div className="onb-form">
+              <label className="onb-field onb-item" style={{ '--i': 2 }}>
+                <span>Date of birth</span>
+                <input
+                  type="date"
+                  className="settings-input"
+                  value={dob}
+                  max={new Date().toISOString().slice(0, 10)}
+                  onChange={(e) => { setDob(e.target.value); setDobTouched(true) }}
+                  onBlur={() => setDobTouched(true)}
+                />
+              </label>
+              {dobTooYoung && (
+                <p className="onb-sub" style={{ color: 'var(--settings-danger, #d9432f)' }}>
+                  You need to be 13 or older to create a Routicle account.
+                </p>
+              )}
+              {dobInvalid && !dobTooYoung && (
+                <p className="onb-sub" style={{ color: 'var(--settings-danger, #d9432f)' }}>
+                  That date doesn't look right.
+                </p>
+              )}
+            </div>
+          </div>
+        </main>
+        <footer className="onb-foot">
+          <div className="onb-nav">
+            <button
+              type="button"
+              className="onb-next"
+              disabled={!dob || dobInvalid || dobTooYoung}
+              onClick={() => setAgeGatePassed(true)}
+            >
+              Continue
+            </button>
+          </div>
+        </footer>
+      </div>
+    )
   }
 
   return (

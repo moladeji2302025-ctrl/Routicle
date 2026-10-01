@@ -114,6 +114,11 @@ export default function PricingPage() {
   const [cadence, setCadence] = useState('annual')
   const [busyTier, setBusyTier] = useState(null)
   const [error, setError] = useState('')
+  // A paid plan's own button only opens this — the renewal terms have to be
+  // shown and separately agreed to before checkout actually starts (California's
+  // Automatic Renewal Law), not folded into the same click as "Get Standard".
+  const [confirmPlan, setConfirmPlan] = useState(null)
+  const [agreed, setAgreed] = useState(false)
 
   const currentTier = subscription?.tier || 'free'
 
@@ -147,13 +152,25 @@ export default function PricingPage() {
       return
     }
 
+    setAgreed(false)
+    setConfirmPlan(plan)
+  }
+
+  async function confirmAndCheckout() {
+    if (!confirmPlan || !agreed || busyTier !== null) return
     try {
-      setBusyTier(plan.id)
-      const url = await startSubscriptionCheckout({ tier: plan.id, cadence, returnUrl: '/account' })
+      setBusyTier(confirmPlan.id)
+      const url = await startSubscriptionCheckout({
+        tier: confirmPlan.id,
+        cadence,
+        returnUrl: '/account',
+        acceptedRenewalTerms: true,
+      })
       window.location.href = url
     } catch (err) {
       setError(err.message)
       setBusyTier(null)
+      setConfirmPlan(null)
     }
   }
 
@@ -287,6 +304,43 @@ export default function PricingPage() {
       <p className="pricing-foot">
         Prices are in USD and charged securely through Paystack. You can cancel anytime and keep access until the end of the period you've paid for. Half of every subscription dollar goes to creators.
       </p>
+
+      {confirmPlan && (
+        <div className="pricing-confirm-backdrop" onClick={() => (busyTier ? null : setConfirmPlan(null))}>
+          <div className="pricing-confirm" role="dialog" aria-modal="true" aria-label="Confirm your subscription" onClick={(e) => e.stopPropagation()}>
+            <h2>Confirm your subscription</h2>
+            <p>
+              You're subscribing to <strong>{confirmPlan.name}</strong> for <strong>{money(priceFor(confirmPlan))}/month</strong>,
+              billed {cadence === 'annual' ? `annually — ${money(priceFor(confirmPlan) * 12)} today` : 'monthly, starting today'}.
+            </p>
+            <p>
+              This renews automatically every {cadence === 'annual' ? 'year' : 'month'} at the same price until you
+              cancel. You can cancel any time from Settings › Plan &amp; billing, and you'll keep access until the
+              end of the period you've already paid for.
+            </p>
+            <label className="pricing-confirm-check">
+              <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
+              <span>
+                I understand this subscription renews automatically at {money(priceFor(confirmPlan))}/month
+                ({cadence === 'annual' ? 'billed annually' : 'billed monthly'}) until I cancel it.
+              </span>
+            </label>
+            <div className="pricing-confirm-actions">
+              <button type="button" className="settings-btn" onClick={() => setConfirmPlan(null)} disabled={busyTier !== null}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="settings-btn settings-btn-primary"
+                disabled={!agreed || busyTier !== null}
+                onClick={confirmAndCheckout}
+              >
+                {busyTier === confirmPlan.id ? 'Starting…' : 'Confirm and continue to payment'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

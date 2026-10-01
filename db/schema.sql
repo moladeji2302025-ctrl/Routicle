@@ -237,6 +237,10 @@ CREATE TABLE IF NOT EXISTS onboarding_done (
   user_id uuid PRIMARY KEY,
   completed_at timestamptz NOT NULL DEFAULT now()
 );
+-- Collected once, at the same moment as the row above, so the onboarding
+-- flow's own age gate (COPPA) has somewhere server-side to check against.
+-- Never exposed on any public profile or projection.
+ALTER TABLE onboarding_done ADD COLUMN IF NOT EXISTS date_of_birth date;
 
 -- ---------------------------------------------------------------------------
 -- The Routicle blog. status: draft | published. The public read only ever
@@ -347,3 +351,9 @@ CREATE TABLE IF NOT EXISTS mockup_templates (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_mockup_templates_category ON mockup_templates (category, sort_order);
+
+-- `transactions` itself predates this file and was applied outside it, so it
+-- isn't defined above — this column alone is new: a timestamped record that
+-- the renewal-terms checkbox was accepted before each checkout, for
+-- California's Automatic Renewal Law.
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS renewal_terms_accepted_at timestamptz;

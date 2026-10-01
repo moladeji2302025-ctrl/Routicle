@@ -9,6 +9,17 @@
 
 export const CONTACT_EMAIL = 'hello@routicle.app'
 
+/**
+ * CAN-SPAM requires a real physical mailing address on every marketing
+ * email, and it's good practice on the Privacy Policy too. There is no real
+ * address on file yet — this is a visible placeholder, not a fabricated
+ * one, so it's obvious this still needs filling in with a real registered
+ * business address or PO box before any marketing email goes out. The same
+ * text (via COMPANY_MAILING_ADDRESS) belongs in the server's env vars —
+ * see api/_lib/email/layout.js.
+ */
+export const COMPANY_ADDRESS = 'Mailing address not yet set — add a real registered business address or PO box here before launch.'
+
 /** Order here is the order of the sub-navigation across the top of each page. */
 export const STATIC_NAV = [
   { slug: 'about', label: 'About' },
@@ -140,13 +151,38 @@ export const STATIC_PAGES = {
     title: 'Privacy Policy',
     accent: 'Policy',
     eyebrow: 'Legal',
-    lede: 'What we collect, what we don’t do with it, and how long we keep it.',
-    notice: 'This is placeholder text for Routicle’s pre-launch build, not a final privacy policy. The full Privacy Policy will be published before launch.',
+    lede: 'What we collect, what we don’t do with it, and how to control it.',
+    notice: 'This is placeholder text for Routicle’s pre-launch build, not a final privacy policy reviewed by a lawyer. The full Privacy Policy will be published before launch.',
     intro: 'As currently intended:',
     points: [
-      { title: 'What we collect', body: 'The account information needed to run the service: name, email, billing details via its payment processor, and usage data like downloads and generations.' },
-      { title: 'What we don’t do', body: 'Routicle does not sell personal data to third parties.' },
-      { title: 'How long we keep it', body: 'Data is retained for as long as an account is active, plus a reasonable period after for legal and accounting purposes.' },
+      {
+        title: 'What we collect',
+        body: 'The account information needed to run the service: name, email, date of birth (collected once when your account is created, to confirm you’re old enough to have one — never shown on your profile or anywhere else), billing details handled by our payment processor, and usage data like downloads and generations.',
+      },
+      {
+        title: 'Analytics cookies',
+        body: 'We use Google Analytics to see which pages people use. Nothing is set or sent until you say yes to the cookie banner shown on your first visit — the script itself isn’t even loaded before then. You can change your answer any time by clearing this site’s data in your browser, which brings the banner back.',
+      },
+      {
+        title: 'Marketing email',
+        body: 'Every marketing email — the newsletter, and nothing else — includes a one-click unsubscribe link. Using it stops that kind of email immediately. Account and billing emails (receipts, security notices, moderation decisions) aren’t marketing and aren’t affected by it.',
+      },
+      {
+        title: 'What we don’t do',
+        body: 'Routicle does not sell personal data to third parties, and does not run session-recording, screen-recording or similar tracking tools of any kind.',
+      },
+      {
+        title: 'How long we keep it',
+        body: 'Data is retained for as long as an account is active, plus a reasonable period after for legal and accounting purposes.',
+      },
+      {
+        title: 'Children’s privacy',
+        body: 'Routicle is not directed at children and is not intended for anyone under 13. We check date of birth when an account is created; an account found to belong to someone under 13 is deactivated.',
+      },
+      {
+        title: 'Contact',
+        body: `Questions about this policy, or a request about your own data: email ${CONTACT_EMAIL}. Our mailing address: ${COMPANY_ADDRESS}`,
+      },
     ],
   },
 }

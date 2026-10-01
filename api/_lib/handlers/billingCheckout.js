@@ -9,12 +9,17 @@ import { limit, LIMITS } from '../ratelimit.js'
 /**
  * Starts a subscription checkout.
  *
- * POST { userId, email, tier, billingCycle, organizationId?, returnUrl }
+ * POST { userId, email, tier, billingCycle, organizationId?, returnUrl, acceptedRenewalTerms }
  *   -> { authorizationUrl, reference }
  *
  * The amount is resolved server-side from the tier/cycle (see _lib/plans.js);
  * the client never supplies a price. A pending row is written to
  * `transactions` first so an abandoned or failed payment is still auditable.
+ *
+ * `acceptedRenewalTerms` must be `true` — the renewal-disclosure checkbox on
+ * the pricing page, required (California's Automatic Renewal Law) before any
+ * paid checkout starts — and its timestamp is kept on the transaction row as
+ * the record that it was shown and agreed to for that specific charge.
  */
 export default async function handler(req, res) {
   await withErrorHandling(res, async () => {
@@ -28,9 +33,16 @@ export default async function handler(req, res) {
 
     const userId = user.id
     const email = user.email
-    const { tier, billingCycle, organizationId, returnUrl } = req.body || {}
+    const { tier, billingCycle, organizationId, returnUrl, acceptedRenewalTerms } = req.body || {}
     if (!TIERS.includes(tier)) return send(res, 400, { error: `tier must be one of ${TIERS.join(', ')}` })
     if (!CYCLES.includes(billingCycle)) return send(res, 400, { error: `billingCycle must be one of ${CYCLES.join(', ')}` })
+    // California's Automatic Renewal Law: the renewal terms have to be shown
+    // and separately agreed to before the charge, not just before clicking
+    // Subscribe. Checked here, not just required in the client UI, so this
+    // can't be skipped by calling the endpoint directly.
+    if (acceptedRenewalTerms !== true) {
+      return send(res, 400, { error: 'The renewal terms need to be acknowledged before starting checkout.' })
+    }
 
     // Only a team's owner/admin may buy a plan on the team's behalf.
     if (organizationId) {
@@ -49,8 +61,8 @@ export default async function handler(req, res) {
     const reference = `rtcl_${crypto.randomBytes(12).toString('hex')}`
 
     await sql`
-      INSERT INTO transactions (reference, user_id, organization_id, tier, billing_cycle, amount_minor, currency)
-      VALUES (${reference}, ${userId}, ${organizationId || null}, ${tier}, ${billingCycle}, ${amountMinor}, ${currency})
+      INSERT INTO transactions (reference, user_id, organization_id, tier, billing_cycle, amount_minor, currency, renewal_terms_accepted_at)
+      VALUES (${reference}, ${userId}, ${organizationId || null}, ${tier}, ${billingCycle}, ${amountMinor}, ${currency}, now())
     `
 
     const origin = req.headers.origin || `https://${req.headers.host}`

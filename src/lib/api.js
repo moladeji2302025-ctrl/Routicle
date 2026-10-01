@@ -40,7 +40,12 @@ async function request(path, options = {}) {
   }
   const body = await res.json()
   if (!res.ok) {
-    throw new Error(body?.error || `Request to ${path} failed (${res.status})`)
+    const err = new Error(body?.error || `Request to ${path} failed (${res.status})`)
+    // Some endpoints send extra structured fields alongside `error` (e.g.
+    // `underAge`) that a caller needs to branch on — carried onto the thrown
+    // Error rather than lost, without disturbing anywhere that only reads `.message`.
+    if (body && typeof body === 'object') Object.assign(err, body)
+    throw err
   }
   return body
 }
@@ -224,8 +229,9 @@ export function fetchOnboarding() {
   return request('/account/onboarding')
 }
 
-export function markOnboardingDone() {
-  return request('/account/onboarding', { method: 'POST', body: '{}' })
+/** dateOfBirth is required server-side — see api/account/[action].js's COPPA age check. */
+export function markOnboardingDone(dateOfBirth) {
+  return request('/account/onboarding', { method: 'POST', body: JSON.stringify({ dateOfBirth }) })
 }
 
 /** Asks for the welcome email. Safe to repeat: the server sends it once. */
@@ -680,10 +686,10 @@ export function removeFolderItem({ folderId, contentItemId }) {
 /* ---- Billing (Paystack) ---- */
 
 /** Starts a checkout; returns the hosted Paystack URL to send the buyer to. */
-export function startCheckout({ userId, email, tier, billingCycle, organizationId, returnUrl }) {
+export function startCheckout({ userId, email, tier, billingCycle, organizationId, returnUrl, acceptedRenewalTerms }) {
   return request('/billing/checkout', {
     method: 'POST',
-    body: JSON.stringify({ userId, email, tier, billingCycle, organizationId, returnUrl }),
+    body: JSON.stringify({ userId, email, tier, billingCycle, organizationId, returnUrl, acceptedRenewalTerms }),
   })
 }
 
