@@ -2995,6 +2995,36 @@ a:hover {
   color: var(--text-muted);
 }
 
+.auth-password-wrap {
+  position: relative;
+  display: flex;
+}
+
+.auth-password-wrap input {
+  width: 100%;
+  padding-right: 42px !important;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  border: none;
+  background: none;
+  color: oklch(0.55 0.006 90);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.auth-password-toggle:hover {
+  color: oklch(0.3 0.006 90);
+}
+
 .auth-field input,
 .auth-field select,
 .auth-field textarea {
